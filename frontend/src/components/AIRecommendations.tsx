@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, ArrowUpRight, ShoppingBag, Heart, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { AddToCartButton } from './AddToCartButton';
 
 interface AIRecommendationsProps {
   currentCategory?: string;
@@ -12,7 +13,7 @@ interface AIRecommendationsProps {
 const AI_RECOMMENDED_ITEMS = [
   {
     id: 'prod-saree-001',
-    name: 'EVAN COLLECTIONS Royal Crimson Banarasi Silk Saree',
+    name: 'Royal Crimson Banarasi Silk Saree by EVAN COLLECTIONS',
     price: 9999,
     matchScore: 98,
     reason: 'Perfect Color & Border Contrast',
@@ -21,7 +22,7 @@ const AI_RECOMMENDED_ITEMS = [
   },
   {
     id: 'prod-saree-002',
-    name: 'EVAN COLLECTIONS Mustard Gold Kanchipuram Silk Saree',
+    name: 'Mustard Gold Kanchipuram Silk Saree by EVAN COLLECTIONS',
     price: 14999,
     matchScore: 95,
     reason: 'Recommended Heirloom Weave',
@@ -30,7 +31,7 @@ const AI_RECOMMENDED_ITEMS = [
   },
   {
     id: 'prod-saree-003',
-    name: 'EVAN COLLECTIONS Pastel Floral Organza Designer Saree',
+    name: 'Pastel Floral Organza Designer Saree by EVAN COLLECTIONS',
     price: 6999,
     matchScore: 94,
     reason: 'Matching Party Wear Drape',
@@ -111,22 +112,16 @@ export const AIRecommendations: React.FC<AIRecommendationsProps> = ({
               <span className="text-sm font-bold text-amber-400 font-mono">₹{item.price.toLocaleString('en-IN')}</span>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    const productObj: any = {
-                      _id: item.id,
-                      name: item.name,
-                      price: item.price,
-                      images: [item.image],
-                      category: item.category,
-                      stock: 50
-                    };
-                    addToCart(productObj, 'Free Size', 'Royal Red', 1);
-                  }}
-                  className="p-2.5 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl text-xs flex items-center gap-1.5 transition shadow-md"
-                >
-                  <ShoppingBag className="w-3.5 h-3.5" /> Quick Add
-                </button>
+                <AddToCartButton
+                  product={{
+                    _id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    images: [item.image],
+                    category: item.category,
+                    stock: 50,
+                  } as any}
+                />
               </div>
             </div>
           </motion.div>

@@ -181,7 +181,7 @@ const HomepageCMSSchema = new Schema<IHomepageCMS>(
       scrolling: { type: Boolean, default: true },
       bgColor: { type: String, default: '#7f1d1d' },
       textColor: { type: String, default: '#fcd34d' },
-      enabled: { type: Boolean, default: true },
+      enabled: { type: Boolean, default: false },
     },
     heroBanner: {
       desktopImage: { type: String, default: '/images/saree_banarasi_red.png' },

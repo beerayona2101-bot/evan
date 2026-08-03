@@ -4,6 +4,7 @@ import { Heart, Star, ShoppingBag } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { AddToCartButton } from './AddToCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -82,13 +83,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className="text-red-800 text-xs font-black">₹{displayPrice.toLocaleString('en-IN')}</span>
         </div>
 
-        {/* Quick Add Button */}
-        <button
-          onClick={() => addToCart(product, 'Free Size', product.colors[0] || 'Royal Red')}
-          className="w-full mt-1.5 py-1 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-md text-[9px] font-black uppercase tracking-wider transition-all shadow flex items-center justify-center gap-1"
-        >
-          <ShoppingBag className="w-2.5 h-2.5" /> ADD TO BAG
-        </button>
+        {/* Quick Add Button with Dynamic Quantity Control */}
+        <AddToCartButton product={product} />
       </div>
     </div>
   );

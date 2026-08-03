@@ -7,7 +7,9 @@
     "dev": "npx concurrently \"npm run server\" \"npm run client\"",
     "server": "npm --prefix backend run dev",
     "client": "npm --prefix frontend run dev",
-    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "start": "node backend/dist/server.js",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
   },
   "keywords": [
     "mern",

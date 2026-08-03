@@ -27,6 +27,8 @@ interface CartContextType {
   openCartDrawer: () => void;
   closeCartDrawer: () => void;
   toggleCartDrawer: () => void;
+  getItemQuantityInCart: (productId: string, size?: string, color?: string) => number;
+  updateCartItemQuantityByProductId: (product: Product, newQuantity: number, size?: string, color?: string) => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -314,6 +316,41 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const totalSavings = itemDiscount + couponDiscount;
   const totalItemsCount = validCartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
 
+  const getItemQuantityInCart = (productId: string, size?: string, color?: string): number => {
+    if (!productId || !cartItems.length) return 0;
+    const matchingItems = cartItems.filter((i) => {
+      if (!i || !i.product || i.product._id !== productId) return false;
+      if (size && i.size !== size) return false;
+      if (color && i.color !== color) return false;
+      return true;
+    });
+    return matchingItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  };
+
+  const updateCartItemQuantityByProductId = async (
+    product: Product,
+    newQuantity: number,
+    size: string = 'Free Size',
+    color: string = 'Royal Red'
+  ) => {
+    if (!product || !product._id) return;
+    const effectiveColor = product.colors && product.colors.length > 0 ? product.colors[0] : color;
+
+    const existingIndex = cartItems.findIndex(
+      (item) => item && item.product && item.product._id === product._id && (size ? item.size === size : true)
+    );
+
+    if (existingIndex > -1) {
+      if (newQuantity <= 0) {
+        await removeFromCart(existingIndex);
+      } else {
+        await updateQuantity(existingIndex, newQuantity);
+      }
+    } else if (newQuantity > 0) {
+      await addToCart(product, size, effectiveColor, newQuantity);
+    }
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -339,6 +376,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         openCartDrawer,
         closeCartDrawer,
         toggleCartDrawer,
+        getItemQuantityInCart,
+        updateCartItemQuantityByProductId,
       }}
     >
       {children}

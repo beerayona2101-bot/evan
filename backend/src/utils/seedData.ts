@@ -20,18 +20,18 @@ const LOCAL_UNIQUE_SAREE_IMAGES = [
   '/images/saree_organza_floral.png',
   '/images/saree_linen_beige.png',
   '/images/saree_paithani_green.png',
+  '/images/saree_banarasi_purple.png',
+  '/images/saree_chanderi_pastel.png',
+  '/images/saree_bandhani_royal_maroon.png',
+  '/images/saree_kanchipuram_crimson.png',
+  '/images/saree_organza_pink.png',
+  '/images/saree_bridal_trousseau.png',
 ];
 
 // Helper to generate a completely unique, non-duplicative authentic Indian Saree image URL for every item
 const getUniqueSareeImage = (index: number, variant: string = 'main'): string => {
-  if (variant === 'category') {
-    return LOCAL_UNIQUE_SAREE_IMAGES[(index - 1) % LOCAL_UNIQUE_SAREE_IMAGES.length];
-  }
-  if (index <= 5 && variant === 'main') {
-    return LOCAL_UNIQUE_SAREE_IMAGES[(index - 1) % LOCAL_UNIQUE_SAREE_IMAGES.length];
-  }
-  const photoId = PURE_SAREE_PHOTO_IDS[(index - 1) % PURE_SAREE_PHOTO_IDS.length];
-  return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=800&q=80&sig=evan-saree-unique-${index}-${variant}`;
+  const localIndex = (index - 1 + (variant === 'hover' ? 1 : variant === 'angle1' ? 2 : variant === 'angle2' ? 3 : 0)) % LOCAL_UNIQUE_SAREE_IMAGES.length;
+  return LOCAL_UNIQUE_SAREE_IMAGES[localIndex];
 };
 
 const SAREE_CATEGORIES_20 = [
@@ -145,6 +145,34 @@ export const seedDatabase = async (): Promise<void> => {
     const productsToCreate: any[] = [];
     let globalIdCounter = 1;
 
+    const LUXURY_DESCRIPTORS = [
+      'Royal Heirloom',
+      'Opulent Zari',
+      'Pure Handloom',
+      'Classic Temple',
+      'Artisanal Brocade',
+      'Lustrous Zardozi',
+      'Heritage Festive',
+      'Grand Celebration',
+      'Regal Velvet',
+      'Intricate Floral',
+      'Traditional Meenakari',
+      'Shimmering Silver',
+      'Golden Tissue',
+      'Dual Tone',
+      'Heavy Pallu',
+      'Vintage Royal',
+      'Korvai Border',
+      'Kadwa Weave',
+      'Bridal Trousseau',
+      'Festive Glamour',
+      'Hand-Dyed',
+      'Embroidered Luxury',
+      'Elegance Atelier',
+      'Artisan Weave',
+      'Pure Mulberry'
+    ];
+
     for (let c = 0; c < SAREE_CATEGORIES_20.length; c++) {
       const catName = SAREE_CATEGORIES_20[c];
       const catId = categoryMap[catName];
@@ -152,7 +180,9 @@ export const seedDatabase = async (): Promise<void> => {
 
       // Generate 25 unique sarees per category = 500 total products!
       for (let p = 1; p <= 25; p++) {
-        const title = `EVAN COLLECTIONS ${catName} Royal Heirloom Saree Vol.${p}`;
+        const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
+        const descriptor = LUXURY_DESCRIPTORS[(p - 1) % LUXURY_DESCRIPTORS.length];
+        const title = `${descriptor} ${cleanCatName} Saree by EVAN COLLECTIONS`;
         const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
         const discountPrice = Math.round(basePrice * 0.84);
         const mrp = Math.round(basePrice * 1.28);

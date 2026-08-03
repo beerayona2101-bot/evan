@@ -54,10 +54,12 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
         {/* Company Bio */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-red-700 flex items-center justify-center shadow border border-amber-400">
-              <span className="font-black text-amber-300 text-xs">E</span>
-            </div>
+          <div className="flex items-center space-x-2.5">
+            <img
+              src="/favicon.png"
+              alt="EVAN COLLECTIONS Logo"
+              className="w-10 h-10 rounded-full object-cover shadow border border-amber-400"
+            />
             <span className="font-street text-3xl font-black text-white">EVAN COLLECTIONS</span>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed font-medium max-w-sm">

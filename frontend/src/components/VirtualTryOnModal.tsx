@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, X, Sparkles, Shirt, Check, RotateCcw, ShoppingBag, Layers, Sun } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { AddToCartButton } from './AddToCartButton';
 
 interface VirtualTryOnModalProps {
   isOpen: boolean;
@@ -185,20 +186,18 @@ export const VirtualTryOnModal: React.FC<VirtualTryOnModalProps> = ({
                 </div>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                className="w-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition"
-              >
-                {isAdded ? (
-                  <>
-                    <Check className="w-4 h-4" /> Added To Luxury Bag!
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" /> Add Outfit To Cart (${product.price})
-                  </>
-                )}
-              </button>
+              <AddToCartButton
+                product={{
+                  _id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  images: [product.image],
+                  category: product.category || 'Silk',
+                  stock: 50,
+                } as any}
+                size={selectedSize}
+                variant="full"
+              />
             </div>
           </div>
         </motion.div>

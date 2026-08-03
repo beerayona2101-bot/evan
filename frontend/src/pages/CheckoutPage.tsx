@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
-import { MapPin, ShieldCheck, CreditCard, Smartphone, Banknote, Building2, Trash2, AlertTriangle } from 'lucide-react';
+import { MapPin, ShieldCheck, CreditCard, Smartphone, Banknote, Building2, Trash2, AlertTriangle, ArrowLeft, X } from 'lucide-react';
 
 export const CheckoutPage: React.FC = () => {
   const { cartItems, removeFromCart, updateQuantity, subtotal, tax, total, clearCart } = useCart();
@@ -463,7 +463,28 @@ export const CheckoutPage: React.FC = () => {
         {/* Sample Razorpay Payment Successful Modal Overlay */}
         {paymentSuccessModal && (
           <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-amber-300 shadow-2xl text-center space-y-5 animate-fadeIn">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-amber-300 shadow-2xl text-center space-y-5 animate-fadeIn relative">
+              
+              {/* Back Arrow & Close Header */}
+              <div className="flex items-center justify-between w-full border-b border-amber-100 pb-3">
+                <button
+                  onClick={() => setPaymentSuccessModal(null)}
+                  className="flex items-center gap-1.5 text-slate-700 hover:text-red-800 text-xs font-black uppercase tracking-wider transition-colors px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200"
+                  title="Go Back to Checkout"
+                >
+                  <ArrowLeft className="w-4 h-4 text-red-800" />
+                  <span>Back</span>
+                </button>
+
+                <button
+                  onClick={() => setPaymentSuccessModal(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-700 flex items-center justify-center transition-colors"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
               <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border border-emerald-300">
                 <ShieldCheck className="w-8 h-8 text-emerald-600" />
               </div>

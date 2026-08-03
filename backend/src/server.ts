@@ -62,6 +62,21 @@ app.use('/api/homepage', homepageRoutes);
 app.use('/api/analytics', revenueRoutes);
 app.use('/api/settings', settingsRoutes);
 
+// Production static file serving for unified deployment
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDistPath));
+
+app.get('*', (req: Request, res: Response, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.resolve(frontendDistPath, 'index.html'), (err) => {
+    if (err) {
+      next();
+    }
+  });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 

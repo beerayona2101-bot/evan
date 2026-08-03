@@ -704,7 +704,7 @@ export const AdminDashboardPage: React.FC = () => {
   // AI Generator
   const handleGenerateAiProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    const generatedTitle = `EVAN COLLECTIONS ${aiInputs.color} ${aiInputs.category} Vol.${Math.floor(100 + Math.random() * 900)}`;
+    const generatedTitle = `${aiInputs.color} ${aiInputs.category} Vol.${Math.floor(100 + Math.random() * 900)} by EVAN COLLECTIONS`;
     const generatedDesc = `Handcrafted ${aiInputs.color.toLowerCase()} ${aiInputs.category.toLowerCase()} woven from pure ${aiInputs.fabric.toLowerCase()} for ${aiInputs.occasion.toLowerCase()}. Features heavy gold zari brocade, unstitched blouse piece (0.8m), and silk mark hallmark.`;
     const price = 12999 + Math.floor(Math.random() * 8000);
     const uniqueAiImage = generateUniqueSareeImage(aiInputs.category, aiInputs.color);
@@ -808,9 +808,11 @@ export const AdminDashboardPage: React.FC = () => {
       <aside className="w-64 bg-slate-900 text-white min-h-screen p-6 hidden md:flex flex-col justify-between border-r border-amber-500/20 sticky top-0 h-screen shadow-2xl z-30">
         <div className="space-y-6">
           <Link to="/" className="flex items-center space-x-3 pt-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-700 to-red-900 flex items-center justify-center shadow border border-amber-300">
-              <span className="font-black text-amber-300 text-sm">E</span>
-            </div>
+            <img
+              src="/favicon.png"
+              alt="EVAN COLLECTIONS Logo"
+              className="w-9 h-9 rounded-full object-cover shadow border border-amber-300"
+            />
             <div className="flex flex-col leading-none">
               <span className="font-street text-2xl font-black tracking-wider text-amber-300">EVAN</span>
               <span className="text-[7.5px] uppercase tracking-[0.25em] font-extrabold text-amber-500">ADMIN ATELIER</span>
@@ -820,99 +822,88 @@ export const AdminDashboardPage: React.FC = () => {
           <nav className="space-y-1 text-xs font-extrabold uppercase tracking-wider max-h-[75vh] overflow-y-auto no-scrollbar pr-1">
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'analytics' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <BarChart3 className="w-4 h-4 text-amber-400" /> Analytics & Reports
             </button>
 
             <button
               onClick={() => setActiveTab('products')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'products' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'products' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <Package className="w-4 h-4 text-amber-400" /> Saree Inventory
             </button>
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'orders' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <ShoppingBag className="w-4 h-4 text-amber-400" /> Customer Orders ({orders.length})
             </button>
 
             <button
               onClick={() => setActiveTab('categories')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'categories' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'categories' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <Tag className="w-4 h-4 text-amber-400" /> Categories & Weaves
             </button>
 
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'inventory' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inventory' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <AlertTriangle className="w-4 h-4 text-amber-400" /> Stock & Warehouse
             </button>
 
             <button
               onClick={() => setActiveTab('customers')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'customers' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'customers' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <Users className="w-4 h-4 text-amber-400" /> Customer CRM
             </button>
 
             <button
               onClick={() => setActiveTab('coupons')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'coupons' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'coupons' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <Sparkles className="w-4 h-4 text-amber-400" /> Coupons & Offers
             </button>
 
             <button
               onClick={() => setActiveTab('ai-generator')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'ai-generator' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'ai-generator' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <Bot className="w-4 h-4 text-amber-400" /> AI Saree Generator
             </button>
 
             <button
               onClick={() => setActiveTab('financials')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'financials' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'financials' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <DollarSign className="w-4 h-4 text-amber-400" /> Earnings & Taxes
             </button>
 
             <button
               onClick={() => setActiveTab('homepage-editor')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'homepage-editor' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'homepage-editor' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <LayoutDashboard className="w-4 h-4 text-amber-400" /> Homepage Editor
             </button>
 
             <button
               onClick={() => setActiveTab('settings')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                activeTab === 'settings' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <MessageSquare className="w-4 h-4 text-amber-400" /> Settings & Contact
             </button>
@@ -1175,9 +1166,8 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
                           <td className="p-4">
                             <span
-                              className={`px-2.5 py-1 text-xs font-black rounded-full ${
-                                prod.stock > 10 ? 'bg-amber-100 text-slate-900' : 'bg-red-100 text-red-800'
-                              }`}
+                              className={`px-2.5 py-1 text-xs font-black rounded-full ${prod.stock > 10 ? 'bg-amber-100 text-slate-900' : 'bg-red-100 text-red-800'
+                                }`}
                             >
                               {prod.stock > 0 ? `${prod.stock} Units` : 'OUT OF STOCK'}
                             </span>
@@ -1362,13 +1352,12 @@ export const AdminDashboardPage: React.FC = () => {
               {filteredDbCategories.map((cat) => (
                 <div
                   key={cat._id}
-                  className={`relative rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between space-y-4 shadow-md hover:shadow-xl ${
-                    cat.status === 'ARCHIVED'
-                      ? 'bg-red-50/40 border-red-200'
-                      : cat.isLive
+                  className={`relative rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between space-y-4 shadow-md hover:shadow-xl ${cat.status === 'ARCHIVED'
+                    ? 'bg-red-50/40 border-red-200'
+                    : cat.isLive
                       ? 'bg-amber-50/40 border-amber-200 hover:border-amber-400'
                       : 'bg-slate-100/60 border-slate-300'
-                  }`}
+                    }`}
                 >
                   <div className="space-y-3">
                     <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-amber-300/60 shadow">
@@ -1381,24 +1370,22 @@ export const AdminDashboardPage: React.FC = () => {
                       {/* Status & Live Badges */}
                       <div className="absolute top-3 left-3 flex items-center gap-1.5">
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow border ${
-                            cat.status === 'ACTIVE'
-                              ? 'bg-emerald-800 text-amber-300 border-emerald-400'
-                              : cat.status === 'INACTIVE'
+                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow border ${cat.status === 'ACTIVE'
+                            ? 'bg-emerald-800 text-amber-300 border-emerald-400'
+                            : cat.status === 'INACTIVE'
                               ? 'bg-amber-800 text-amber-100 border-amber-400'
                               : 'bg-red-800 text-amber-200 border-red-400'
-                          }`}
+                            }`}
                         >
                           {cat.status}
                         </span>
 
                         <button
                           onClick={() => handleToggleDbCategoryLive(cat)}
-                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow transition-all ${
-                            cat.isLive
-                              ? 'bg-red-800 text-amber-300 hover:bg-red-900 border border-amber-300'
-                              : 'bg-slate-800 text-slate-300 hover:bg-slate-900'
-                          }`}
+                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow transition-all ${cat.isLive
+                            ? 'bg-red-800 text-amber-300 hover:bg-red-900 border border-amber-300'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-900'
+                            }`}
                           title="Click to toggle Live/Offline"
                         >
                           {cat.isLive ? '● LIVE' : '○ OFFLINE'}
@@ -1409,9 +1396,8 @@ export const AdminDashboardPage: React.FC = () => {
                       <div className="absolute top-3 right-3 flex items-center gap-1.5">
                         <button
                           onClick={() => handleToggleDbCategoryFeatured(cat)}
-                          className={`p-1.5 rounded-full shadow transition-all ${
-                            cat.featured ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-slate-900/60 text-slate-300 hover:text-amber-300'
-                          }`}
+                          className={`p-1.5 rounded-full shadow transition-all ${cat.featured ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-slate-900/60 text-slate-300 hover:text-amber-300'
+                            }`}
                           title="Toggle Featured Category"
                         >
                           <Star className="w-3.5 h-3.5 fill-current" />

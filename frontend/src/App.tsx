@@ -75,6 +75,7 @@ const AppContent: React.FC = () => {
         </Suspense>
       </main>
       {!hideFooter && <Footer />}
+      <WhatsAppButton />
       <ToastContainer />
     </div>
   );

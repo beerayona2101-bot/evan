@@ -19,9 +19,9 @@ export const Navbar: React.FC = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 py-1 px-3 sm:px-6 bg-amber-50/70 backdrop-blur-md border-b border-amber-200/60 font-sans">
-      {/* EVAN COLLECTIONS Ultra-Compact Pill Navbar with Gold Border Accent */}
-      <div className="max-w-7xl mx-auto bg-white/95 backdrop-blur-xl text-slate-900 rounded-full px-4 py-1.5 border border-amber-300/80 shadow-[0_4px_15px_rgba(107,29,47,0.06)] flex items-center justify-between transition-all">
+    <header className="sticky top-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-2.5 px-4 sm:px-8 shadow-sm mb-1">
+      {/* EVAN COLLECTIONS Seamless Header */}
+      <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
         {/* Mobile menu button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -31,15 +31,17 @@ export const Navbar: React.FC = () => {
         </button>
 
         {/* Brand Logo: EVAN COLLECTIONS */}
-        <Link to="/" className="flex items-center space-x-1.5">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-red-700 to-red-900 flex items-center justify-center shadow-md border border-amber-300">
-            <span className="font-black text-amber-300 text-[11px]">E</span>
-          </div>
+        <Link to="/" className="flex items-center space-x-2">
+          <img
+            src="/favicon.png"
+            alt="EVAN COLLECTIONS Logo"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm border border-amber-300/80 hover:scale-105 transition-transform"
+          />
           <div className="flex flex-col leading-none">
-            <span className="font-street text-lg font-black tracking-wider text-slate-900 hover:text-red-700 transition-colors">
+            <span className="font-street text-lg sm:text-xl font-black tracking-wider text-slate-900 hover:text-red-700 transition-colors">
               EVAN
             </span>
-            <span className="text-[6.5px] uppercase tracking-[0.2em] font-extrabold text-amber-700">
+            <span className="text-[7px] uppercase tracking-[0.2em] font-extrabold text-amber-700">
               COLLECTIONS
             </span>
           </div>

@@ -34,9 +34,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Dynamic import of socket.io-client for code-splitting & performance optimization
       const { io } = await import('socket.io-client');
 
-      const serverUrl = window.location.origin.includes('localhost')
-        ? 'http://localhost:5000'
-        : '/';
+      const serverUrl = import.meta.env.VITE_SOCKET_URL || (
+        window.location.origin.includes('localhost')
+          ? 'http://localhost:5000'
+          : '/'
+      );
 
       const socketInstance = io(serverUrl, {
         transports: ['websocket', 'polling'],

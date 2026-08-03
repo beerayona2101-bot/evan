@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import { AddToCartButton } from '../components/AddToCartButton';
 
 export const WishlistPage: React.FC = () => {
   const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
@@ -103,12 +104,7 @@ export const WishlistPage: React.FC = () => {
                     ₹{displayPrice.toLocaleString('en-IN')}
                   </div>
 
-                  <button
-                    onClick={() => handleMoveToCart(product)}
-                    className="w-full py-2.5 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" /> Move to Bag
-                  </button>
+                  <AddToCartButton product={product} className="py-2 text-xs" />
                 </div>
               </div>
             );

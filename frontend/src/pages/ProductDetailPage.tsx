@@ -8,6 +8,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { AISizeCalculator } from '../components/AISizeCalculator';
 import { VirtualTryOnModal } from '../components/VirtualTryOnModal';
 import { AIRecommendations } from '../components/AIRecommendations';
+import { AddToCartButton } from '../components/AddToCartButton';
 import { reviewApi } from '../services/reviewApi';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/ToastContainer';
@@ -19,7 +20,7 @@ export const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string>('');
-  const [selectedSize, setSelectedSize] = useState<string>('L');
+  const [selectedColor, setSelectedColor] = useState<string>('Royal Crimson Red & Gold');
   const [activeTab, setActiveTab] = useState<'specs' | 'reviews' | 'care'>('specs');
   
   // Reviews state
@@ -48,6 +49,9 @@ export const ProductDetailPage: React.FC = () => {
         setProduct(res.data);
         if (res.data.images && res.data.images.length > 0) {
           setSelectedImage(res.data.images[0]);
+        }
+        if (res.data.colors && res.data.colors.length > 0) {
+          setSelectedColor(res.data.colors[0]);
         }
       })
       .catch(() => {})
@@ -239,60 +243,53 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Size Selection with AI Fit Trigger */}
-            <div className="space-y-1 py-1">
+            {/* Color Selection (Replacing clothing sizes with Saree Color Options) */}
+            <div className="space-y-2 py-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Select Size:</span>
-                <button
-                  onClick={() => setIsSizeCalcOpen(true)}
-                  className="text-[11px] font-extrabold text-amber-700 hover:text-red-800 flex items-center gap-1 transition"
-                >
-                  <Sparkles className="w-3 h-3 text-amber-500" /> Find My AI Size <Ruler className="w-3 h-3" />
-                </button>
-              </div>
-
-              <div className="flex gap-2">
-                {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-3 py-1 rounded-xl text-xs font-mono font-black border transition ${
-                      selectedSize === size
-                        ? 'bg-slate-900 text-amber-300 border-slate-900 shadow-md'
-                        : 'bg-white text-slate-700 border-amber-200 hover:border-amber-400'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Virtual Try-On Banner */}
-            <div className="bg-gradient-to-r from-slate-900 via-zinc-900 to-black p-3 rounded-2xl border border-amber-500/40 text-zinc-100 flex items-center justify-between shadow-lg">
-              <div className="space-y-0.5">
-                <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Virtual Fitting Room
+                <span className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Available Colors:</span>
+                  <span className="text-amber-800 font-bold normal-case font-sans">({selectedColor})</span>
                 </span>
-                <p className="text-xs font-bold">Preview on 3D Model Avatars</p>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                  In Stock & Ready to Ship
+                </span>
               </div>
 
-              <button
-                onClick={() => setIsTryOnOpen(true)}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:brightness-110 text-black font-extrabold text-xs rounded-xl flex items-center gap-1 shadow transition"
-              >
-                <Eye className="w-3.5 h-3.5" /> 3D Virtual Try-On
-              </button>
+              <div className="flex flex-wrap gap-2">
+                {((product?.colors && product.colors.length > 0) ? product.colors : ['Royal Crimson Red', 'Pure Gold', 'Emerald Green', 'Royal Purple']).map((colorName) => {
+                  const isSelected = selectedColor === colorName;
+                  let dotBg = 'bg-red-700';
+                  if (colorName.toLowerCase().includes('gold') || colorName.toLowerCase().includes('mustard')) dotBg = 'bg-amber-400';
+                  else if (colorName.toLowerCase().includes('green') || colorName.toLowerCase().includes('emerald') || colorName.toLowerCase().includes('mint')) dotBg = 'bg-emerald-700';
+                  else if (colorName.toLowerCase().includes('purple')) dotBg = 'bg-purple-800';
+                  else if (colorName.toLowerCase().includes('pink') || colorName.toLowerCase().includes('blush')) dotBg = 'bg-pink-400';
+                  else if (colorName.toLowerCase().includes('beige') || colorName.toLowerCase().includes('linen')) dotBg = 'bg-amber-200';
+                  else if (colorName.toLowerCase().includes('blue')) dotBg = 'bg-blue-800';
+
+                  return (
+                    <button
+                      key={colorName}
+                      onClick={() => setSelectedColor(colorName)}
+                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                        isSelected
+                          ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/30 scale-[1.02]'
+                          : 'bg-white text-slate-800 border-amber-200 hover:border-amber-400 hover:bg-amber-50/50'
+                      }`}
+                    >
+                      <span className={`w-3.5 h-3.5 rounded-full ${dotBg} border border-white/60 shadow-sm flex-shrink-0`} />
+                      <span>{colorName}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 ml-0.5" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
+
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-              <button
-                onClick={() => addToCart(product, selectedSize, product.colors[0] || 'Onyx')}
-                className="w-full sm:flex-1 py-3 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="w-4 h-4" /> ADD TO BAG ({selectedSize})
-              </button>
+              <AddToCartButton product={product} size={selectedColor} variant="full" className="w-full sm:flex-1" />
               <button
                 onClick={handleBuyNow}
                 className="w-full sm:flex-1 py-3 bg-red-800 hover:bg-red-900 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg border border-amber-300"
@@ -446,7 +443,7 @@ export const ProductDetailPage: React.FC = () => {
           onClose={() => setIsSizeCalcOpen(false)}
           productTitle={product.name}
           category={product.category}
-          onSelectSize={(size) => setSelectedSize(size)}
+          onSelectSize={(color) => setSelectedColor(color)}
         />
 
         <VirtualTryOnModal
