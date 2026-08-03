@@ -4,14 +4,37 @@ frontend/node_modules/
 backend/node_modules/
 backend/dist/
 frontend/.vite/
+.vite/
 
-# Environment files
+# Environment & Secret files
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.env
+*.pem
 
-# Build & Logs
+# Build & Compiled artifacts
 dist/
 build/
+out/
+.next/
+*.tsbuildinfo
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# System & OS metadata
 .DS_Store
+Thumbs.db
 *.log
+logs/
+*.sys
