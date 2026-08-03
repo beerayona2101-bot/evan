@@ -1,0 +1,26 @@
+{
+  "name": "evan-mern-ecommerce",
+  "version": "1.0.0",
+  "description": "EVAN - Premium Men's Fashion E-Commerce MERN Stack Application",
+  "main": "backend/dist/server.js",
+  "scripts": {
+    "dev": "npx concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix backend run dev",
+    "client": "npm --prefix frontend run dev",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+  },
+  "keywords": [
+    "mern",
+    "ecommerce",
+    "fashion",
+    "t-shirts",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "EVAN",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

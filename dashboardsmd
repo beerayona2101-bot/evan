@@ -1,0 +1,890 @@
+Overall Architecture
+Customer
+        ↓
+Website (React)
+        ↓
+Backend APIs (Express.js)
+        ↓
+MongoDB Database
+        ↓
+Admin Dashboard
+        ↓
+Shipping Partner
+        ↓
+Customer Delivery
+2. Customer Journey
+Landing Page
+
+↓
+
+Browse Categories
+
+↓
+
+Product Listing
+
+↓
+
+Product Details
+
+↓
+
+Wishlist / Cart
+
+↓
+
+Checkout
+
+↓
+
+Payment
+
+↓
+
+Order Confirmation
+
+↓
+
+Warehouse
+
+↓
+
+Shipping
+
+↓
+
+Delivery
+
+↓
+
+Review
+
+↓
+
+Return / Exchange (if needed)
+3. Customer Website Modules
+Home
+
+Shows
+
+Hero banners
+New arrivals
+Trending sarees
+Wedding collection
+Festival collection
+Featured products
+Best sellers
+Reviews
+Instagram feed
+Newsletter
+Categories
+
+Examples
+
+Silk Sarees
+
+Cotton Sarees
+
+Designer Sarees
+
+Wedding Sarees
+
+Party Wear
+
+Bridal
+
+Festival
+
+Handloom
+
+Banarasi
+
+Kanchipuram
+
+Each category loads products dynamically from MongoDB.
+
+Product Details
+
+Every saree contains
+
+8 Images
+
+Zoom
+
+Fabric
+
+Color
+
+Border
+
+Pattern
+
+Occasion
+
+Stock
+
+Delivery Date
+
+Return Policy
+
+Reviews
+
+Ratings
+
+Related Products
+
+Frequently Bought Together
+
+Wishlist
+
+Add to Cart
+
+Buy Now
+4. Wishlist Process
+Customer clicks ❤️
+
+↓
+
+Wishlist Collection
+
+↓
+
+MongoDB
+
+↓
+
+Wishlist Page
+
+↓
+
+Move to Cart
+
+↓
+
+Delete
+5. Cart Flow
+Add Product
+
+↓
+
+Cart
+
+↓
+
+Quantity
+
+↓
+
+Coupon
+
+↓
+
+Shipping
+
+↓
+
+GST
+
+↓
+
+Grand Total
+
+↓
+
+Checkout
+
+Everything updates automatically.
+
+6. Checkout
+
+Customer enters
+
+Address
+
+Phone
+
+Email
+
+Landmark
+
+PIN Code
+
+System checks
+
+Delivery Availability
+
+Shipping Charges
+
+Expected Delivery
+
+COD Availability
+7. Payment
+
+Methods
+
+UPI
+
+Google Pay
+
+PhonePe
+
+Paytm
+
+Cards
+
+Net Banking
+
+COD
+
+Payment Success
+
+↓
+
+Order Created
+
+↓
+
+Inventory Reduced
+
+↓
+
+Invoice Generated
+
+↓
+
+Email
+
+↓
+
+SMS
+
+↓
+
+WhatsApp
+
+8. Order Lifecycle
+Pending
+
+↓
+
+Confirmed
+
+↓
+
+Packed
+
+↓
+
+Ready To Ship
+
+↓
+
+Shipped
+
+↓
+
+Out For Delivery
+
+↓
+
+Delivered
+
+Customer sees timeline.
+
+9. Return Process
+Return Request
+
+↓
+
+Admin Review
+
+↓
+
+Pickup Scheduled
+
+↓
+
+Warehouse Received
+
+↓
+
+Quality Check
+
+↓
+
+Refund Approved
+
+↓
+
+Money Returned
+10. Customer Dashboard
+
+Contains
+
+Dashboard
+
+Orders
+
+Wishlist
+
+Addresses
+
+Coupons
+
+Notifications
+
+Reviews
+
+Returns
+
+Settings
+
+Wallet
+
+Support Tickets
+Order History
+
+Shows
+
+Product
+
+Invoice
+
+Tracking
+
+Payment
+
+Status
+
+Delivery
+
+Return
+
+Review
+Address Book
+Home
+
+Office
+
+Other
+
+Multiple addresses.
+
+Wishlist
+
+Saved products.
+
+Notifications
+Order
+
+Offer
+
+Discount
+
+Shipping
+
+Refund
+
+Coupon
+Reviews
+
+Customer can
+
+Give Stars
+
+Write Review
+
+Upload Photos
+
+Upload Videos
+11. Admin Dashboard
+
+No navbar.
+
+Professional Sidebar.
+
+Dashboard
+
+Analytics
+
+Reports
+
+Orders
+
+Customers
+
+Products
+
+Categories
+
+Collections
+
+Inventory
+
+Reviews
+
+Coupons
+
+Offers
+
+Marketing
+
+Media
+
+CMS
+
+Settings
+
+Users
+
+Roles
+
+Support
+
+Logout
+12. Dashboard Cards
+Today's Revenue
+
+Today's Orders
+
+Customers
+
+Products
+
+Inventory
+
+Refunds
+
+Profit
+
+Expenses
+
+Pending Orders
+
+Cancelled Orders
+
+Delivered Orders
+13. Analytics
+
+Charts
+
+Sales
+
+Revenue
+
+Visitors
+
+Orders
+
+Conversion
+
+Best Sellers
+
+Categories
+
+Traffic
+
+Devices
+
+Countries
+14. Products
+
+Every product
+
+Image
+
+Gallery
+
+Price
+
+Stock
+
+Category
+
+Collection
+
+SKU
+
+Barcode
+
+Description
+
+SEO
+
+Reviews
+
+Views
+
+Orders
+Product CRUD
+
+Admin
+
+Add
+
+Edit
+
+Delete
+
+Duplicate
+
+Archive
+
+Feature
+
+Trending
+
+Best Seller
+
+New Arrival
+15. Categories
+
+Admin manages
+
+Name
+
+Banner
+
+Description
+
+SEO
+
+Slug
+
+Visibility
+
+Products
+16. Collections
+
+Examples
+
+Wedding
+
+Bridal
+
+Silk
+
+Luxury
+
+Daily Wear
+
+Festival
+
+Office Wear
+
+Designer
+17. Inventory
+
+Shows
+
+Current Stock
+
+Low Stock
+
+Out Of Stock
+
+Warehouse
+
+Incoming Stock
+
+Reserved Stock
+18. Orders
+
+Admin sees
+
+Customer
+
+Address
+
+Payment
+
+Products
+
+Invoice
+
+Tracking
+
+Status
+
+Actions
+
+Confirm
+
+Pack
+
+Ship
+
+Cancel
+
+Refund
+
+Return
+
+Exchange
+19. Shipping
+
+Admin generates
+
+Invoice
+
+Shipping Label
+
+Tracking Number
+
+Courier Assignment
+20. Customers
+
+Admin sees
+
+Profile
+
+Orders
+
+Wishlist
+
+Addresses
+
+Coupons
+
+Reviews
+
+Lifetime Value
+21. Coupons
+Flat
+
+Percentage
+
+Festival
+
+First Order
+
+Limited Time
+22. Reviews
+
+Approve
+
+Reject
+
+Delete
+
+Reply
+
+Feature
+
+23. Media Library
+
+Stores
+
+Product Images
+
+Videos
+
+Banners
+
+Category Images
+
+Collection Images
+24. Reports
+
+Daily
+
+Weekly
+
+Monthly
+
+Yearly
+
+Exports
+
+Excel
+
+CSV
+
+PDF
+25. Earnings
+
+Shows
+
+Revenue
+
+Profit
+
+Taxes
+
+Refunds
+
+Shipping Income
+
+Coupon Cost
+
+Expenses
+26. Payouts
+
+If EVAN COLLECTIONS later supports multiple sellers or vendors, this section manages payments to them.
+
+Vendor Earnings
+
+Pending Amount
+
+Paid Amount
+
+Settlement Date
+
+Bank Account
+
+UPI
+
+Transaction History
+
+If you are the only seller, this page can instead summarize your business income and withdrawals.
+
+27. AI Product Generator
+
+Admin enters
+
+Category
+
+Fabric
+
+Color
+
+Occasion
+
+AI generates
+
+Product Name
+
+Description
+
+SEO
+
+Tags
+
+Specifications
+
+Wash Care
+28. AI Image Generator
+
+Admin enters
+
+Silk Saree
+
+Golden Border
+
+Wedding
+
+AI creates prompt
+
+↓
+
+Images
+
+↓
+
+Admin Reviews
+
+↓
+
+Publishes
+
+29. Contact Us
+Phone
+
+9490644434
+
+WhatsApp
+
+9490644434
+
+Email
+
+Address
+
+Business Hours
+
+Google Map
+
+Contact Form
+
+FAQ
+30. Notifications
+
+Customer receives
+
+Order Placed
+
+Payment Received
+
+Packed
+
+Shipped
+
+Delivered
+
+Offer
+
+Coupon
+
+Refund
+
+Through
+
+Email
+
+SMS
+
+WhatsApp
+
+Push Notification
+31. Security
+JWT
+
+RBAC (Role-Based Access Control)
+
+Password Hashing
+
+Audit Logs
+
+Secure Sessions
+
+Rate Limiting
+32. Production Flow
+Admin Adds Product
+        ↓
+MongoDB Stores Product
+        ↓
+Customer Browses Products
+        ↓
+Customer Adds to Cart
+        ↓
+Customer Pays
+        ↓
+Order Created
+        ↓
+Inventory Updated
+        ↓
+Warehouse Packs Order
+        ↓
+Courier Ships Order
+        ↓
+Tracking Updated
+        ↓
+Customer Receives Saree
+        ↓
+Customer Reviews Product
+        ↓
+Admin Sees Analytics
+Recommended Development Order
+Authentication & Roles
+Database Models
+Product & Category Management
+Search & Filters
+Wishlist & Cart
+Checkout & Payments
+Orders & Tracking
+Customer Dashboard
+Admin Dashboard
+Reports & Analytics
+Notifications
+AI Features
+Testing & Deployment
