@@ -160,39 +160,26 @@ export const RevenueDashboardPage: React.FC = () => {
 
       {/* ⚙️ Master Filter Toolbar */}
       <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-amber-800" />
-          <span className="font-black text-slate-900 uppercase">Period Filter:</span>
-        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* FIRST PLACE: Period Filter Pill Dropdown */}
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100/80 border-2 border-amber-400 rounded-full font-bold text-xs text-amber-900 shadow-sm outline-none cursor-pointer"
+          >
+            <option value="today">Today</option>
+            <option value="7days">Last 7 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="thisYear">This Year</option>
+          </select>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {[
-            { id: 'today', label: 'Today' },
-            { id: '7days', label: 'Last 7 Days' },
-            { id: '30days', label: 'Last 30 Days' },
-            { id: 'thisMonth', label: 'This Month' },
-            { id: 'lastMonth', label: 'Last Month' },
-            { id: 'thisYear', label: 'This Year' },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setPeriod(item.id)}
-              className={`px-3 py-1.5 rounded-xl font-bold uppercase transition-all ${
-                period === item.id
-                  ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40'
-                  : 'bg-amber-50 text-slate-700 hover:bg-amber-100'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3">
+          {/* Payment Methods Dropdown */}
           <select
             value={paymentMethodFilter}
             onChange={(e) => setPaymentMethodFilter(e.target.value)}
-            className="px-3 py-1.5 bg-amber-50 border border-amber-300 rounded-xl font-bold text-xs"
+            className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100/80 border-2 border-amber-400 rounded-full font-bold text-xs text-slate-900 shadow-sm outline-none cursor-pointer"
           >
             <option value="ALL">All Payment Methods</option>
             <option value="Razorpay">Razorpay / Online</option>
@@ -201,10 +188,11 @@ export const RevenueDashboardPage: React.FC = () => {
             <option value="Credit Card">Credit Card</option>
           </select>
 
+          {/* Order Statuses Dropdown */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 bg-amber-50 border border-amber-300 rounded-xl font-bold text-xs"
+            className="px-5 py-2.5 bg-amber-50 hover:bg-amber-100/80 border-2 border-amber-400 rounded-full font-bold text-xs text-slate-900 shadow-sm outline-none cursor-pointer"
           >
             <option value="ALL">All Order Statuses</option>
             <option value="Delivered">Delivered</option>
@@ -213,12 +201,16 @@ export const RevenueDashboardPage: React.FC = () => {
             <option value="Refunded">Refunded</option>
           </select>
         </div>
+
+        <div className="text-xs font-black text-slate-700 uppercase tracking-wide">
+          FILTER APPLIED: <span className="text-red-800">{period}</span>
+        </div>
       </div>
 
       {/* 🔔 Automated Financial Alerts */}
-      {alerts && alerts.length > 0 && (
+      {alerts && alerts.filter((al: any) => !al.title?.toLowerCase().includes('stock')).length > 0 && (
         <div className="space-y-2">
-          {alerts.map((al: any, idx: number) => (
+          {alerts.filter((al: any) => !al.title?.toLowerCase().includes('stock')).map((al: any, idx: number) => (
             <div
               key={idx}
               className={`p-4 rounded-2xl border flex items-center justify-between shadow-sm text-xs ${
@@ -241,93 +233,64 @@ export const RevenueDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* 💰 12 REVENUE CARDS GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* 💰 EXACT 5 METRIC CARDS IN SINGLE ROW */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         
-        {/* Card 1: Gross Revenue */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">GROSS REVENUE</span>
-          <span className="font-street text-3xl font-black text-slate-900">₹{revenueCards.grossRevenue.toLocaleString('en-IN')}</span>
-          <span className="text-emerald-700 text-[10px] font-bold block flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" /> Total Order Inflow
+        {/* Card 1: TOTAL EARNINGS */}
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
+          <span className="text-xs font-black text-amber-800 uppercase tracking-tight block leading-tight">
+            TOTAL EARNINGS
+          </span>
+          <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+            ₹{revenueCards.grossRevenue.toLocaleString('en-IN')}
+          </span>
+          <span className="text-emerald-700 text-[10px] font-bold block flex items-center gap-1 whitespace-nowrap">
+            <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" /> Order Inflow
           </span>
         </div>
 
-        {/* Card 2: Net Revenue */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">NET REVENUE</span>
-          <span className="font-street text-3xl font-black text-red-800">₹{revenueCards.netRevenue.toLocaleString('en-IN')}</span>
-          <span className="text-slate-500 text-[10px] font-bold block">After Refunds & Returns</span>
+        {/* Card 2: ESTIMATED NET PROFIT */}
+        <div className="bg-amber-50/60 p-4 sm:p-5 rounded-3xl border-2 border-emerald-600 shadow-md space-y-1">
+          <span className="text-xs font-black text-emerald-900 uppercase tracking-tight block leading-tight">
+            ESTIMATED NET PROFIT
+          </span>
+          <span className="font-street text-xl sm:text-2xl font-black text-emerald-800 block whitespace-nowrap">
+            ₹{(profitAndExpenses?.netProfit || Math.round(revenueCards.grossRevenue * 0.55)).toLocaleString('en-IN')}
+          </span>
+          <span className="text-emerald-800 text-[10px] font-bold block whitespace-nowrap">After COGS & Tax</span>
         </div>
 
-        {/* Card 3: Total Sales Count */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">TOTAL COMPLETED SALES</span>
-          <span className="font-street text-3xl font-black text-slate-900">{revenueCards.totalSales} Sales</span>
-          <span className="text-emerald-700 text-[10px] font-bold block">Delivered Sarees</span>
+        {/* Card 3: TOTAL COMPLETED SALES */}
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
+          <span className="text-xs font-black text-amber-800 uppercase tracking-tight block leading-tight">
+            TOTAL COMPLETED SALES
+          </span>
+          <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+            {revenueCards.totalSales} Sales
+          </span>
+          <span className="text-emerald-700 text-[10px] font-bold block whitespace-nowrap">Delivered Sarees</span>
         </div>
 
-        {/* Card 4: Total Orders */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">TOTAL ORDERS</span>
-          <span className="font-street text-3xl font-black text-slate-900">{revenueCards.totalOrders} Orders</span>
-          <span className="text-slate-500 text-[10px] font-bold block">Period Order Volume</span>
+        {/* Card 4: TOTAL ORDERS */}
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
+          <span className="text-xs font-black text-amber-800 uppercase tracking-tight block leading-tight">
+            TOTAL ORDERS
+          </span>
+          <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+            {revenueCards.totalOrders} Orders
+          </span>
+          <span className="text-slate-500 text-[10px] font-bold block whitespace-nowrap">Period Volume</span>
         </div>
 
-        {/* Card 5: AOV */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">AVERAGE ORDER VALUE (AOV)</span>
-          <span className="font-street text-3xl font-black text-amber-900">₹{revenueCards.aov.toLocaleString('en-IN')}</span>
-          <span className="text-slate-500 text-[10px] font-bold block">Per Cart Spend</span>
-        </div>
-
-        {/* Card 6: Total Customers */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">TOTAL CUSTOMERS</span>
-          <span className="font-street text-3xl font-black text-slate-900">{revenueCards.totalCustomers}</span>
-          <span className="text-emerald-700 text-[10px] font-bold block">Verified Buyers</span>
-        </div>
-
-        {/* Card 7: Total Products Sold */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">TOTAL PRODUCTS SOLD</span>
-          <span className="font-street text-3xl font-black text-slate-900">{revenueCards.totalProductsSold} Units</span>
-          <span className="text-amber-800 text-[10px] font-bold block">Artisan Saree Weaves</span>
-        </div>
-
-        {/* Card 8: Revenue Today */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">REVENUE TODAY</span>
-          <span className="font-street text-3xl font-black text-red-800">₹{revenueCards.revenueToday.toLocaleString('en-IN')}</span>
-          <span className="text-slate-500 text-[10px] font-bold block">Current 24h Inflow</span>
-        </div>
-
-        {/* Card 9: Revenue This Week */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">REVENUE THIS WEEK</span>
-          <span className="font-street text-3xl font-black text-slate-900">₹{revenueCards.revenueThisWeek.toLocaleString('en-IN')}</span>
-          <span className="text-emerald-700 text-[10px] font-bold block">7-Day Trailing</span>
-        </div>
-
-        {/* Card 10: Revenue This Month */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">REVENUE THIS MONTH</span>
-          <span className="font-street text-3xl font-black text-slate-900">₹{revenueCards.revenueThisMonth.toLocaleString('en-IN')}</span>
-          <span className="text-amber-800 text-[10px] font-bold block">Calendar Month</span>
-        </div>
-
-        {/* Card 11: Revenue This Year */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">REVENUE THIS YEAR</span>
-          <span className="font-street text-3xl font-black text-slate-900">₹{revenueCards.revenueThisYear.toLocaleString('en-IN')}</span>
-          <span className="text-slate-500 text-[10px] font-bold block">FY 2026 Inflow</span>
-        </div>
-
-        {/* Card 12: Net Profit */}
-        <div className="bg-amber-500/10 p-5 rounded-3xl border-2 border-emerald-600 shadow-md space-y-1">
-          <span className="text-[10px] font-black text-emerald-900 uppercase tracking-widest block">ESTIMATED NET PROFIT</span>
-          <span className="font-street text-3xl font-black text-emerald-800">₹{profitAndExpenses.netProfit.toLocaleString('en-IN')}</span>
-          <span className="text-emerald-800 text-[10px] font-bold block">After COGS, Tax & Fees</span>
+        {/* Card 5: RETURNED AMOUNT */}
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-amber-300 shadow-md space-y-1">
+          <span className="text-xs font-black text-amber-800 uppercase tracking-tight block leading-tight">
+            RETURNED AMOUNT
+          </span>
+          <span className="font-street text-xl sm:text-2xl font-black text-red-800 block whitespace-nowrap">
+            ₹{(revenueCards.returnedAmount || profitAndExpenses?.refundedAmount || 0).toLocaleString('en-IN')}
+          </span>
+          <span className="text-slate-500 text-[10px] font-bold block whitespace-nowrap">Refunds & Returns</span>
         </div>
 
       </div>
@@ -364,88 +327,36 @@ export const RevenueDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 📊 ORDER STATISTICS & 🧾 GST TAXES SPLIT */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* 📊 Order Statistics Breakdown */}
-        <div className="bg-white p-6 rounded-3xl border border-amber-300 shadow-xl space-y-4">
-          <div className="border-b border-amber-100 pb-3">
-            <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">FULFILLMENT PIPELINE</span>
-            <h3 className="font-street text-2xl font-black text-slate-900 uppercase">📊 ORDER STATUS STATISTICS</h3>
+      {/* 🧾 GST & TAXES SUMMARY */}
+      <div className="bg-white p-6 rounded-3xl border border-amber-300 shadow-xl space-y-4">
+        <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
+          <div>
+            <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">INDIAN TEXTILE TAXES</span>
+            <h3 className="font-street text-2xl font-black text-slate-900 uppercase">🧾 GST & TAX BREAKDOWN (5%)</h3>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 font-bold block">Pending</span>
-              <span className="font-street text-xl font-black text-amber-900">{orderStats.pending}</span>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 font-bold block">Confirmed</span>
-              <span className="font-street text-xl font-black text-blue-900">{orderStats.confirmed}</span>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 font-bold block">Processing</span>
-              <span className="font-street text-xl font-black text-indigo-900">{orderStats.processing}</span>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 font-bold block">Packed</span>
-              <span className="font-street text-xl font-black text-purple-900">{orderStats.packed}</span>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 font-bold block">Shipped</span>
-              <span className="font-street text-xl font-black text-amber-800">{orderStats.shipped}</span>
-            </div>
-            <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-300">
-              <span className="text-emerald-800 font-bold block">Delivered</span>
-              <span className="font-street text-xl font-black text-emerald-800">{orderStats.delivered}</span>
-            </div>
-            <div className="p-3 bg-red-50 rounded-2xl border border-red-200">
-              <span className="text-red-800 font-bold block">Cancelled</span>
-              <span className="font-street text-xl font-black text-red-800">{orderStats.cancelled}</span>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-              <span className="text-amber-900 font-bold block">Returned</span>
-              <span className="font-street text-xl font-black text-amber-900">{orderStats.returned}</span>
-            </div>
-            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-200">
-              <span className="text-purple-900 font-bold block">Refunded</span>
-              <span className="font-street text-xl font-black text-purple-900">{orderStats.refunded}</span>
-            </div>
-          </div>
+          <button onClick={() => handleExportReport('GST', 'csv')} className="p-2 bg-amber-100 rounded-xl text-red-800 font-bold text-xs">
+            <Download className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* 🧾 GST & Taxes Summary */}
-        <div className="bg-white p-6 rounded-3xl border border-amber-300 shadow-xl space-y-4">
-          <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
-            <div>
-              <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">INDIAN TEXTILE TAXES</span>
-              <h3 className="font-street text-2xl font-black text-slate-900 uppercase">🧾 GST & TAX BREAKDOWN (5%)</h3>
-            </div>
-            <button onClick={() => handleExportReport('GST', 'csv')} className="p-2 bg-amber-100 rounded-xl text-red-800 font-bold text-xs">
-              <Download className="w-4 h-4" />
-            </button>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-semibold">
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">Taxable Revenue</span>
+            <span className="font-street text-xl font-black text-slate-900">₹{gst.taxableRevenue.toLocaleString('en-IN')}</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-3 text-xs font-semibold">
-            <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 block text-[10px] uppercase font-bold">Taxable Revenue</span>
-              <span className="font-street text-xl font-black text-slate-900">₹{gst.taxableRevenue.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 block text-[10px] uppercase font-bold">Total GST Collected</span>
-              <span className="font-street text-xl font-black text-red-800">₹{gst.totalGstCollected.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 block text-[10px] uppercase font-bold">CGST (2.5%)</span>
-              <span className="font-street text-xl font-black text-red-800">₹{gst.cgst.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
-              <span className="text-slate-600 block text-[10px] uppercase font-bold">SGST (2.5%)</span>
-              <span className="font-street text-xl font-black text-red-800">₹{gst.sgst.toLocaleString('en-IN')}</span>
-            </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">Total GST Collected</span>
+            <span className="font-street text-xl font-black text-red-800">₹{gst.totalGstCollected.toLocaleString('en-IN')}</span>
+          </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">CGST (2.5%)</span>
+            <span className="font-street text-xl font-black text-red-800">₹{gst.cgst.toLocaleString('en-IN')}</span>
+          </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">SGST (2.5%)</span>
+            <span className="font-street text-xl font-black text-red-800">₹{gst.sgst.toLocaleString('en-IN')}</span>
           </div>
         </div>
-
       </div>
 
       {/* 💵 PROFIT & LOSS STATEMENT (P&L BREAKDOWN) */}

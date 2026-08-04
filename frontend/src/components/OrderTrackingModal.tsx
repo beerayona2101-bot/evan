@@ -41,8 +41,8 @@ export const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, 
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 font-sans">
-      <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-amber-300 shadow-2xl space-y-6 relative overflow-hidden">
+    <div className="fixed inset-0 z-[99999] bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 font-sans overflow-y-auto">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 max-w-md sm:max-w-lg w-full max-h-[85vh] overflow-y-auto custom-scrollbar border border-amber-300 shadow-2xl space-y-4 my-auto relative">
         
         {/* Header */}
         <div className="flex justify-between items-start border-b border-amber-200 pb-4">
@@ -89,7 +89,28 @@ export const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, 
         </div>
 
         {/* Status Alert for Cancelled / Returned */}
-        {(isCancelled || isReturned || isRefunded) && (
+        {isCancelled && (() => {
+          const isCust = (order as any).cancelledBy === 'Customer' || ((order as any).cancelReason || '').toLowerCase().includes('customer');
+          const reason = (order as any).cancelReason || 'Damaged Product / Quality Inspection Failure';
+          return (
+            <div className="p-4 rounded-2xl bg-red-100/90 border border-red-300 text-red-950 text-xs font-bold space-y-1.5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-red-700 flex-shrink-0" />
+                <span className="uppercase text-[11px] font-black tracking-wider text-red-800">
+                  {isCust ? '🚫 ORDER CANCELLED BY CUSTOMER' : '🛡️ OFFICIAL ADMIN CANCELLATION NOTICE'}
+                </span>
+              </div>
+              <div className="pl-7 text-xs text-red-950 font-semibold">
+                <strong>Official Reason:</strong> {reason}
+              </div>
+              <div className="pl-7 text-[10px] text-red-800 font-medium">
+                Any paid amount will be automatically refunded to your payment method.
+              </div>
+            </div>
+          );
+        })()}
+
+        {(isReturned || isRefunded) && (
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold flex items-center gap-2">
             <Clock className="w-5 h-5 text-red-600 flex-shrink-0" />
             <span>Order status updated to: {currentStatus}. Please contact support for assistance.</span>

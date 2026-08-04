@@ -26,6 +26,9 @@ export const updateUserProfile = async (req: AuthRequest, res: Response): Promis
 
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
+    if (req.body.avatar !== undefined) {
+      user.avatar = req.body.avatar;
+    }
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -37,6 +40,7 @@ export const updateUserProfile = async (req: AuthRequest, res: Response): Promis
       email: updatedUser.email,
       role: updatedUser.role,
       phone: updatedUser.phone,
+      avatar: updatedUser.avatar,
     });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });

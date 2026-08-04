@@ -8,6 +8,7 @@ import {
   updateOrderStatus,
   cancelOrder,
   requestOrderReturn,
+  deleteOrder,
 } from '../controllers/orderController';
 import { protect, admin } from '../middleware/authMiddleware';
 
@@ -21,5 +22,6 @@ router.put('/:id/cancel', protect, cancelOrder);
 router.put('/:id/return', protect, requestOrderReturn);
 router.put('/:id/deliver', protect, admin, updateOrderToDelivered);
 router.put('/:id/status', protect, admin, updateOrderStatus);
+router.delete('/:id', protect, admin, deleteOrder);
 
 export default router;

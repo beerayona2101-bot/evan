@@ -4,8 +4,6 @@ import {
   Save,
   Plus,
   Trash2,
-  ChevronDown,
-  ChevronUp,
   Image as ImageIcon,
   Monitor,
   Tablet,
@@ -17,20 +15,133 @@ import {
   Layers,
   Award,
   Star,
-  Instagram,
   Mail,
   Shield,
   MessageSquare,
+  UploadCloud,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
 import { useSocket } from '../context/SocketContext';
 
+// Helper Component for Cloudinary Image Uploads & Image URL Management
+interface ImageUploaderControlProps {
+  label: string;
+  currentUrl: string;
+  onUrlChange: (url: string) => void;
+  folder?: string;
+}
+
+const ImageUploaderControl: React.FC<ImageUploaderControlProps> = ({
+  label,
+  currentUrl,
+  onUrlChange,
+}) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    showToast(`Uploading image "${file.name}"...`, 'info');
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      if (typeof reader.result === 'string') {
+        try {
+          const res = await api.post('/upload', { image: reader.result });
+          if (res.data?.imageUrl || res.data?.url) {
+            const uploadedUrl = res.data.imageUrl || res.data.url;
+            onUrlChange(uploadedUrl);
+            showToast('Successfully uploaded image!', 'success');
+          } else {
+            onUrlChange(reader.result);
+            showToast('Image preview loaded', 'info');
+          }
+        } catch {
+          onUrlChange(reader.result);
+          showToast('Image preview loaded locally', 'info');
+        } finally {
+          setUploading(false);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-slate-700 font-bold uppercase text-[9px] tracking-wider">{label}</label>
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white p-3 rounded-2xl border border-amber-200 shadow-sm">
+        {/* Preview Thumbnail */}
+        <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-amber-300 bg-slate-900 flex-shrink-0 group">
+          {currentUrl ? (
+            <img src={currentUrl} alt="Preview" className="w-full h-full object-cover object-top" />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center text-amber-500 text-[10px]">
+              <ImageIcon className="w-6 h-6 mb-1 opacity-50" />
+              <span>No Image</span>
+            </div>
+          )}
+          {currentUrl && (
+            <button
+              type="button"
+              onClick={() => onUrlChange('')}
+              className="absolute inset-0 bg-slate-950/75 text-red-400 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-xs font-bold"
+              title="Remove Image"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* URL Input & Upload Button */}
+        <div className="flex-1 w-full space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Paste Image URL or Upload File below..."
+              value={currentUrl || ''}
+              onChange={(e) => onUrlChange(e.target.value)}
+              className="flex-1 p-2.5 bg-amber-50/40 border border-amber-300 rounded-xl font-semibold text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-black rounded-xl cursor-pointer flex items-center gap-1.5 border border-amber-300 shadow-sm transition-all disabled:opacity-50">
+              {uploading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" /> : <UploadCloud className="w-3.5 h-3.5 text-amber-400" />}
+              <span>{uploading ? 'UPLOADING IMAGE...' : '📸 UPLOAD IMAGE'}</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={handleFileChange}
+              />
+            </label>
+            {currentUrl && (
+              <button
+                type="button"
+                onClick={() => onUrlChange('')}
+                className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-bold rounded-xl border border-red-300 flex items-center gap-1"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const HomepageEditorPage: React.FC = () => {
   const [cms, setCms] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('hero');
+  const [activeSection, setActiveSection] = useState<string>('lookbook');
   const [devicePreview, setDevicePreview] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [showLivePreview, setShowLivePreview] = useState(false);
   const { socket } = useSocket();
@@ -74,26 +185,6 @@ export const HomepageEditorPage: React.FC = () => {
     }
   };
 
-  const handleCloudinaryUpload = async (file: File, callback: (url: string) => void) => {
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      if (typeof reader.result === 'string') {
-        showToast(`Uploading image "${file.name}" to Cloudinary CDN...`, 'info');
-        try {
-          const res = await api.post('/homepage/upload', { image: reader.result });
-          if (res.data?.imageUrl) {
-            callback(res.data.imageUrl);
-            showToast('Uploaded asset to Cloudinary CDN!', 'success');
-          }
-        } catch {
-          callback(reader.result);
-          showToast('Image preview loaded locally', 'info');
-        }
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   if (loading || !cms) {
     return (
       <div className="min-h-screen bg-[#FFFDF9] flex items-center justify-center p-8">
@@ -107,66 +198,79 @@ export const HomepageEditorPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#FAF6F0] text-slate-900 font-sans p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+  // 9 Modules aligned 1-to-1 with Landing Page layout
+  const sidebarModules = [
+    { key: 'announcement', label: '1. Announcement Bar', icon: Sparkles },
+    { key: 'hero', label: '2. Hero Banner', icon: Layers },
+    { key: 'lookbook', label: '3. Editorial Lookbook Gallery (5 Tiles)', icon: Award },
+    { key: 'categories', label: '4. 3D Saree Carousel (Featured Cards)', icon: SlidersHorizontal },
+    { key: 'arrivals', label: '5. New Saree Arrivals', icon: Star },
+    { key: 'testimonials', label: '6. Client Testimonials ("WHAT CLIENTS SAY")', icon: MessageSquare },
+    { key: 'brands', label: '7. Partner Brands & Trust Badges', icon: Shield },
+    { key: 'newsletter', label: '8. Royal Newsletter Club', icon: Mail },
+    { key: 'footer', label: '9. Footer Configuration', icon: Layers },
+  ];
 
-        {/* Top Header Bar */}
-        <div className="bg-white p-5 rounded-3xl border border-amber-300 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-red-700" /> SHOPIFY/ELEMENTOR STYLE THEME CUSTOMIZER
+  return (
+    <div className="bg-[#FAF6F0] text-slate-900 font-sans p-2 sm:p-4 rounded-3xl space-y-4">
+      <div className="max-w-7xl mx-auto space-y-4">
+
+        {/* Sleek Single-Line Header Bar */}
+        <div className="bg-white py-2.5 px-4 sm:px-6 rounded-2xl border border-amber-300 shadow-md flex flex-row items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-red-700" /> LIVE THEME EDITOR
             </span>
-            <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tight">
+            <h1 className="font-street text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
               🏠 HOMEPAGE CMS EDITOR
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Device Switcher */}
-            <div className="bg-amber-50 p-1 rounded-xl border border-amber-300 flex items-center gap-1">
+            <div className="bg-amber-50 p-0.5 rounded-lg border border-amber-300 flex items-center gap-0.5">
               <button
                 onClick={() => setDevicePreview('desktop')}
-                className={`p-2 rounded-lg text-xs font-extrabold flex items-center gap-1 transition-all ${
+                className={`p-1.5 rounded text-xs font-extrabold flex items-center gap-1 transition-all ${
                   devicePreview === 'desktop' ? 'bg-slate-900 text-amber-300 shadow' : 'text-slate-600 hover:bg-amber-100'
                 }`}
                 title="Desktop View"
               >
-                <Monitor className="w-4 h-4" />
+                <Monitor className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setDevicePreview('tablet')}
-                className={`p-2 rounded-lg text-xs font-extrabold flex items-center gap-1 transition-all ${
+                className={`p-1.5 rounded text-xs font-extrabold flex items-center gap-1 transition-all ${
                   devicePreview === 'tablet' ? 'bg-slate-900 text-amber-300 shadow' : 'text-slate-600 hover:bg-amber-100'
                 }`}
                 title="Tablet View"
               >
-                <Tablet className="w-4 h-4" />
+                <Tablet className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setDevicePreview('mobile')}
-                className={`p-2 rounded-lg text-xs font-extrabold flex items-center gap-1 transition-all ${
+                className={`p-1.5 rounded text-xs font-extrabold flex items-center gap-1 transition-all ${
                   devicePreview === 'mobile' ? 'bg-slate-900 text-amber-300 shadow' : 'text-slate-600 hover:bg-amber-100'
                 }`}
                 title="Mobile View"
               >
-                <Smartphone className="w-4 h-4" />
+                <Smartphone className="w-3.5 h-3.5" />
               </button>
             </div>
 
             <button
               onClick={() => setShowLivePreview(!showLivePreview)}
-              className="px-4 py-2.5 bg-amber-100 border border-amber-300 hover:bg-amber-200 text-slate-900 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow"
+              className="px-3 py-1.5 bg-amber-100 border border-amber-300 hover:bg-amber-200 text-slate-900 text-[11px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-sm"
             >
-              <Eye className="w-4 h-4 text-amber-800" /> {showLivePreview ? 'Hide Preview' : 'Live Preview'}
+              <Eye className="w-3.5 h-3.5 text-amber-800" /> {showLivePreview ? 'Hide Preview' : 'Live Preview'}
             </button>
 
             <button
               onClick={handleSaveCMS}
               disabled={saving}
-              className="px-6 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-lg transition-all border border-amber-300 disabled:opacity-50"
+              className="px-4 py-1.5 bg-red-800 hover:bg-red-900 text-amber-300 text-[11px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md transition-all border border-amber-300 disabled:opacity-50"
             >
-              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span>SAVE & PUBLISH LIVE</span>
             </button>
           </div>
@@ -178,24 +282,10 @@ export const HomepageEditorPage: React.FC = () => {
           {/* Section Navigation Tabs (Left 4 cols) */}
           <aside className="lg:col-span-4 bg-white p-4 rounded-3xl border border-amber-300 shadow-md space-y-2">
             <h3 className="text-xs font-black uppercase tracking-widest text-amber-900 px-3 py-2 border-b border-amber-100">
-              HOMEPAGE SECTIONS (13 MODULES)
+              LANDING PAGE MODULES (9 SECTIONS)
             </h3>
             <div className="space-y-1">
-              {[
-                { key: 'announcement', label: '1. Announcement Bar', icon: Sparkles },
-                { key: 'hero', label: '2. Hero Banner', icon: Layers },
-                { key: 'categories', label: '3. Featured Categories (Cards)', icon: SlidersHorizontal },
-                { key: 'collections', label: '4. Featured Collections', icon: Award },
-                { key: 'trending', label: '5. Trending Sarees Carousel', icon: Star },
-                { key: 'arrivals', label: '6. New Arrivals Showcase', icon: Sparkles },
-                { key: 'bestsellers', label: '7. Best Sellers Banner', icon: Award },
-                { key: 'festival', label: '8. Festival Promo Banner', icon: Layers },
-                { key: 'testimonials', label: '9. Customer Testimonials', icon: MessageSquare },
-                { key: 'instagram', label: '10. Instagram Gallery', icon: Instagram },
-                { key: 'brands', label: '11. Partner Brands Guild', icon: Shield },
-                { key: 'newsletter', label: '12. Newsletter Club', icon: Mail },
-                { key: 'footer', label: '13. Footer Configuration', icon: Layers },
-              ].map((item) => {
+              {sidebarModules.map((item) => {
                 const IconComp = item.icon;
                 const isActive = activeSection === item.key;
                 return (
@@ -221,7 +311,7 @@ export const HomepageEditorPage: React.FC = () => {
           {/* Active Section Form Editor (Right 8 cols) */}
           <main className="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl border border-amber-300 shadow-xl space-y-6">
 
-            {/* SECTION 1: ANNOUNCEMENT BAR */}
+            {/* MODULE 1: ANNOUNCEMENT BAR */}
             {activeSection === 'announcement' && (
               <div className="space-y-4">
                 <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
@@ -286,7 +376,7 @@ export const HomepageEditorPage: React.FC = () => {
               </div>
             )}
 
-            {/* SECTION 2: HERO BANNER */}
+            {/* MODULE 2: HERO BANNER */}
             {activeSection === 'hero' && (
               <div className="space-y-4">
                 <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
@@ -337,35 +427,19 @@ export const HomepageEditorPage: React.FC = () => {
                     />
                   </div>
 
-                  {/* Image Upload Box */}
-                  <div>
-                    <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Desktop Saree Image (URL or Local File)</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={cms.heroBanner.desktopImage}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, desktopImage: e.target.value } })}
-                        className="flex-1 p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium text-xs"
-                      />
-                      <label className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-amber-300 font-black text-xs rounded-xl cursor-pointer flex items-center gap-1.5 border border-amber-300 whitespace-nowrap">
-                        <ImageIcon className="w-4 h-4 text-amber-400" />
-                        <span>BROWSE FILE</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleCloudinaryUpload(file, (url) => {
-                                setCms({ ...cms, heroBanner: { ...cms.heroBanner, desktopImage: url } });
-                              });
-                            }
-                          }}
-                        />
-                      </label>
-                    </div>
-                  </div>
+                  {/* Desktop Hero Image Upload */}
+                  <ImageUploaderControl
+                    label="DESKTOP HERO IMAGE (UPLOAD OR URL)"
+                    currentUrl={cms.heroBanner.desktopImage}
+                    onUrlChange={(url) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, desktopImage: url } })}
+                  />
+
+                  {/* Mobile Hero Image Upload */}
+                  <ImageUploaderControl
+                    label="MOBILE HERO IMAGE (UPLOAD OR URL)"
+                    currentUrl={cms.heroBanner.mobileImage}
+                    onUrlChange={(url) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, mobileImage: url } })}
+                  />
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -412,53 +486,197 @@ export const HomepageEditorPage: React.FC = () => {
               </div>
             )}
 
-            {/* SECTION 3: FEATURED CATEGORIES CARDS */}
+            {/* MODULE 3: EDITORIAL LOOKBOOK GALLERY (5 TILES) */}
+            {activeSection === 'lookbook' && (() => {
+              const default5LookbookTiles = [
+                { id: 'col-1', name: 'Banarasi Zari Brocade Collection', subtitle: 'Editorial Lookbook Tile 1', image: '/images/saree_banarasi_red.png', description: 'Intricate Varanasi gold zari brocade heritage weave.', buttonText: 'Explore', buttonLink: '/shop?category=Banarasi Sarees', displayOrder: 1 },
+                { id: 'col-2', name: 'Kanchipuram Temple Border', subtitle: 'Editorial Lookbook Tile 2', image: '/images/saree_kanchipuram_gold.png', description: 'South Indian mulberry silk with pure temple zari border.', buttonText: 'Explore', buttonLink: '/shop?category=Kanchipuram Sarees', displayOrder: 2 },
+                { id: 'col-3', name: 'LUXURY SILK SAREES', subtitle: "EDITOR'S CHOICE - Large Featured Tile 3", image: '/images/saree_banarasi_purple.png', description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.', buttonText: 'SHOP SILK COLLECTION', buttonLink: '/shop?category=Silk Sarees', displayOrder: 3 },
+                { id: 'col-4', name: 'Paithani Peacock Pallu', subtitle: 'Editorial Lookbook Tile 4', image: '/images/saree_paithani_green.png', description: 'Maharashtrian pure silk with handwoven peacock motif pallu.', buttonText: 'Explore', buttonLink: '/shop?category=Paithani Sarees', displayOrder: 4 },
+                { id: 'col-5', name: 'Scalloped Floral Organza', subtitle: 'Editorial Lookbook Tile 5', image: '/images/saree_organza_floral.png', description: 'Ultra-lightweight organza with scalloped embroidered border.', buttonText: 'Explore', buttonLink: '/shop?category=Organza Sarees', displayOrder: 5 },
+              ];
+
+              let currentCollections = cms.featuredCollections && cms.featuredCollections.length > 0
+                ? [...cms.featuredCollections]
+                : [];
+              while (currentCollections.length < 5) {
+                currentCollections.push(default5LookbookTiles[currentCollections.length]);
+              }
+
+              return (
+                <div className="space-y-4">
+                  <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 3</span>
+                      <h3 className="font-street text-2xl font-black text-slate-900 uppercase">EDITORIAL LOOKBOOK GALLERY (5 TILES)</h3>
+                      <p className="text-xs text-slate-500 font-semibold">Full image upload & CRUD control for all 5 Lookbook Tiles on the Landing Page</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newCol = {
+                          id: `col-${Date.now()}`,
+                          name: 'New Lookbook Tile',
+                          subtitle: 'Editorial Lookbook Tile',
+                          image: '/images/saree_banarasi_red.png',
+                          description: 'Handcrafted luxury saree weave.',
+                          buttonText: 'Explore',
+                          buttonLink: '/shop',
+                          displayOrder: currentCollections.length + 1,
+                        };
+                        setCms({ ...cms, featuredCollections: [...currentCollections, newCol] });
+                      }}
+                      className="px-4 py-2 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow"
+                    >
+                      <Plus className="w-4 h-4" /> ADD TILE
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {currentCollections.map((colCard: any, idx: number) => (
+                      <div key={colCard.id || idx} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-3 text-xs">
+                        <div className="flex justify-between items-center border-b border-amber-200 pb-2">
+                          <span className="font-extrabold text-amber-900 uppercase text-[10px]">
+                            TILE #{idx + 1} - {colCard.name} {idx === 2 ? '(CENTER LARGE FEATURED TILE)' : ''}
+                          </span>
+                          <button
+                            onClick={() => {
+                              const updated = currentCollections.filter((_: any, i: number) => i !== idx);
+                              setCms({ ...cms, featuredCollections: updated });
+                            }}
+                            className="text-red-700 hover:text-red-900 p-1 font-bold flex items-center gap-1"
+                          >
+                            <Trash2 className="w-4 h-4" /> Delete Tile
+                          </button>
+                        </div>
+
+                        {/* Image Upload Control with Cloudinary & Thumbnail */}
+                        <ImageUploaderControl
+                          label={`TILE #${idx + 1} IMAGE ASSET`}
+                          currentUrl={colCard.image}
+                          onUrlChange={(url) => {
+                            const updated = [...currentCollections];
+                            updated[idx].image = url;
+                            setCms({ ...cms, featuredCollections: updated });
+                          }}
+                        />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Tile Title / Headline</label>
+                            <input
+                              type="text"
+                              value={colCard.name}
+                              onChange={(e) => {
+                                const updated = [...currentCollections];
+                                updated[idx].name = e.target.value;
+                                setCms({ ...cms, featuredCollections: updated });
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Target Category Link</label>
+                            <input
+                              type="text"
+                              placeholder={`/shop?category=${encodeURIComponent(colCard.name)}`}
+                              value={colCard.buttonLink || `/shop?category=${encodeURIComponent(colCard.name)}`}
+                              onChange={(e) => {
+                                const updated = [...currentCollections];
+                                updated[idx].buttonLink = e.target.value;
+                                setCms({ ...cms, featuredCollections: updated });
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-mono text-[11px]"
+                            />
+                          </div>
+                        </div>
+
+                        {idx === 2 && (
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Center Tile Description Text</label>
+                            <input
+                              type="text"
+                              value={colCard.description || ''}
+                              onChange={(e) => {
+                                const updated = [...currentCollections];
+                                updated[idx].description = e.target.value;
+                                setCms({ ...cms, featuredCollections: updated });
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* MODULE 4: 3D SAREE SELECTION CAROUSEL (FEATURED CARDS) */}
             {activeSection === 'categories' && (
               <div className="space-y-4">
                 <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
                   <div>
-                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 3</span>
-                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">FEATURED CATEGORY CARDS EDITOR</h3>
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 4</span>
+                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">3D SAREE CAROUSEL (FEATURED CARDS)</h3>
+                    <p className="text-xs text-slate-500 font-semibold">Complete CRUD & image upload for all 3D Saree Carousel cards</p>
                   </div>
                   <button
                     onClick={() => {
-                      const newCat = {
-                        id: `cat-${Date.now()}`,
-                        name: 'New Saree Category',
-                        image: '/images/saree_kanchipuram_gold.png',
-                        description: 'Artisanal handloom saree weave.',
-                        buttonText: 'EXPLORE WEAVES',
-                        buttonLink: '/shop',
+                      const newCard = {
+                        id: `sc-${Date.now()}`,
+                        name: 'New Modern Saree Drape',
+                        tag: 'TRENDING PARTYWEAR',
+                        price: '$140.00 USD',
+                        rupeePrice: '₹8,999',
+                        image: '/images/saree_organza_floral.png',
+                        description: 'Artisanal handwoven saree weave.',
+                        buttonText: 'SHOP COLLECTION',
+                        buttonLink: '/shop?category=Designer Sarees',
                         status: 'ACTIVE',
                         displayOrder: cms.featuredCategories.length + 1,
                       };
-                      setCms({ ...cms, featuredCategories: [...cms.featuredCategories, newCat] });
+                      setCms({ ...cms, featuredCategories: [...cms.featuredCategories, newCard] });
                     }}
                     className="px-4 py-2 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow"
                   >
-                    <Plus className="w-4 h-4" /> ADD CARD
+                    <Plus className="w-4 h-4" /> ADD SAREE CARD
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   {cms.featuredCategories.map((card: any, idx: number) => (
-                    <div key={card.id} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-3 text-xs">
+                    <div key={card.id || idx} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-3 text-xs">
                       <div className="flex justify-between items-center border-b border-amber-200 pb-2">
-                        <span className="font-extrabold text-amber-900 uppercase text-[10px]">CARD #{idx + 1} - {card.name}</span>
+                        <span className="font-extrabold text-amber-900 uppercase text-[10px]">
+                          SAREE CARD #{idx + 1} - {card.name}
+                        </span>
                         <button
                           onClick={() => {
                             const updated = cms.featuredCategories.filter((c: any) => c.id !== card.id);
                             setCms({ ...cms, featuredCategories: updated });
                           }}
-                          className="text-red-700 hover:text-red-900 p-1"
+                          className="text-red-700 hover:text-red-900 p-1 font-bold flex items-center gap-1"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" /> Delete Card
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Image Upload Control */}
+                      <ImageUploaderControl
+                        label={`SAREE CARD #${idx + 1} IMAGE (UPLOAD FILE OR URL)`}
+                        currentUrl={card.image}
+                        onUrlChange={(url) => {
+                          const updated = [...cms.featuredCategories];
+                          updated[idx].image = url;
+                          setCms({ ...cms, featuredCategories: updated });
+                        }}
+                      />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         <div>
-                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Category Name</label>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Saree Name / Title</label>
                           <input
                             type="text"
                             value={card.name}
@@ -467,65 +685,58 @@ export const HomepageEditorPage: React.FC = () => {
                               updated[idx].name = e.target.value;
                               setCms({ ...cms, featuredCategories: updated });
                             }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold text-slate-900"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Tag / Subtitle</label>
+                          <input
+                            type="text"
+                            value={card.tag || card.name.toUpperCase().replace(' SAREES', '')}
+                            onChange={(e) => {
+                              const updated = [...cms.featuredCategories];
+                              updated[idx].tag = e.target.value;
+                              setCms({ ...cms, featuredCategories: updated });
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-extrabold text-amber-800 uppercase"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">USD Price</label>
+                          <input
+                            type="text"
+                            value={card.price || '$160.00 USD'}
+                            onChange={(e) => {
+                              const updated = [...cms.featuredCategories];
+                              updated[idx].price = e.target.value;
+                              setCms({ ...cms, featuredCategories: updated });
+                            }}
                             className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Card Cover Image (URL or Browse)</label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={card.image}
-                              onChange={(e) => {
-                                const updated = [...cms.featuredCategories];
-                                updated[idx].image = e.target.value;
-                                setCms({ ...cms, featuredCategories: updated });
-                              }}
-                              className="flex-1 p-2.5 bg-white border border-amber-300 rounded-xl font-semibold text-xs"
-                            />
-                            <label className="px-3 py-2.5 bg-slate-900 text-amber-300 text-xs font-black rounded-xl cursor-pointer flex items-center gap-1 border border-amber-300">
-                              <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    handleCloudinaryUpload(file, (url) => {
-                                      const updated = [...cms.featuredCategories];
-                                      updated[idx].image = url;
-                                      setCms({ ...cms, featuredCategories: updated });
-                                    });
-                                  }
-                                }}
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Description</label>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Rupee Price (INR)</label>
                           <input
                             type="text"
-                            value={card.description}
+                            value={card.rupeePrice || '₹9,999'}
                             onChange={(e) => {
                               const updated = [...cms.featuredCategories];
-                              updated[idx].description = e.target.value;
+                              updated[idx].rupeePrice = e.target.value;
                               setCms({ ...cms, featuredCategories: updated });
                             }}
-                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium"
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold text-red-800"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Target Collection URL</label>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Target Shop Link</label>
                           <input
                             type="text"
-                            placeholder={`/shop?category=${encodeURIComponent(card.name)}`}
                             value={card.buttonLink || `/shop?category=${encodeURIComponent(card.name)}`}
                             onChange={(e) => {
                               const updated = [...cms.featuredCategories];
@@ -542,19 +753,19 @@ export const HomepageEditorPage: React.FC = () => {
               </div>
             )}
 
-            {/* SECTION 5: TRENDING SAREES CAROUSEL */}
-            {activeSection === 'trending' && (
+            {/* MODULE 5: NEW SAREE ARRIVALS */}
+            {activeSection === 'arrivals' && (
               <div className="space-y-4">
                 <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
                   <div>
                     <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 5</span>
-                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">TRENDING SAREES CAROUSEL</h3>
+                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">NEW SAREE ARRIVALS SHOWCASE</h3>
                   </div>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={cms.trendingSarees.enabled}
-                      onChange={(e) => setCms({ ...cms, trendingSarees: { ...cms.trendingSarees, enabled: e.target.checked } })}
+                      checked={cms.newArrivals?.enabled !== false}
+                      onChange={(e) => setCms({ ...cms, newArrivals: { ...cms.newArrivals, enabled: e.target.checked } })}
                       className="w-4 h-4 accent-red-800 rounded"
                     />
                     <span className="text-xs font-bold text-slate-700 uppercase">Enable Module</span>
@@ -566,8 +777,8 @@ export const HomepageEditorPage: React.FC = () => {
                     <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Section Title</label>
                     <input
                       type="text"
-                      value={cms.trendingSarees.title}
-                      onChange={(e) => setCms({ ...cms, trendingSarees: { ...cms.trendingSarees, title: e.target.value } })}
+                      value={cms.newArrivals?.title || 'NEW SAREE ARRIVALS'}
+                      onChange={(e) => setCms({ ...cms, newArrivals: { ...cms.newArrivals, title: e.target.value } })}
                       className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                     />
                   </div>
@@ -575,8 +786,8 @@ export const HomepageEditorPage: React.FC = () => {
                     <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Section Subtitle</label>
                     <input
                       type="text"
-                      value={cms.trendingSarees.subtitle}
-                      onChange={(e) => setCms({ ...cms, trendingSarees: { ...cms.trendingSarees, subtitle: e.target.value } })}
+                      value={cms.newArrivals?.subtitle || 'Freshly Woven Artisan Sarees Added Today'}
+                      onChange={(e) => setCms({ ...cms, newArrivals: { ...cms.newArrivals, subtitle: e.target.value } })}
                       className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold text-amber-800"
                     />
                   </div>
@@ -584,13 +795,13 @@ export const HomepageEditorPage: React.FC = () => {
               </div>
             )}
 
-            {/* SECTION 9: TESTIMONIALS */}
+            {/* MODULE 6: CLIENT TESTIMONIALS */}
             {activeSection === 'testimonials' && (
               <div className="space-y-4">
                 <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
                   <div>
-                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 9</span>
-                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">CUSTOMER TESTIMONIALS EDITOR</h3>
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 6</span>
+                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">CLIENT TESTIMONIALS EDITOR</h3>
                   </div>
                   <button
                     onClick={() => {
@@ -607,46 +818,217 @@ export const HomepageEditorPage: React.FC = () => {
                     }}
                     className="px-4 py-2 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow"
                   >
-                    <Plus className="w-4 h-4" /> ADD REVIEWS
+                    <Plus className="w-4 h-4" /> ADD REVIEW
                   </button>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                <div className="space-y-4 text-xs">
                   {cms.testimonials.map((test: any, idx: number) => (
-                    <div key={test.id} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-2">
+                    <div key={test.id || idx} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-3">
                       <div className="flex justify-between items-center border-b border-amber-200 pb-2">
-                        <span className="font-bold text-slate-900">{test.customerName} - {test.location}</span>
+                        <span className="font-bold text-slate-900">REVIEW #{idx + 1} - {test.customerName}</span>
                         <button
                           onClick={() => {
                             const updated = cms.testimonials.filter((t: any) => t.id !== test.id);
                             setCms({ ...cms, testimonials: updated });
                           }}
-                          className="text-red-700 hover:text-red-900"
+                          className="text-red-700 hover:text-red-900 font-bold flex items-center gap-1"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" /> Delete Review
                         </button>
                       </div>
-                      <textarea
-                        rows={2}
-                        value={test.review}
-                        onChange={(e) => {
+
+                      {/* Avatar Image Uploader */}
+                      <ImageUploaderControl
+                        label="CLIENT AVATAR IMAGE"
+                        currentUrl={test.customerImage}
+                        onUrlChange={(url) => {
                           const updated = [...cms.testimonials];
-                          updated[idx].review = e.target.value;
+                          updated[idx].customerImage = url;
                           setCms({ ...cms, testimonials: updated });
                         }}
-                        className="w-full p-2 bg-white border border-amber-300 rounded-xl font-medium"
                       />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Customer Name</label>
+                          <input
+                            type="text"
+                            value={test.customerName}
+                            onChange={(e) => {
+                              const updated = [...cms.testimonials];
+                              updated[idx].customerName = e.target.value;
+                              setCms({ ...cms, testimonials: updated });
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Location</label>
+                          <input
+                            type="text"
+                            value={test.location || 'Mumbai, India'}
+                            onChange={(e) => {
+                              const updated = [...cms.testimonials];
+                              updated[idx].location = e.target.value;
+                              setCms({ ...cms, testimonials: updated });
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Review Message</label>
+                        <textarea
+                          rows={2}
+                          value={test.review}
+                          onChange={(e) => {
+                            const updated = [...cms.testimonials];
+                            updated[idx].review = e.target.value;
+                            setCms({ ...cms, testimonials: updated });
+                          }}
+                          className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* SECTION 13: FOOTER */}
+            {/* MODULE 7: PARTNER BRANDS & TRUST BADGES */}
+            {activeSection === 'brands' && (
+              <div className="space-y-4">
+                <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
+                  <div>
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 7</span>
+                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">PARTNER BRANDS & TRUST BADGES</h3>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newBrand = {
+                        id: `b-${Date.now()}`,
+                        name: 'Artisan Guild Partner',
+                        logo: '/images/saree_banarasi_red.png',
+                        website: '#',
+                        priority: cms.brands.length + 1,
+                        status: 'ACTIVE',
+                      };
+                      setCms({ ...cms, brands: [...cms.brands, newBrand] });
+                    }}
+                    className="px-4 py-2 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow"
+                  >
+                    <Plus className="w-4 h-4" /> ADD BRAND
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  {cms.brands.map((brand: any, idx: number) => (
+                    <div key={brand.id || idx} className="p-4 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-3">
+                      <div className="flex justify-between items-center border-b border-amber-200 pb-2">
+                        <span className="font-bold text-slate-900">BRAND #{idx + 1} - {brand.name}</span>
+                        <button
+                          onClick={() => {
+                            const updated = cms.brands.filter((b: any) => b.id !== brand.id);
+                            setCms({ ...cms, brands: updated });
+                          }}
+                          className="text-red-700 hover:text-red-900 font-bold flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" /> Delete Brand
+                        </button>
+                      </div>
+
+                      <ImageUploaderControl
+                        label="BRAND LOGO ASSET"
+                        currentUrl={brand.logo}
+                        onUrlChange={(url) => {
+                          const updated = [...cms.brands];
+                          updated[idx].logo = url;
+                          setCms({ ...cms, brands: updated });
+                        }}
+                      />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Brand Name</label>
+                          <input
+                            type="text"
+                            value={brand.name}
+                            onChange={(e) => {
+                              const updated = [...cms.brands];
+                              updated[idx].name = e.target.value;
+                              setCms({ ...cms, brands: updated });
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Website URL</label>
+                          <input
+                            type="text"
+                            value={brand.website || '#'}
+                            onChange={(e) => {
+                              const updated = [...cms.brands];
+                              updated[idx].website = e.target.value;
+                              setCms({ ...cms, brands: updated });
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-mono text-[11px]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* MODULE 8: ROYAL NEWSLETTER CLUB */}
+            {activeSection === 'newsletter' && (
+              <div className="space-y-4 text-xs font-semibold">
+                <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
+                  <div>
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 8</span>
+                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">ROYAL NEWSLETTER CLUB</h3>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={cms.newsletter?.enabled !== false}
+                      onChange={(e) => setCms({ ...cms, newsletter: { ...cms.newsletter, enabled: e.target.checked } })}
+                      className="w-4 h-4 accent-red-800 rounded"
+                    />
+                    <span className="text-xs font-bold text-slate-700 uppercase">Enable Module</span>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Headline</label>
+                  <input
+                    type="text"
+                    value={cms.newsletter?.title || 'JOIN EVAN ROYAL SAREE CLUB'}
+                    onChange={(e) => setCms({ ...cms, newsletter: { ...cms.newsletter, title: e.target.value } })}
+                    className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Description</label>
+                  <textarea
+                    rows={2}
+                    value={cms.newsletter?.description || ''}
+                    onChange={(e) => setCms({ ...cms, newsletter: { ...cms.newsletter, description: e.target.value } })}
+                    className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* MODULE 9: FOOTER CONFIGURATION */}
             {activeSection === 'footer' && (
               <div className="space-y-4 text-xs font-semibold">
                 <div className="border-b border-amber-100 pb-3">
-                  <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 13</span>
+                  <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 9</span>
                   <h3 className="font-street text-2xl font-black text-slate-900 uppercase">FOOTER CONFIGURATION</h3>
                 </div>
 
@@ -655,7 +1037,7 @@ export const HomepageEditorPage: React.FC = () => {
                     <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Brand Logo Text</label>
                     <input
                       type="text"
-                      value={cms.footer.logo}
+                      value={cms.footer?.logo || 'EVAN COLLECTIONS'}
                       onChange={(e) => setCms({ ...cms, footer: { ...cms.footer, logo: e.target.value } })}
                       className="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                     />
@@ -664,7 +1046,7 @@ export const HomepageEditorPage: React.FC = () => {
                     <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Contact Phone</label>
                     <input
                       type="text"
-                      value={cms.footer.contactPhone}
+                      value={cms.footer?.contactPhone || '+91 9490644434'}
                       onChange={(e) => setCms({ ...cms, footer: { ...cms.footer, contactPhone: e.target.value } })}
                       className="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                     />
@@ -675,7 +1057,7 @@ export const HomepageEditorPage: React.FC = () => {
                   <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Footer Description</label>
                   <textarea
                     rows={2}
-                    value={cms.footer.description}
+                    value={cms.footer?.description || ''}
                     onChange={(e) => setCms({ ...cms, footer: { ...cms.footer, description: e.target.value } })}
                     className="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
                   />

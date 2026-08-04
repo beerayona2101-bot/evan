@@ -94,6 +94,10 @@ const productSchema: Schema = new Schema(
     sareeWidth: { type: String, default: '1.15 Meters' },
     sareeWeight: { type: String, default: '650 Grams' },
     pattern: { type: String, default: 'Jacquard Zari Brocade' },
+    clothType: { type: String, default: '100% Pure Mulberry Handloom Silk / Organza' },
+    comfortLevel: { type: String, default: 'Ultra Soft, Breathable & Skin-Friendly for All-Day Wear' },
+    threadMaterial: { type: String, default: 'Tested Gold Zari & Pure Metallic Thread' },
+    colorDetails: { type: String, default: 'Rich Organic Eco-Friendly Dyes with High Color Fastness' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   },
   {

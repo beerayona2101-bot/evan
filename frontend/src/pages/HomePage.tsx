@@ -130,37 +130,33 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  // Saree collection cards for 3D selection carousel with direct category navigation links
-  const sareeCollectionCards = cms?.featuredCategories && cms.featuredCategories.length > 0
+  // Modern saree collection cards for 3D selection carousel with direct category navigation links
+  const defaultModernCards = [
+    { id: 's1', title: 'Modern Lightweight Organza Floral', tag: 'PARTYWEAR ORGANZA', price: '$115.00 USD', rupeePrice: '₹6,999', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees' },
+    { id: 's2', title: 'Fancy Tissue Zari Shimmer Saree', tag: 'MODERN TISSUE', price: '$190.00 USD', rupeePrice: '₹12,499', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Silk Sarees' },
+    { id: 's3', title: 'Royal Crimson Banarasi Partywear', tag: 'TRENDING BANARASI', price: '$160.00 USD', rupeePrice: '₹9,999', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees' },
+    { id: 's4', title: 'Glamour Sequenced Purple Georgette', tag: 'PARTYWEAR GEORGETTE', price: '$220.00 USD', rupeePrice: '₹14,999', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Designer Sarees' },
+    { id: 's5', title: 'Handwoven Peacock Paithani Silk', tag: 'PAITHANI SILK', price: '$280.00 USD', rupeePrice: '₹17,999', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees' },
+    { id: 's6', title: 'Pure Artisan Soft Linen Saree', tag: 'LIGHTWEIGHT LINEN', price: '$95.00 USD', rupeePrice: '₹4,499', image: '/images/saree_linen_beige.png', buttonLink: '/shop?category=Linen Sarees' },
+    { id: 's7', title: 'Mustard Temple Zari Kanchipuram', tag: 'KANCHIPURAM SILK', price: '$240.00 USD', rupeePrice: '₹14,999', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees' },
+    { id: 's8', title: 'Contemporary Floral Chiffon Drape', tag: 'TRENDY CHIFFON', price: '$135.00 USD', rupeePrice: '₹8,499', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Designer Sarees' },
+  ];
+
+  const sareeCollectionCards = cms?.featuredCategories && cms.featuredCategories.length >= 1
     ? cms.featuredCategories.map((cat: any, i: number) => {
-        const catName = cat.name || 'Silk Sarees';
-        const link = (cat.buttonLink && cat.buttonLink !== '/shop')
-          ? cat.buttonLink
-          : `/shop?category=${encodeURIComponent(catName)}`;
+        const catName = cat.name || defaultModernCards[i % defaultModernCards.length].title;
+        const link = cat.buttonLink || `/shop?category=${encodeURIComponent(catName)}`;
         return {
           id: cat.id || cat._id || `sc-${i}`,
-          title: catName,
-          tag: catName.toUpperCase().replace(' SAREES', ''),
-          price: cat.price || `$${200 + i * 40}.00 USD`,
-          rupeePrice: cat.rupeePrice || `₹${((200 + i * 40) * 65).toLocaleString('en-IN')}`,
-          image: cat.image || '/images/saree_banarasi_red.png',
+          title: cat.name || defaultModernCards[i % defaultModernCards.length].title,
+          tag: (cat.tag || cat.name || 'SILK').toUpperCase().replace(' SAREES', ''),
+          price: cat.price || defaultModernCards[i % defaultModernCards.length].price,
+          rupeePrice: cat.rupeePrice || defaultModernCards[i % defaultModernCards.length].rupeePrice,
+          image: cat.image || defaultModernCards[i % defaultModernCards.length].image,
           buttonLink: link,
         };
       })
-    : [
-        { id: 's1', title: 'Handwoven Paithani Brocade', tag: 'PAITHANI SILK', price: '$280.00 USD', rupeePrice: '₹17,999', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees' },
-        { id: 's2', title: 'Pastel Floral Organza Saree', tag: 'ORGANZA SILK', price: '$115.00 USD', rupeePrice: '₹6,999', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees' },
-        { id: 's3', title: 'Mustard Gold Kanchipuram Silk', tag: 'KANCHIPURAM SILK', price: '$240.00 USD', rupeePrice: '₹14,999', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees' },
-        { id: 's4', title: 'Royal Crimson Banarasi Saree', tag: 'BANARASI SILK', price: '$160.00 USD', rupeePrice: '₹9,999', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees' },
-        { id: 's5', title: 'Pure Jamdani Soft Linen Saree', tag: 'HANDLOOM LINEN', price: '$95.00 USD', rupeePrice: '₹4,499', image: '/images/saree_linen_beige.png', buttonLink: '/shop?category=Linen Sarees' },
-        { id: 's6', title: 'Chanderi Zari Tissue Silk Saree', tag: 'CHANDERI SILK', price: '$190.00 USD', rupeePrice: '₹12,499', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Silk Sarees' },
-        { id: 's7', title: 'Mysore Mulberry Silk Saree', tag: 'MYSORE SILK', price: '$220.00 USD', rupeePrice: '₹15,999', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Mysore Silk Sarees' },
-        { id: 's8', title: 'Uppada Light Jamdani Silk', tag: 'UPPADA SILK', price: '$210.00 USD', rupeePrice: '₹13,999', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Handloom Sarees' },
-        { id: 's9', title: 'Patola Double Ikat Royal Saree', tag: 'PATOLA IKAT', price: '$310.00 USD', rupeePrice: '₹21,999', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Designer Sarees' },
-        { id: 's10', title: 'Tussar Gharcha Artisan Saree', tag: 'TUSSAR SILK', price: '$175.00 USD', rupeePrice: '₹11,499', image: '/images/saree_linen_beige.png', buttonLink: '/shop?category=Tussar Silk' },
-        { id: 's11', title: 'Bandhani Royal Crimson Saree', tag: 'BANDHANI SILK', price: '$145.00 USD', rupeePrice: '₹8,999', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Bandhani Sarees' },
-        { id: 's12', title: 'Gadwal Temple Zari Silk Saree', tag: 'GADWAL SILK', price: '$260.00 USD', rupeePrice: '₹16,999', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Wedding Sarees' },
-      ];
+    : defaultModernCards;
 
   const hero = cms?.heroBanner || {
     enabled: true,
@@ -263,121 +259,130 @@ export const HomePage: React.FC = () => {
             <p className="text-[10px] sm:text-xs text-amber-800 font-bold uppercase tracking-widest">Curated Saree Collections • Click Any Tile To Explore</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 h-auto md:h-[400px]">
-            {/* Tile 1 & 2 */}
-            <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
-              <Link
-                to="/shop?category=Banarasi Sarees"
-                className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
-              >
-                <img
-                  src="/images/saree_banarasi_red.png"
-                  alt="Banarasi Zari Weave"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
-                  <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">Banarasi Zari Brocade Collection</span>
-                  <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
-                    Explore <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </Link>
+          {/* Dynamic 5-Tile Lookbook Gallery from CMS */}
+          {(() => {
+            const cols = cms?.featuredCollections || [];
+            const tile1 = cols[0] || { name: 'Banarasi Zari Brocade Collection', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees', buttonText: 'Explore' };
+            const tile2 = cols[1] || { name: 'Kanchipuram Temple Border', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees', buttonText: 'Explore' };
+            const tile3 = cols[2] || { name: 'LUXURY SILK SAREES', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Silk Sarees', buttonText: 'SHOP SILK COLLECTION', description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.' };
+            const tile4 = cols[3] || { name: 'Paithani Peacock Pallu', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees', buttonText: 'Explore' };
+            const tile5 = cols[4] || { name: 'Scalloped Floral Organza', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees', buttonText: 'Explore' };
 
-              <Link
-                to="/shop?category=Kanchipuram Sarees"
-                className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
-              >
-                <img
-                  src="/images/saree_kanchipuram_gold.png"
-                  alt="Kanchipuram Gold Silk"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
-                  <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">Kanchipuram Temple Border</span>
-                  <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
-                    Explore <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            {/* Tile 3 (Featured Large Tile) */}
-            <div className="md:col-span-4 h-full min-h-[320px] md:min-h-full">
-              <Link
-                to="/shop?category=Silk Sarees"
-                className="relative h-full rounded-2xl overflow-hidden group border border-amber-200 bg-slate-900 block"
-              >
-                <img
-                  src="/images/saree_banarasi_purple.png"
-                  alt="Glamour Royal Saree Portrait"
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
-                />
-                <div className="absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow z-10">
-                  EDITOR'S CHOICE
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex items-end p-5">
-                  <div className="w-full">
-                    <h3 className="text-amber-300 font-street text-2xl sm:text-3xl tracking-wide group-hover:text-white transition-colors">LUXURY SILK SAREES</h3>
-                    <p className="text-slate-200 text-xs mt-0.5">Discover handcrafted mulberry silk sarees & heirloom zari drapes.</p>
-                    <div className="mt-2.5 inline-flex items-center gap-2 text-xs font-black text-amber-400 uppercase group-hover:translate-x-1 transition-transform">
-                      <span>SHOP SILK COLLECTION</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 h-auto md:h-[400px]">
+                {/* Tile 1 & 2 */}
+                <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
+                  <Link
+                    to={tile1.buttonLink || '/shop?category=Banarasi Sarees'}
+                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                  >
+                    <img
+                      src={tile1.image || '/images/saree_banarasi_red.png'}
+                      alt={tile1.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                      <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile1.name}</span>
+                      <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                        {tile1.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
+                      </span>
                     </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
+                  </Link>
 
-            {/* Tile 4 & 5 */}
-            <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
-              <Link
-                to="/shop?category=Paithani Sarees"
-                className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
-              >
-                <img
-                  src="/images/saree_paithani_green.png"
-                  alt="Paithani Silk Zari"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
-                  <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">Paithani Peacock Pallu</span>
-                  <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
-                    Explore <ArrowRight className="w-3 h-3" />
-                  </span>
+                  <Link
+                    to={tile2.buttonLink || '/shop?category=Kanchipuram Sarees'}
+                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                  >
+                    <img
+                      src={tile2.image || '/images/saree_kanchipuram_gold.png'}
+                      alt={tile2.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                      <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile2.name}</span>
+                      <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                        {tile2.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
 
-              <Link
-                to="/shop?category=Organza Sarees"
-                className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
-              >
-                <img
-                  src="/images/saree_organza_floral.png"
-                  alt="Organza Embroidery"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
-                  <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">Scalloped Floral Organza</span>
-                  <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
-                    Explore <ArrowRight className="w-3 h-3" />
-                  </span>
+                {/* Tile 3 (Featured Large Center Tile) */}
+                <div className="md:col-span-4 h-full min-h-[320px] md:min-h-full">
+                  <Link
+                    to={tile3.buttonLink || '/shop?category=Silk Sarees'}
+                    className="relative h-full rounded-2xl overflow-hidden group border border-amber-200 bg-slate-900 block"
+                  >
+                    <img
+                      src={tile3.image || '/images/saree_banarasi_purple.png'}
+                      alt={tile3.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
+                    />
+                    <div className="absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow z-10">
+                      EDITOR'S CHOICE
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex items-end p-5">
+                      <div className="w-full">
+                        <h3 className="text-amber-300 font-street text-2xl sm:text-3xl tracking-wide group-hover:text-white transition-colors">{tile3.name}</h3>
+                        <p className="text-slate-200 text-xs mt-0.5">{tile3.description || 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.'}</p>
+                        <div className="mt-2.5 inline-flex items-center gap-2 text-xs font-black text-amber-400 uppercase group-hover:translate-x-1 transition-transform">
+                          <span>{tile3.buttonText || 'SHOP SILK COLLECTION'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
-            </div>
-          </div>
+
+                {/* Tile 4 & 5 */}
+                <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
+                  <Link
+                    to={tile4.buttonLink || '/shop?category=Paithani Sarees'}
+                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                  >
+                    <img
+                      src={tile4.image || '/images/saree_paithani_green.png'}
+                      alt={tile4.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                      <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile4.name}</span>
+                      <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                        {tile4.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to={tile5.buttonLink || '/shop?category=Organza Sarees'}
+                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                  >
+                    <img
+                      src={tile5.image || '/images/saree_organza_floral.png'}
+                      alt={tile5.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                      <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile5.name}</span>
+                      <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                        {tile5.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
       {/* 3. INTERACTIVE SELECTION SAREE CAROUSEL WITH DIRECT COLLECTION RELOCATION */}
       {cms?.trendingSarees?.enabled !== false && (
-        <section className="bg-white my-12 py-12 border-y border-amber-200/80 shadow-sm relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center space-y-2 mb-10">
-            <h2 className="font-street text-4xl sm:text-6xl text-slate-900 tracking-tight">
+        <section className="bg-white my-10 py-10 border-y border-amber-200/80 shadow-sm relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center mb-8">
+            <h2 className="font-street text-xl sm:text-2xl font-extrabold text-slate-900 tracking-wider uppercase">
               {cms?.trendingSarees?.title || 'DIVE INTO A WORLD OF ENDLESS SAREE POSSIBILITIES'}
             </h2>
-            <p className="text-xs text-red-800 uppercase tracking-widest font-black">
-              {cms?.trendingSarees?.subtitle || 'FEATURED SAREE COLLECTION • CLICK ANY ACTIVE CARD TO GO TO ITS COLLECTION'}
-            </p>
           </div>
 
           <div
@@ -434,7 +439,7 @@ export const HomePage: React.FC = () => {
                     className={`absolute top-0 cursor-pointer ${
                       isActive
                         ? 'shadow-2xl border-2 border-red-800 rounded-3xl w-72 sm:w-80 h-[440px]'
-                        : 'border border-amber-300 rounded-2xl w-64 sm:w-72 h-[400px] hover:opacity-90'
+                        : 'border border-amber-300 hover:border-amber-400 rounded-2xl w-64 sm:w-72 h-[400px] hover:shadow-xl'
                     } bg-slate-900 overflow-hidden flex flex-col justify-between p-5 select-none group`}
                   >
                     <img
@@ -446,7 +451,7 @@ export const HomePage: React.FC = () => {
 
                     {/* Top Tag Pill */}
                     <div className="relative z-10 flex justify-between items-center">
-                      <span className="bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
+                      <span className="bg-white/90 backdrop-blur-md text-slate-900 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
                         {card.tag}
                       </span>
                       {isActive && (
@@ -458,11 +463,13 @@ export const HomePage: React.FC = () => {
 
                     {/* Bottom Info Overlay */}
                     <div className="relative z-10 text-left text-white space-y-1.5">
-                      <h4 className="font-serif-luxury font-extrabold text-base line-clamp-1 text-amber-200">{card.title}</h4>
+                      <h4 className="font-serif-luxury font-extrabold text-base line-clamp-1 text-amber-200 group-hover:text-amber-400 group-hover:scale-[1.02] transition-all duration-300">
+                        {card.title}
+                      </h4>
                       <div className="flex items-center justify-between pt-1">
                         <div>
-                          <span className="text-xs font-bold text-amber-400 block">{card.price}</span>
-                          <span className="text-[11px] font-extrabold text-slate-300">{card.rupeePrice}</span>
+                          <span className="text-xs font-bold text-amber-400 group-hover:text-white transition-colors block">{card.price}</span>
+                          <span className="text-[11px] font-extrabold text-slate-300 group-hover:text-amber-200 transition-colors">{card.rupeePrice}</span>
                         </div>
                         {isActive ? (
                           <Link
@@ -474,7 +481,7 @@ export const HomePage: React.FC = () => {
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-amber-400 group-hover:text-slate-950 text-white flex items-center justify-center transition-colors">
                             <ArrowRight className="w-3.5 h-3.5" />
                           </div>
                         )}

@@ -46,18 +46,23 @@ export const orderApi = {
     return response.data;
   },
 
-  updateOrderStatus: async (id: string, status: string): Promise<Order> => {
-    const response = await api.put(`/orders/${id}/status`, { status });
+  updateOrderStatus: async (id: string, status: string, reason?: string): Promise<Order> => {
+    const response = await api.put(`/orders/${id}/status`, { status, reason });
     return response.data;
   },
 
-  cancelOrder: async (id: string): Promise<Order> => {
-    const response = await api.put(`/orders/${id}/cancel`);
+  cancelOrder: async (id: string, reason?: string): Promise<Order> => {
+    const response = await api.put(`/orders/${id}/cancel`, { reason });
     return response.data;
   },
 
   requestReturn: async (id: string): Promise<Order> => {
     const response = await api.put(`/orders/${id}/return`);
+    return response.data;
+  },
+
+  deleteOrder: async (id: string): Promise<any> => {
+    const response = await api.delete(`/orders/${id}`);
     return response.data;
   },
 };

@@ -53,14 +53,11 @@ export const WhatsAppButton: React.FC = () => {
   const encodedText = encodeURIComponent(settings.whatsappGreeting);
   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
 
-  // Position calculation: Sleek compact bottom-right corner by default
-  const positionClass =
-    settings.whatsappPosition === 'bottom-left'
-      ? 'bottom-5 left-5'
-      : 'bottom-5 right-5';
+  // Position calculation: Always fixed to the bottom-right corner for web & responsive screens
+  const positionClass = 'bottom-5 right-5 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8';
 
   return (
-    <div className={`fixed ${positionClass} z-[999] flex items-center justify-center font-sans`}>
+    <div className={`fixed ${positionClass} z-[99999] flex items-center justify-center font-sans`}>
       {/* Pulse Outer Ring */}
       <span
         className="absolute inset-0 rounded-full animate-ping opacity-30 pointer-events-none"

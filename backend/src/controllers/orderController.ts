@@ -34,17 +34,27 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
       totalPrice,
       isPaid: true,
       paidAt: new Date(),
+      isStockDeducted: true,
       orderStatus: 'Pending',
     });
 
     const createdOrder = await order.save();
 
-    // Auto-reduce product stock in MongoDB Atlas
+    // Auto-reduce product stock in MongoDB Atlas and emit real-time socket events
     if (mongoose.connection.readyState === 1) {
       for (const item of orderItems) {
         if (item.product && mongoose.Types.ObjectId.isValid(item.product)) {
           const qty = item.qty || item.quantity || 1;
-          await Product.findByIdAndUpdate(item.product, { $inc: { stock: -qty } }).catch(() => {});
+          const updatedProd = await Product.findByIdAndUpdate(
+            item.product,
+            { $inc: { stock: -qty } },
+            { new: true }
+          ).catch(() => null);
+
+          if (updatedProd) {
+            emitRealtimeEvent('productUpdated', updatedProd);
+            emitRealtimeEvent('inventoryUpdated', { productId: updatedProd._id, stock: updatedProd.stock });
+          }
         }
       }
     }
@@ -95,38 +105,122 @@ export const getOrders = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const updateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
-    if (order) {
-      const newStatus = req.body.status || order.orderStatus;
-      order.orderStatus = newStatus;
-      if (req.body.trackingNumber) {
-        order.trackingNumber = req.body.trackingNumber;
-      }
-      if (newStatus === 'Delivered') {
-        order.isDelivered = true;
-        order.deliveredAt = new Date();
-      }
-      const updatedOrder = await order.save();
-      emitRealtimeEvent('orderUpdated', updatedOrder);
-
-      // Trigger status-specific emails
-      const customerEmail = (updatedOrder.user as any)?.email || req.body.email || 'customer@evancollections.com';
-      if (newStatus === 'Shipped') {
-        sendOrderShippedEmail(updatedOrder, customerEmail).catch(() => {});
-      } else if (newStatus === 'Out For Delivery') {
-        sendOutForDeliveryEmail(updatedOrder, customerEmail).catch(() => {});
-      } else if (newStatus === 'Delivered') {
-        sendOrderDeliveredEmail(updatedOrder, customerEmail).catch(() => {});
-      } else if (newStatus === 'Cancelled') {
-        sendOrderCancelledEmail(updatedOrder, customerEmail).catch(() => {});
-      } else {
-        sendOrderStatusUpdateEmail(updatedOrder, customerEmail).catch(() => {});
-      }
-
-      res.json(updatedOrder);
-    } else {
+    const existingOrder = await Order.findById(req.params.id);
+    if (!existingOrder) {
       res.status(404).json({ message: 'Order not found' });
+      return;
     }
+
+    if (existingOrder.orderStatus === 'Cancelled') {
+      res.status(400).json({ message: 'Cancelled orders cannot be modified or re-activated.' });
+      return;
+    }
+
+    const rawStatus = (req.body.status || req.body.orderStatus || 'Pending').toString().trim();
+    const statusMap: Record<string, string> = {
+      pending: 'Pending',
+      confirmed: 'Confirmed',
+      processing: 'Processing',
+      packed: 'Packed',
+      shipped: 'Shipped',
+      'out for delivery': 'Out For Delivery',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled',
+    };
+    const normalizedStatus = statusMap[rawStatus.toLowerCase()] || rawStatus;
+
+    let isStockDeductedNow = existingOrder.isStockDeducted || false;
+
+    // Deduct stock when order is Confirmed / Processing / Shipped and stock was not deducted
+    if (normalizedStatus !== 'Cancelled' && !isStockDeductedNow) {
+      if (mongoose.connection.readyState === 1) {
+        for (const item of existingOrder.orderItems) {
+          if (item.product && mongoose.Types.ObjectId.isValid(item.product)) {
+            const qty = item.qty || 1;
+            const updatedProd = await Product.findByIdAndUpdate(
+              item.product,
+              { $inc: { stock: -qty } },
+              { new: true }
+            ).catch(() => null);
+
+            if (updatedProd) {
+              emitRealtimeEvent('productUpdated', updatedProd);
+              emitRealtimeEvent('inventoryUpdated', { productId: updatedProd._id, stock: updatedProd.stock });
+            }
+          }
+        }
+      }
+      isStockDeductedNow = true;
+    }
+
+    // Restore stock if order is Cancelled and stock was deducted
+    if (normalizedStatus === 'Cancelled' && isStockDeductedNow) {
+      if (mongoose.connection.readyState === 1) {
+        for (const item of existingOrder.orderItems) {
+          if (item.product && mongoose.Types.ObjectId.isValid(item.product)) {
+            const qty = item.qty || 1;
+            const updatedProd = await Product.findByIdAndUpdate(
+              item.product,
+              { $inc: { stock: +qty } },
+              { new: true }
+            ).catch(() => null);
+
+            if (updatedProd) {
+              emitRealtimeEvent('productUpdated', updatedProd);
+              emitRealtimeEvent('inventoryUpdated', { productId: updatedProd._id, stock: updatedProd.stock });
+            }
+          }
+        }
+      }
+      isStockDeductedNow = false;
+    }
+
+    const updateFields: any = {
+      orderStatus: normalizedStatus,
+      isStockDeducted: isStockDeductedNow,
+    };
+
+    if (normalizedStatus === 'Cancelled') {
+      updateFields.cancelledBy = req.body.cancelledBy || 'Admin';
+      updateFields.cancelReason = req.body.reason || req.body.cancelReason || 'Damaged Product / Quality Inspection Failure';
+    }
+
+    if (req.body.trackingNumber) {
+      updateFields.trackingNumber = req.body.trackingNumber;
+    }
+    if (normalizedStatus === 'Delivered') {
+      updateFields.isDelivered = true;
+      updateFields.deliveredAt = new Date();
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true, runValidators: false }
+    ).populate('user', 'name email');
+
+    if (!updatedOrder) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+
+    emitRealtimeEvent('orderUpdated', updatedOrder);
+
+    // Trigger status-specific emails asynchronously
+    const customerEmail = (updatedOrder.user as any)?.email || req.body.email || 'customer@evancollections.com';
+    if (normalizedStatus === 'Shipped') {
+      sendOrderShippedEmail(updatedOrder, customerEmail).catch(() => {});
+    } else if (normalizedStatus === 'Out For Delivery') {
+      sendOutForDeliveryEmail(updatedOrder, customerEmail).catch(() => {});
+    } else if (normalizedStatus === 'Delivered') {
+      sendOrderDeliveredEmail(updatedOrder, customerEmail).catch(() => {});
+    } else if (normalizedStatus === 'Cancelled') {
+      sendOrderCancelledEmail(updatedOrder, customerEmail).catch(() => {});
+    } else {
+      sendOrderStatusUpdateEmail(updatedOrder, customerEmail).catch(() => {});
+    }
+
+    res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -140,7 +234,15 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
         res.status(400).json({ message: 'Delivered orders cannot be cancelled' });
         return;
       }
+      if (order.orderStatus === 'Cancelled') {
+        res.status(400).json({ message: 'Order is already cancelled' });
+        return;
+      }
+
+      const reason = req.body.reason || req.body.cancelReason || 'Cancelled by customer';
       order.orderStatus = 'Cancelled';
+      (order as any).cancelledBy = 'Customer';
+      (order as any).cancelReason = reason;
       const updatedOrder = await order.save();
       emitRealtimeEvent('orderUpdated', updatedOrder);
 
@@ -181,7 +283,21 @@ export const updateOrderToDelivered = async (req: AuthRequest, res: Response): P
       order.orderStatus = 'Delivered';
       const updatedOrder = await order.save();
       emitRealtimeEvent('orderUpdated', updatedOrder);
-      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const deleteOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      await order.deleteOne();
+      emitRealtimeEvent('orderDeleted', { id: req.params.id });
+      res.json({ message: 'Order removed successfully' });
     } else {
       res.status(404).json({ message: 'Order not found' });
     }

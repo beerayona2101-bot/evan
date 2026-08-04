@@ -106,8 +106,12 @@ export const Navbar: React.FC = () => {
                 onClick={() => setUserDropdown(!userDropdown)}
                 className="flex items-center space-x-2 focus:outline-none"
               >
-                <div className="w-7 h-7 rounded-full bg-red-800 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow">
-                  {user.name.charAt(0).toUpperCase()}
+                <div className="w-8 h-8 rounded-full bg-red-800 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow overflow-hidden">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
                 </div>
               </button>
             ) : (
@@ -121,10 +125,19 @@ export const Navbar: React.FC = () => {
 
             {/* Profile Dropdown Menu */}
             {userDropdown && user && (
-              <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl border border-amber-200 py-2 z-50 text-xs font-semibold text-slate-800">
-                <div className="px-4 py-2 border-b border-amber-100">
-                  <p className="font-bold text-slate-900 truncate">{user.name}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+              <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-amber-200 py-2 z-50 text-xs font-semibold text-slate-800">
+                <div className="px-4 py-2.5 border-b border-amber-100 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-red-800 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow overflow-hidden flex-shrink-0">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div className="truncate">
+                    <p className="font-bold text-slate-900 truncate">{user.name}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                  </div>
                 </div>
 
                 <Link

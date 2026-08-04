@@ -20,7 +20,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group bg-white rounded-xl p-2 sm:p-2.5 border border-amber-200/80 hover:border-amber-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
       {/* Ultra Compact Saree Image Container */}
-      <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-amber-50/30 mb-1.5 flex items-center justify-center p-1">
+      <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-amber-50/30 mb-1.5">
         <Link to={`/product/${product._id}`} className="w-full h-full block">
           <img
             src={product.images[0] || '/images/saree_banarasi_red.png'}
@@ -28,7 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/images/saree_banarasi_red.png';
             }}
-            className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-300 ease-out rounded-md"
+            className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </Link>
 
@@ -58,13 +58,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="space-y-0.5 text-center">
         <Link
           to={`/shop?category=${encodeURIComponent(product.category)}`}
-          className="text-[8.5px] font-black uppercase tracking-wider text-amber-800 hover:text-red-700 block line-clamp-1 transition-colors"
+          className="text-[8.5px] font-black uppercase tracking-wider text-amber-800 group-hover:text-red-700 block line-clamp-1 transition-colors"
         >
           {product.fabric || product.category}
         </Link>
         
         <Link to={`/product/${product._id}`} className="block">
-          <h4 className="font-serif-luxury font-bold text-[11px] leading-tight text-slate-900 line-clamp-1 hover:text-red-700 transition-colors">
+          <h4 className="font-serif-luxury font-bold text-[11px] leading-tight text-slate-900 line-clamp-1 group-hover:text-red-700 transition-colors">
             {product.name}
           </h4>
         </Link>

@@ -30,6 +30,8 @@ import { RefundsAnalyticsPage } from './analytics/RefundsAnalyticsPage';
 import { ReturnsAnalyticsPage } from './analytics/ReturnsAnalyticsPage';
 import { LowStockInventoryPage } from './analytics/LowStockInventoryPage';
 import { TopSellingProductsPage } from './analytics/TopSellingProductsPage';
+import { StockWarehouseInventoryAdjuster } from '../components/StockWarehouseInventoryAdjuster';
+import { AdminCancelOrderModal } from '../components/AdminCancelOrderModal';
 
 export const AdminDashboardPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -46,6 +48,14 @@ export const AdminDashboardPage: React.FC = () => {
   >('analytics');
 
   const [analyticsSubTab, setAnalyticsSubTab] = useState<string>('dashboard');
+
+  // Orders Filter States (Time Period, Custom Calendar Date)
+  const [orderPeriodFilter, setOrderPeriodFilter] = useState<string>('all');
+  const [orderCustomDate, setOrderCustomDate] = useState<string>('');
+
+  // Admin Cancel Order Modal State
+  const [adminCancelModalOrder, setAdminCancelModalOrder] = useState<Order | null>(null);
+  const [showAdminCancelModal, setShowAdminCancelModal] = useState<boolean>(false);
 
   // Category Filter State for Inventory (null = 3x3 Cards Grid View)
   const [selectedAdminCategory, setSelectedAdminCategory] = useState<string | null>(null);
@@ -309,6 +319,8 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Search Filter inside Admin
   const [adminSearch, setAdminSearch] = useState('');
+  // Order Status Filter inside Customer Orders Pipeline
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>('ALL');
 
   const fetchAdminData = async () => {
     setLoading(true);
@@ -348,17 +360,37 @@ export const AdminDashboardPage: React.FC = () => {
       setOrders((prev) => prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
     };
 
+    const handleProductUpdated = (updatedProd: any) => {
+      if (updatedProd && updatedProd._id) {
+        setProducts((prev) =>
+          prev.map((p) => (p._id === updatedProd._id ? { ...p, ...updatedProd } : p))
+        );
+      } else {
+        fetchAdminData();
+      }
+    };
+
+    const handleInventoryUpdated = (data: { productId: string; stock: number }) => {
+      if (data && data.productId) {
+        setProducts((prev) =>
+          prev.map((p) => (p._id === data.productId ? { ...p, stock: data.stock } : p))
+        );
+      }
+    };
+
     socket.on('orderCreated', handleNewOrder);
     socket.on('orderUpdated', handleOrderUpdate);
     socket.on('productCreated', fetchAdminData);
-    socket.on('productUpdated', fetchAdminData);
+    socket.on('productUpdated', handleProductUpdated);
+    socket.on('inventoryUpdated', handleInventoryUpdated);
     socket.on('productDeleted', fetchAdminData);
 
     return () => {
       socket.off('orderCreated', handleNewOrder);
       socket.off('orderUpdated', handleOrderUpdate);
       socket.off('productCreated', fetchAdminData);
-      socket.off('productUpdated', fetchAdminData);
+      socket.off('productUpdated', handleProductUpdated);
+      socket.off('inventoryUpdated', handleInventoryUpdated);
       socket.off('productDeleted', fetchAdminData);
     };
   }, [socket]);
@@ -499,12 +531,33 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Order Status Handler
   const handleOrderStatusChange = async (orderId: string, status: string) => {
+    if (status === 'Cancelled') {
+      const targetOrder = orders.find((o) => o._id === orderId);
+      if (targetOrder) {
+        setAdminCancelModalOrder(targetOrder);
+        setShowAdminCancelModal(true);
+        return;
+      }
+    }
+
     try {
       const updated = await orderApi.updateOrderStatus(orderId, status);
       setOrders(orders.map((o) => (o._id === orderId ? updated : o)));
-      showToast(`Order #${orderId} status updated to ${status}`, 'success');
+      showToast(`Order #${orderId.slice(-6)} status updated to ${status.toUpperCase()}!`, 'success');
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Error updating order status', 'error');
+    }
+  };
+
+  // Order Deletion Handler
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!window.confirm(`Are you sure you want to delete order #${orderId}? This action cannot be undone.`)) return;
+    try {
+      await orderApi.deleteOrder(orderId);
+      setOrders(orders.filter((o) => o._id !== orderId));
+      showToast(`Order #${orderId} deleted successfully`, 'success');
     } catch {
-      showToast('Error updating order status', 'error');
+      showToast('Error deleting order', 'error');
     }
   };
 
@@ -701,27 +754,49 @@ export const AdminDashboardPage: React.FC = () => {
     return selectedImg;
   };
 
-  // AI Generator
+  // AI Generator with Full Saree Specifications
   const handleGenerateAiProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    const generatedTitle = `${aiInputs.color} ${aiInputs.category} Vol.${Math.floor(100 + Math.random() * 900)} by EVAN COLLECTIONS`;
-    const generatedDesc = `Handcrafted ${aiInputs.color.toLowerCase()} ${aiInputs.category.toLowerCase()} woven from pure ${aiInputs.fabric.toLowerCase()} for ${aiInputs.occasion.toLowerCase()}. Features heavy gold zari brocade, unstitched blouse piece (0.8m), and silk mark hallmark.`;
-    const price = 12999 + Math.floor(Math.random() * 8000);
-    const uniqueAiImage = generateUniqueSareeImage(aiInputs.category, aiInputs.color);
+    const cat = aiInputs.category || 'Banarasi Sarees';
+    const fab = aiInputs.fabric || 'Royal Handloom Silk';
+    const col = aiInputs.color || 'Royal Crimson Red';
+    const occ = aiInputs.occasion || 'Bridal & Wedding';
+
+    const generatedTitle = `EVAN COLLECTIONS ${col} ${cat} Vol.${Math.floor(100 + Math.random() * 900)}`;
+    const generatedDesc = `Exquisite ${col.toLowerCase()} handwoven ${cat.toLowerCase()} by master artisans in India. Features rich zari brocade, unstitched contrast blouse piece, and lustrous silk drape. Certified pure silk mark.`;
+    const price = 15999 + Math.floor(Math.random() * 9000);
+    const discountPrice = Math.round(price * 0.85);
+    const mrp = Math.round(price * 1.35);
+    const uniqueAiImage = generateUniqueSareeImage(cat, col);
 
     setAiGeneratedResult({
       name: generatedTitle,
+      shortDescription: `Pure Silk Mark Certified Handcrafted ${cat}`,
       description: generatedDesc,
+      detailedDescription: generatedDesc,
       price,
-      discountPrice: Math.round(price * 0.85),
-      mrp: Math.round(price * 1.25),
-      category: aiInputs.category,
-      fabric: aiInputs.fabric,
+      discountPrice,
+      mrp,
+      category: cat,
+      fabric: fab,
+      material: fab,
+      clothType: `100% Pure Mulberry ${fab}`,
+      threadMaterial: `Tested Gold Zari & Fine Silk Threads`,
+      comfortLevel: `Soft, Lightweight & Skin-Friendly for All-Day Wear`,
+      colorDetails: `${col} - Organic Eco-Friendly Dyes`,
       borderType: 'Heavy Gold Zari Temple Border',
+      blousePiece: 'Includes Unstitched Blouse Piece (0.8m)',
+      occasion: occ,
+      sareeLength: '5.5 Meters + Includes Unstitched Blouse (0.8m)',
+      sareeWeight: '750 Grams',
+      washCare: 'Dry Clean Only. Store wrapped in soft cotton fabric.',
+      colors: [col, 'Mustard Gold', 'Emerald Green'],
       sku: `EVAN-AI-${Math.floor(1000 + Math.random() * 9000)}`,
+      stock: 25,
       image: uniqueAiImage,
+      images: [uniqueAiImage],
     });
-    showToast('AI Saree Attributes & Real-Time Image Generated!', 'success');
+    showToast('Full Saree Product Attributes & Real-Time Image Generated!', 'success');
   };
 
   const handlePublishAiProduct = async () => {
@@ -729,17 +804,32 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       const created = await productApi.createProduct({
         name: aiGeneratedResult.name,
+        shortDescription: aiGeneratedResult.shortDescription,
         description: aiGeneratedResult.description,
-        price: aiGeneratedResult.price,
-        discountPrice: aiGeneratedResult.discountPrice,
-        mrp: aiGeneratedResult.mrp,
+        detailedDescription: aiGeneratedResult.detailedDescription,
+        price: Number(aiGeneratedResult.price),
+        discountPrice: Number(aiGeneratedResult.discountPrice),
+        mrp: Number(aiGeneratedResult.mrp),
         category: aiGeneratedResult.category,
         fabric: aiGeneratedResult.fabric,
-        stock: 25,
-        images: [aiGeneratedResult.image || '/images/saree_banarasi_red.png'],
+        material: aiGeneratedResult.material,
+        clothType: aiGeneratedResult.clothType,
+        threadMaterial: aiGeneratedResult.threadMaterial,
+        comfortLevel: aiGeneratedResult.comfortLevel,
+        colorDetails: aiGeneratedResult.colorDetails,
+        borderType: aiGeneratedResult.borderType,
+        blousePiece: aiGeneratedResult.blousePiece,
+        occasion: aiGeneratedResult.occasion,
+        sareeLength: aiGeneratedResult.sareeLength,
+        sareeWeight: aiGeneratedResult.sareeWeight,
+        washCare: aiGeneratedResult.washCare,
+        colors: aiGeneratedResult.colors || [aiInputs.color],
+        sku: aiGeneratedResult.sku,
+        stock: Number(aiGeneratedResult.stock || 25),
+        images: aiGeneratedResult.images || [aiGeneratedResult.image || '/images/saree_banarasi_red.png'],
       });
       setProducts([created, ...products]);
-      showToast('AI Generated Saree with Real-Time Image Published Live!', 'success');
+      showToast('Full AI Saree Product Card Published Live to MongoDB!', 'success');
       setAiGeneratedResult(null);
     } catch {
       showToast('Failed to publish AI Saree', 'error');
@@ -803,9 +893,9 @@ export const AdminDashboardPage: React.FC = () => {
     });
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] text-slate-900 flex font-sans">
-      {/* Sidebar Navigation */}
-      <aside className="w-64 bg-slate-900 text-white min-h-screen p-6 hidden md:flex flex-col justify-between border-r border-amber-500/20 sticky top-0 h-screen shadow-2xl z-30">
+    <div className="h-screen w-screen bg-[#FFFDF9] text-slate-900 flex font-sans overflow-hidden">
+      {/* Sidebar Navigation - Fixed locked position on screen */}
+      <aside className="w-64 h-full bg-slate-900 text-white p-6 hidden md:flex flex-col justify-between border-r border-amber-500/20 shadow-2xl z-30 flex-shrink-0 overflow-hidden">
         <div className="space-y-6">
           <Link to="/" className="flex items-center space-x-3 pt-2">
             <img
@@ -841,7 +931,7 @@ export const AdminDashboardPage: React.FC = () => {
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`}
             >
-              <ShoppingBag className="w-4 h-4 text-amber-400" /> Customer Orders ({orders.length})
+              <ShoppingBag className="w-4 h-4 text-amber-400" /> Orders ({orders.length})
             </button>
 
             <button
@@ -874,14 +964,6 @@ export const AdminDashboardPage: React.FC = () => {
                 }`}
             >
               <Sparkles className="w-4 h-4 text-amber-400" /> Coupons & Offers
-            </button>
-
-            <button
-              onClick={() => setActiveTab('ai-generator')}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'ai-generator' ? 'bg-red-800 text-amber-300 shadow border border-amber-300/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                }`}
-            >
-              <Bot className="w-4 h-4 text-amber-400" /> AI Saree Generator
             </button>
 
             <button
@@ -923,41 +1005,8 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 sm:p-8 space-y-6 overflow-y-auto max-w-7xl">
-        {/* Top Header */}
-        <div className="bg-white p-6 rounded-3xl border border-amber-200 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-red-800 text-amber-300 flex items-center justify-center font-black text-xl shadow border border-amber-300">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-amber-800">EVAN ADMIN CONTROL</span>
-              <h1 className="font-street text-3xl font-black text-slate-900 tracking-tight uppercase">
-                {activeTab.toUpperCase()} PANEL
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-700" />
-              <input
-                type="text"
-                placeholder="Search SKU, saree, category..."
-                value={adminSearch}
-                onChange={(e) => setAdminSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-amber-50/50 border border-amber-300 rounded-xl text-xs font-semibold focus:outline-none"
-              />
-            </div>
-            <button
-              onClick={handleOpenCreateModal}
-              className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-md flex items-center gap-1.5 border border-amber-300 whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4" /> Add Saree
-            </button>
-          </div>
-        </div>
+      {/* Main Content Area - Independently scrollable */}
+      <main className="flex-1 h-full overflow-y-auto p-6 sm:p-8 space-y-6">
 
         {/* TAB 1: Analytics & Reports Overview */}
         {activeTab === 'analytics' && <AnalyticsSummaryDashboard onNavigate={(targetTab) => setActiveTab(targetTab as any)} />}
@@ -1213,75 +1262,296 @@ export const AdminDashboardPage: React.FC = () => {
         )}
 
         {/* TAB 3: Customer Orders */}
-        {activeTab === 'orders' && (
-          <div className="bg-white rounded-3xl border border-amber-200 shadow-md overflow-hidden">
-            <div className="p-6 border-b border-amber-100 flex items-center justify-between bg-amber-50/40">
-              <h3 className="font-street text-2xl font-black text-slate-900">CUSTOMER ORDERS PIPELINE</h3>
-              <button onClick={handleExportCSV} className="px-3 py-1.5 bg-amber-100 text-slate-900 font-bold text-xs uppercase rounded-xl hover:bg-amber-200">
-                Export Orders CSV
-              </button>
-            </div>
+        {activeTab === 'orders' && (() => {
+          const matchesOrderPeriod = (createdAtStr: string) => {
+            if (orderPeriodFilter === 'all') return true;
+            const createdDate = new Date(createdAtStr);
+            const now = new Date();
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-semibold">
-                <thead className="bg-amber-100/60 text-slate-900 font-extrabold uppercase border-b border-amber-200">
-                  <tr>
-                    <th className="p-4">Order ID & Date</th>
-                    <th className="p-4">Customer</th>
-                    <th className="p-4">Total Amount</th>
-                    <th className="p-4">Status Pipeline</th>
-                    <th className="p-4 text-right">Invoices & Labels</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-amber-100">
-                  {orders.map((o) => (
-                    <tr key={o._id} className="hover:bg-amber-50/60 transition-colors">
-                      <td className="p-4">
-                        <span className="font-mono font-bold text-red-800 text-sm block">#{o._id}</span>
-                        <span className="text-slate-500 text-[10px]">{new Date(o.createdAt).toLocaleDateString()}</span>
-                      </td>
-                      <td className="p-4 font-bold text-slate-900">
-                        {(o as any).user?.name || 'Guest / Verified Buyer'}
-                      </td>
-                      <td className="p-4 font-black text-slate-900 text-sm">
-                        ₹{o.totalPrice.toLocaleString('en-IN')}
-                      </td>
-                      <td className="p-4">
-                        <select
-                          value={o.orderStatus}
-                          onChange={(e) => handleOrderStatusChange(o._id, e.target.value)}
-                          className="p-2 bg-amber-50 border border-amber-300 rounded-xl text-xs font-bold text-slate-900 uppercase"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Confirmed">Confirmed</option>
-                          <option value="Packed">Packed</option>
-                          <option value="Shipped">Shipped</option>
-                          <option value="Out For Delivery">Out For Delivery</option>
-                          <option value="Delivered">Delivered</option>
-                          <option value="Cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td className="p-4 text-right space-x-2">
+            if (orderPeriodFilter === 'today') {
+              return createdDate.toDateString() === now.toDateString();
+            }
+
+            if (orderPeriodFilter === '7days') {
+              const past7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+              return createdDate >= past7;
+            }
+
+            if (orderPeriodFilter === '30days') {
+              const past30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+              return createdDate >= past30;
+            }
+
+            if (orderPeriodFilter === 'this_month') {
+              return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
+            }
+
+            if (orderPeriodFilter === 'last_month') {
+              const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+              return createdDate.getMonth() === lastMonthDate.getMonth() && createdDate.getFullYear() === lastMonthDate.getFullYear();
+            }
+
+            if (orderPeriodFilter === 'this_year') {
+              return createdDate.getFullYear() === now.getFullYear();
+            }
+
+            if (orderPeriodFilter === 'custom' && orderCustomDate) {
+              const [y, m, d] = orderCustomDate.split('-').map(Number);
+              return (
+                createdDate.getFullYear() === y &&
+                createdDate.getMonth() + 1 === m &&
+                createdDate.getDate() === d
+              );
+            }
+
+            return true;
+          };
+
+          const getOrderStatusCount = (statusKey: string) => {
+            const dateFiltered = orders.filter((o) => matchesOrderPeriod(o.createdAt));
+            if (statusKey === 'ALL') return dateFiltered.length;
+            return dateFiltered.filter((o) => (o.orderStatus || '').toLowerCase() === statusKey.toLowerCase()).length;
+          };
+
+          const filteredOrders = orders.filter((o) => {
+            const matchesStatus = orderStatusFilter === 'ALL' || (o.orderStatus || '').toLowerCase() === orderStatusFilter.toLowerCase();
+            const matchesDate = matchesOrderPeriod(o.createdAt);
+            return matchesStatus && matchesDate;
+          });
+
+          return (
+            <div className="bg-white rounded-3xl border border-amber-200 shadow-md overflow-hidden space-y-0">
+              {/* Header Bar */}
+              <div className="p-6 border-b border-amber-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-amber-50/40">
+                <div>
+                  <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">FULFILLMENT PIPELINE</span>
+                  <h3 className="font-street text-2xl sm:text-3xl font-black text-slate-900">ORDERS PIPELINE</h3>
+                </div>
+                <button onClick={handleExportCSV} className="px-3.5 py-2 bg-amber-100 text-slate-900 font-extrabold text-xs uppercase rounded-xl hover:bg-amber-200 border border-amber-300 shadow-sm">
+                  Export Orders CSV
+                </button>
+              </div>
+
+              {/* Single-Line Interactive Status Filter Buttons Bar */}
+              <div className="p-4 bg-amber-50/60 border-b border-amber-200 flex items-center gap-2 overflow-x-auto whitespace-nowrap custom-scrollbar">
+                {[
+                  { key: 'ALL', label: 'ALL ORDERS' },
+                  { key: 'Pending', label: 'PENDING' },
+                  { key: 'Confirmed', label: 'CONFIRMED' },
+                  { key: 'Processing', label: 'PROCESSING' },
+                  { key: 'Packed', label: 'PACKED' },
+                  { key: 'Shipped', label: 'SHIPPED' },
+                  { key: 'Out For Delivery', label: 'OUT FOR DELIVERY' },
+                  { key: 'Delivered', label: 'DELIVERED' },
+                  { key: 'Cancelled', label: 'CANCELLED' },
+                ].map((st) => {
+                  const count = getOrderStatusCount(st.key);
+                  const isActive = orderStatusFilter.toLowerCase() === st.key.toLowerCase();
+                  return (
+                    <button
+                      key={st.key}
+                      onClick={() => setOrderStatusFilter(st.key)}
+                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 border shadow-sm flex-shrink-0 ${
+                        isActive
+                          ? 'bg-red-800 text-amber-300 border-amber-300 shadow-md'
+                          : 'bg-white text-slate-700 hover:bg-amber-100 border-amber-300/80'
+                      }`}
+                    >
+                      <span>{st.label}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] ${isActive ? 'bg-amber-300 text-red-900 font-black' : 'bg-amber-100 text-slate-900 font-bold'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 📅 Date & Time Period Filter Bar (Day, Month, Year, Calendar Date Picker) */}
+              <div className="p-4 bg-amber-100/50 border-b border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1.5 font-black text-amber-900 uppercase tracking-wider text-[11px]">
+                    <Clock className="w-4 h-4 text-red-800" />
+                    <span>TIME PERIOD FILTER:</span>
+                  </div>
+
+                  {/* Dropdown presets */}
+                  <select
+                    value={orderPeriodFilter}
+                    onChange={(e: any) => {
+                      setOrderPeriodFilter(e.target.value);
+                      if (e.target.value !== 'custom') setOrderCustomDate('');
+                    }}
+                    className="px-3.5 py-2 bg-white border border-amber-300 rounded-xl font-bold text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase cursor-pointer"
+                  >
+                    <option value="all">🗓️ ALL TIME ORDERS</option>
+                    <option value="today">⚡ TODAY</option>
+                    <option value="7days">📅 LAST 7 DAYS</option>
+                    <option value="30days">📆 LAST 30 DAYS</option>
+                    <option value="this_month">📊 THIS MONTH</option>
+                    <option value="last_month">📜 LAST MONTH</option>
+                    <option value="this_year">🏆 THIS YEAR</option>
+                    <option value="custom">🔍 CHOOSE SPECIFIC DATE (CALENDAR)</option>
+                  </select>
+
+                  {/* Calendar Date Picker Input */}
+                  {(orderPeriodFilter === 'custom' || orderCustomDate) && (
+                    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-400 shadow-sm">
+                      <span className="text-[10px] font-black text-amber-800 uppercase">PICK DATE:</span>
+                      <input
+                        type="date"
+                        value={orderCustomDate}
+                        onChange={(e) => {
+                          setOrderCustomDate(e.target.value);
+                          setOrderPeriodFilter('custom');
+                        }}
+                        className="bg-transparent font-mono text-xs font-bold text-slate-900 focus:outline-none cursor-pointer"
+                      />
+                      {orderCustomDate && (
                         <button
-                          onClick={() => handlePrintInvoice(o)}
-                          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-[10px] rounded-lg uppercase inline-flex items-center gap-1"
+                          onClick={() => {
+                            setOrderCustomDate('');
+                            setOrderPeriodFilter('all');
+                          }}
+                          className="px-2 py-0.5 bg-red-100 text-red-800 rounded-md text-[9px] font-black uppercase hover:bg-red-200 border border-red-300"
                         >
-                          <FileText className="w-3 h-3 text-red-700" /> Invoice
+                          ✕ Clear
                         </button>
-                        <button
-                          onClick={() => handlePrintShippingLabel(o)}
-                          className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-extrabold text-[10px] rounded-lg uppercase inline-flex items-center gap-1"
-                        >
-                          <Printer className="w-3 h-3 text-amber-300" /> Label
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Filter Summary & Reset Button */}
+                <div className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
+                  <span>
+                    Showing <strong className="text-red-800 font-black font-mono text-xs">{filteredOrders.length}</strong> of {orders.length} Orders
+                  </span>
+                  {(orderPeriodFilter !== 'all' || orderStatusFilter !== 'ALL' || orderCustomDate) && (
+                    <button
+                      onClick={() => {
+                        setOrderStatusFilter('ALL');
+                        setOrderPeriodFilter('all');
+                        setOrderCustomDate('');
+                      }}
+                      className="px-2.5 py-1 bg-red-800 text-amber-300 rounded-lg text-[10px] font-black uppercase hover:bg-red-900 border border-amber-300 shadow-sm"
+                    >
+                      Reset All Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Orders Table */}
+              <div className="overflow-x-auto">
+                {filteredOrders.length === 0 ? (
+                  <div className="p-12 text-center bg-amber-50/30 text-slate-600 font-semibold text-xs space-y-2">
+                    <p>
+                      No customer orders found matching current filter parameters:
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-2 text-[11px]">
+                      <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-300 font-bold uppercase">
+                        Status: {orderStatusFilter}
+                      </span>
+                      <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-300 font-bold uppercase">
+                        Period: {orderPeriodFilter.replace('_', ' ')}
+                      </span>
+                      {orderCustomDate && (
+                        <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-300 font-bold font-mono">
+                          Date: {orderCustomDate}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <table className="w-full text-left text-xs font-semibold">
+                    <thead className="bg-amber-100/60 text-slate-900 font-extrabold uppercase border-b border-amber-200">
+                      <tr>
+                        <th className="p-4">Order ID & Date</th>
+                        <th className="p-4">Customer</th>
+                        <th className="p-4">Total Amount</th>
+                        <th className="p-4">Status Pipeline</th>
+                        <th className="p-4 text-right">Invoices & Labels</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-amber-100">
+                      {filteredOrders.map((o) => (
+                        <tr key={o._id} className="hover:bg-amber-50/60 transition-colors">
+                          <td className="p-4">
+                            <span className="font-mono font-bold text-red-800 text-sm block">#{o._id}</span>
+                            <span className="text-slate-500 text-[10px]">{new Date(o.createdAt).toLocaleDateString()}</span>
+                          </td>
+                          <td className="p-4 font-bold text-slate-900">
+                            {(o as any).user?.name || 'Guest / Verified Buyer'}
+                          </td>
+                          <td className="p-4 font-black text-slate-900 text-sm">
+                            ₹{o.totalPrice.toLocaleString('en-IN')}
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={o.orderStatus}
+                              disabled={o.orderStatus === 'Cancelled'}
+                              onChange={(e) => handleOrderStatusChange(o._id, e.target.value)}
+                              className={`p-2 border rounded-xl text-xs font-bold uppercase transition-all ${
+                                o.orderStatus === 'Cancelled'
+                                  ? 'bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed opacity-80'
+                                  : 'bg-amber-50 border-amber-300 text-slate-900 cursor-pointer'
+                              }`}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Confirmed">Confirmed</option>
+                              <option value="Packed">Packed</option>
+                              <option value="Shipped">Shipped</option>
+                              <option value="Out For Delivery">Out For Delivery</option>
+                              <option value="Delivered">Delivered</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+
+                            {o.orderStatus === 'Cancelled' && (() => {
+                              const isCust = (o as any).cancelledBy === 'Customer' || (o.cancelReason || '').toLowerCase().includes('customer');
+                              return (
+                                <div className="mt-1.5 text-[10px] font-bold text-red-900 bg-red-100/80 p-2 rounded-xl border border-red-300 flex flex-col gap-0.5">
+                                  <span className="uppercase text-[9px] font-black tracking-wider text-red-800">
+                                    {isCust ? '🚫 CANCELLED BY CUSTOMER' : '🛡️ CANCELLED BY ADMIN'}
+                                  </span>
+                                  {o.cancelReason && (
+                                    <span className="text-[10px] text-red-950 font-semibold">
+                                      <strong>Reason:</strong> {o.cancelReason}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          </td>
+                          <td className="p-4 text-right space-x-2">
+                            <button
+                              onClick={() => handlePrintInvoice(o)}
+                              className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-[10px] rounded-lg uppercase inline-flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3 text-red-700" /> Invoice
+                            </button>
+                            <button
+                              onClick={() => handlePrintShippingLabel(o)}
+                              className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-extrabold text-[10px] rounded-lg uppercase inline-flex items-center gap-1"
+                            >
+                              <Printer className="w-3 h-3 text-amber-300" /> Label
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOrder(o._id)}
+                              className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-[10px] rounded-lg uppercase inline-flex items-center gap-1 transition-colors"
+                              title="Delete Order"
+                            >
+                              <Trash2 className="w-3 h-3 text-red-700" /> Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* TAB 4: Categories & Weaves (Database-Driven Enterprise CRUD) */}
         {activeTab === 'categories' && (
@@ -1360,15 +1630,9 @@ export const AdminDashboardPage: React.FC = () => {
                     }`}
                 >
                   <div className="space-y-3">
-                    <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-amber-300/60 shadow">
-                      <img
-                        src={cat.image || '/images/saree_kanchipuram_gold.png'}
-                        alt={cat.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-
-                      {/* Status & Live Badges */}
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                    {/* Status & Live & Featured & Product Count Badges (Photo Removed) */}
+                    <div className="flex items-center justify-between gap-2 p-3 bg-amber-100/50 rounded-2xl border border-amber-200">
+                      <div className="flex items-center gap-1.5">
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow border ${cat.status === 'ACTIVE'
                             ? 'bg-emerald-800 text-amber-300 border-emerald-400'
@@ -1392,8 +1656,7 @@ export const AdminDashboardPage: React.FC = () => {
                         </button>
                       </div>
 
-                      {/* Featured & Product Count Badges */}
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => handleToggleDbCategoryFeatured(cat)}
                           className={`p-1.5 rounded-full shadow transition-all ${cat.featured ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-slate-900/60 text-slate-300 hover:text-amber-300'
@@ -1532,71 +1795,6 @@ export const AdminDashboardPage: React.FC = () => {
                       />
                     </div>
 
-                    {/* Image Upload Box */}
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
-                        Category Cover Image (Local File or URL) *
-                      </label>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            required
-                            value={dbCatForm.image}
-                            onChange={(e) => setDbCatForm({ ...dbCatForm, image: e.target.value })}
-                            className="flex-1 p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium text-xs"
-                            placeholder="Image URL or Base64 file string..."
-                          />
-                          <label className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-amber-300 font-black text-xs rounded-xl cursor-pointer shadow flex items-center gap-1.5 border border-amber-300 whitespace-nowrap">
-                            <ImageIcon className="w-4 h-4 text-amber-400" />
-                            <span>BROWSE LOCAL FILE</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = async () => {
-                                    if (typeof reader.result === 'string') {
-                                      const base64Data = reader.result;
-                                      setDbCatForm((prev) => ({ ...prev, image: base64Data }));
-                                      showToast(`Uploading "${file.name}" to Cloudinary CDN...`, 'info');
-                                      try {
-                                        const uploadRes = await categoryApi.uploadImage(base64Data);
-                                        if (uploadRes?.imageUrl) {
-                                          setDbCatForm((prev) => ({ ...prev, image: uploadRes.imageUrl }));
-                                          showToast(`Uploaded to Cloudinary CDN!`, 'success');
-                                        }
-                                      } catch {
-                                        showToast(`Local image preview ready!`, 'success');
-                                      }
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                            />
-                          </label>
-                        </div>
-
-                        {dbCatForm.image && (
-                          <div className="flex items-center gap-3 p-3 bg-amber-50/80 rounded-xl border border-amber-300">
-                            <img
-                              src={dbCatForm.image}
-                              alt="Cover Preview"
-                              className="w-16 h-12 object-cover rounded-lg border border-amber-300 shadow-sm"
-                            />
-                            <div className="text-[10px] text-slate-700">
-                              <span className="font-black text-red-800 uppercase block">✓ COVER IMAGE PREVIEW READY</span>
-                              <span className="truncate block max-w-xs font-mono text-[9px] text-slate-500">{dbCatForm.image.slice(0, 50)}...</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
@@ -1712,26 +1910,12 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 5: Stock & Warehouse */}
+        {/* TAB 5: Stock & Warehouse (Category-Wise Cards & Manual Stock Adjuster) */}
         {activeTab === 'inventory' && (
-          <div className="bg-white rounded-3xl border border-amber-200 shadow-md p-6 space-y-6">
-            <h3 className="font-street text-2xl font-black text-slate-900">STOCK & WAREHOUSE INVENTORY ADJUSTER</h3>
-            <div className="space-y-3">
-              {products.map((p) => (
-                <div key={p._id} className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 flex justify-between items-center text-xs font-semibold">
-                  <div>
-                    <p className="font-bold text-slate-900 text-sm">{p.name}</p>
-                    <p className="text-slate-500">SKU: {p.sku} | Current Stock: <strong className="text-red-800">{p.stock} units</strong></p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => handleUpdateStock(p._id, p.stock, -5)} className="px-3 py-1 bg-red-100 text-red-800 font-bold rounded-lg hover:bg-red-200">-5</button>
-                    <button onClick={() => handleUpdateStock(p._id, p.stock, +5)} className="px-3 py-1 bg-amber-100 text-slate-900 font-bold rounded-lg hover:bg-amber-200">+5</button>
-                    <button onClick={() => handleUpdateStock(p._id, p.stock, +10)} className="px-3 py-1 bg-slate-900 text-amber-300 font-bold rounded-lg hover:bg-slate-800">+10</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <StockWarehouseInventoryAdjuster
+            products={products}
+            onRefreshProducts={fetchAdminData}
+          />
         )}
 
         {/* TAB 6: Customer CRM */}
@@ -1751,7 +1935,16 @@ export const AdminDashboardPage: React.FC = () => {
                 <tbody className="divide-y divide-amber-100">
                   {customers.map((c) => (
                     <tr key={c._id}>
-                      <td className="p-3 font-bold text-slate-900">{c.name}</td>
+                      <td className="p-3 font-bold text-slate-900 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow overflow-hidden flex-shrink-0">
+                          {c.avatar ? (
+                            <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
+                          ) : (
+                            c.name.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <span>{c.name}</span>
+                      </td>
                       <td className="p-3 text-slate-600">{c.email}</td>
                       <td className="p-3 font-extrabold uppercase text-amber-800">{c.role}</td>
                       <td className="p-3 text-right space-x-2">
@@ -1838,16 +2031,16 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* TAB 9: AI Generator */}
         {activeTab === 'ai-generator' && (
-          <div className="bg-white p-8 rounded-3xl border border-amber-200 shadow-lg space-y-6">
+          <div className="bg-white p-8 rounded-3xl border border-amber-200 shadow-lg space-y-6 text-slate-900 font-sans">
             <div className="space-y-2">
               <span className="text-xs font-black uppercase tracking-widest text-amber-800 flex items-center gap-2">
                 <Bot className="w-4 h-4 text-red-700" /> AI SAREE GENERATOR ATELIER
               </span>
               <h3 className="font-street text-3xl font-black text-slate-900">GENERATE SAREE ATTRIBUTES WITH AI</h3>
-              <p className="text-xs text-slate-600 font-medium">Enter inputs to generate titles, weave description, SEO tags, SKU, and specifications.</p>
+              <p className="text-xs text-slate-600 font-medium">Enter inputs to generate full titles, fabric specifications, thread & zari details, SKU, and product imagery.</p>
             </div>
 
-            <form onSubmit={handleGenerateAiProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+            <form onSubmit={handleGenerateAiProduct} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-semibold">
               <div>
                 <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Saree Category</label>
                 <select
@@ -1860,6 +2053,8 @@ export const AdminDashboardPage: React.FC = () => {
                   <option value="Organza Sarees">Organza Sarees</option>
                   <option value="Linen Sarees">Linen Sarees</option>
                   <option value="Paithani Sarees">Paithani Sarees</option>
+                  <option value="Silk Sarees">Silk Sarees</option>
+                  <option value="Partywear Sarees">Partywear Sarees</option>
                 </select>
               </div>
 
@@ -1869,6 +2064,7 @@ export const AdminDashboardPage: React.FC = () => {
                   type="text"
                   value={aiInputs.fabric}
                   onChange={(e) => setAiInputs({ ...aiInputs, fabric: e.target.value })}
+                  placeholder="e.g. Royal Banarasi Silk"
                   className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
                 />
               </div>
@@ -1879,6 +2075,7 @@ export const AdminDashboardPage: React.FC = () => {
                   type="text"
                   value={aiInputs.color}
                   onChange={(e) => setAiInputs({ ...aiInputs, color: e.target.value })}
+                  placeholder="e.g. Royal Crimson Red"
                   className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
                 />
               </div>
@@ -1889,82 +2086,182 @@ export const AdminDashboardPage: React.FC = () => {
                   type="text"
                   value={aiInputs.occasion}
                   onChange={(e) => setAiInputs({ ...aiInputs, occasion: e.target.value })}
+                  placeholder="e.g. Bridal & Wedding"
                   className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
                 />
               </div>
 
-              <div className="md:col-span-2 pt-2">
-                <button type="submit" className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl flex items-center justify-center gap-2 border border-amber-300">
-                  <Sparkles className="w-4 h-4" /> GENERATE AI SAREE PRODUCT
+              <div className="lg:col-span-4 pt-2">
+                <button type="submit" className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl flex items-center justify-center gap-2 border border-amber-300 transition-all">
+                  <Sparkles className="w-4 h-4 text-amber-300" /> ✨ GENERATE FULL AI SAREE PRODUCT CARD ATTRIBUTES
                 </button>
               </div>
             </form>
 
             {aiGeneratedResult && (
-              <div className="p-6 bg-amber-50 rounded-2xl border-2 border-amber-300 shadow-xl space-y-5">
-                <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+              <div className="p-6 bg-amber-50/70 rounded-3xl border-2 border-amber-300 shadow-xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
+                
+                {/* Result Header */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-amber-200 pb-4">
                   <div>
-                    <span className="font-street text-2xl font-black text-slate-900 block">AI GENERATED RESULT</span>
-                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest">✨ Real-Time Unique Image & Metadata</span>
+                    <span className="font-street text-2xl font-black text-slate-900 block">AI GENERATED SAREE PRODUCT CARD</span>
+                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-emerald-600" /> Complete Specifications & Real-Time Imagery Ready for Live Store
+                    </span>
                   </div>
-                  <span className="bg-red-800 text-amber-300 text-xs font-black uppercase px-3 py-1 rounded-full border border-amber-300 shadow">
-                    {aiGeneratedResult.sku}
+                  <span className="bg-red-800 text-amber-300 text-xs font-mono font-black uppercase px-3.5 py-1.5 rounded-full border border-amber-300 shadow">
+                    SKU: {aiGeneratedResult.sku}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                  {/* REAL-TIME GENERATED UNIQUE IMAGE PREVIEW */}
-                  <div className="space-y-2 text-center">
-                    <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-amber-300 shadow-md group bg-white">
+                {/* Main Product Card Preview Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
+                  {/* Left Column: Real-Time Generated Image & Cloudinary Controls */}
+                  <div className="space-y-3">
+                    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-amber-300 shadow-lg bg-slate-900 group">
                       <img
                         src={aiGeneratedResult.image}
                         alt={aiGeneratedResult.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                       />
-                      <span className="absolute top-2 left-2 bg-slate-950/90 text-amber-300 text-[9px] font-black uppercase px-2.5 py-1 rounded-full border border-amber-300/40 backdrop-blur-sm shadow">
-                        ✨ REAL-TIME UNIQUE IMAGE
+                      <span className="absolute top-3 left-3 bg-slate-950/90 text-amber-300 text-[9px] font-black uppercase px-3 py-1 rounded-full border border-amber-300/40 backdrop-blur-md shadow">
+                        ✨ REAL-TIME UNIQUE SAREE IMAGE
                       </span>
                     </div>
+
                     <button
                       type="button"
                       onClick={() => {
                         const newImg = generateUniqueSareeImage(aiInputs.category, aiInputs.color);
-                        setAiGeneratedResult({ ...aiGeneratedResult, image: newImg });
+                        setAiGeneratedResult({ ...aiGeneratedResult, image: newImg, images: [newImg] });
                         showToast('Generated new real-time unique saree image!', 'info');
                       }}
-                      className="text-[11px] font-black text-red-800 hover:text-red-900 uppercase tracking-wider flex items-center justify-center gap-1.5 w-full py-2 bg-white hover:bg-amber-100/50 rounded-xl border border-amber-300 shadow-sm transition-all"
+                      className="text-xs font-black text-red-800 hover:text-red-900 uppercase tracking-wider flex items-center justify-center gap-1.5 w-full py-2.5 bg-white hover:bg-amber-100 rounded-xl border border-amber-300 shadow-sm transition-all"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 text-red-700" /> REGENERATE UNIQUE IMAGE
+                      <RefreshCw className="w-4 h-4 text-red-700" /> REGENERATE UNIQUE IMAGE
                     </button>
                   </div>
 
-                  {/* GENERATED METADATA ATTRIBUTES */}
-                  <div className="md:col-span-2 space-y-3 text-xs font-medium text-slate-700">
-                    <p><strong className="text-slate-900 font-bold uppercase text-[11px] block">Generated Saree Title:</strong> {aiGeneratedResult.name}</p>
-                    <p><strong className="text-slate-900 font-bold uppercase text-[11px] block">Weave & Fabric Description:</strong> {aiGeneratedResult.description}</p>
-                    <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-amber-300">
+                  {/* Right 2 Columns: Editable Title, Price & Full Specifications Grid */}
+                  <div className="lg:col-span-2 space-y-5">
+                    
+                    {/* Title & Description */}
+                    <div className="space-y-2">
+                      <label className="block text-slate-700 font-bold uppercase text-[10px]">Saree Product Headline Name</label>
+                      <input
+                        type="text"
+                        value={aiGeneratedResult.name}
+                        onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, name: e.target.value })}
+                        className="w-full p-3 bg-white border border-amber-300 rounded-xl font-street text-xl font-black text-slate-900 shadow-sm"
+                      />
+                    </div>
+
+                    {/* Pricing Box */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 rounded-2xl border border-amber-300 shadow-sm">
                       <div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase block">Offer Price</span>
-                        <span className="font-street text-2xl font-black text-red-800">₹{aiGeneratedResult.discountPrice?.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase block">Offer Price (₹)</span>
+                        <input
+                          type="number"
+                          value={aiGeneratedResult.discountPrice}
+                          onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, discountPrice: Number(e.target.value) })}
+                          className="w-full p-2 bg-amber-50 border border-amber-300 rounded-lg font-black text-lg text-red-800"
+                        />
                       </div>
                       <div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase block">MRP</span>
-                        <span className="font-street text-base font-bold text-slate-400 line-through">₹{aiGeneratedResult.mrp?.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase block">MRP (₹)</span>
+                        <input
+                          type="number"
+                          value={aiGeneratedResult.mrp}
+                          onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, mrp: Number(e.target.value) })}
+                          className="w-full p-2 bg-amber-50 border border-amber-300 rounded-lg font-bold text-base text-slate-500 line-through"
+                        />
                       </div>
-                      <div className="ml-auto">
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-emerald-300">
-                          SAVE {Math.round(((aiGeneratedResult.mrp - aiGeneratedResult.discountPrice) / aiGeneratedResult.mrp) * 100)}%
+                      <div className="flex flex-col justify-center items-center bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span className="text-[9px] font-black text-emerald-800 uppercase">DISCOUNT SAVINGS</span>
+                        <span className="font-street text-xl font-black text-emerald-700">
+                          {Math.round(((aiGeneratedResult.mrp - aiGeneratedResult.discountPrice) / aiGeneratedResult.mrp) * 100)}% OFF
                         </span>
                       </div>
                     </div>
+
+                    {/* FULL SAREE SPECIFICATIONS GRID (MATCHES PRODUCT CARD SCREENSHOT 3) */}
+                    <div className="space-y-3 pt-1">
+                      <span className="text-xs font-black uppercase tracking-widest text-amber-900 border-b border-amber-200 pb-1 block">
+                        SAREE PRODUCT CARD SPECIFICATIONS (AUTOMATICALLY POPULATED)
+                      </span>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold">
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">CLOTH & FABRIC TYPE</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.clothType}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, clothType: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">THREAD & ZARI MATERIAL</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.threadMaterial}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, threadMaterial: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">COMFORT & BREATHABILITY</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.comfortLevel}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, comfortLevel: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">COLOR & DYE DETAILS</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.colorDetails}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, colorDetails: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">DIMENSIONS & WEIGHT</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.sareeLength}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, sareeLength: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-300 space-y-1">
+                          <span className="text-[9px] font-black text-amber-900 uppercase block">GARMENT CARE</span>
+                          <input
+                            type="text"
+                            value={aiGeneratedResult.washCare}
+                            onChange={(e) => setAiGeneratedResult({ ...aiGeneratedResult, washCare: e.target.value })}
+                            className="w-full p-1.5 bg-amber-50/50 border border-amber-200 rounded font-bold text-slate-900 text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
                 <button
                   onClick={handlePublishAiProduct}
-                  className="w-full py-4 bg-slate-900 hover:bg-red-800 text-amber-300 font-black uppercase text-xs tracking-wider rounded-xl shadow-xl border border-amber-300 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-slate-900 hover:bg-red-800 text-amber-300 font-black uppercase text-xs tracking-wider rounded-2xl shadow-xl border border-amber-300 transition-all flex items-center justify-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" /> PUBLISH AI SAREE WITH REAL-TIME IMAGE TO MONGODB
+                  <Sparkles className="w-4 h-4 text-amber-400" /> ✨ PUBLISH FULL AI SAREE PRODUCT CARD TO MONGODB
                 </button>
               </div>
             )}
@@ -2274,6 +2571,15 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           </div>
         )}
+        {/* Admin Cancel Order Modal */}
+        <AdminCancelOrderModal
+          isOpen={showAdminCancelModal}
+          order={adminCancelModalOrder}
+          onClose={() => setShowAdminCancelModal(false)}
+          onOrderCancelled={(updatedOrder) => {
+            setOrders((prev) => prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
+          }}
+        />
       </main>
     </div>
   );

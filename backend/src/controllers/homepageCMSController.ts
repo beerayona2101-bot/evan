@@ -45,75 +45,105 @@ const getDefaultCMSData = () => ({
   featuredCategories: [
     {
       id: 'cat-1',
-      name: 'Kanchipuram Silk Sarees',
-      image: '/images/saree_kanchipuram_gold.png',
-      description: 'Royal South Indian temple zari brocades woven in pure mulberry silk.',
-      buttonText: 'EXPLORE KANCHIPURAM',
-      buttonLink: '/shop?category=Kanchipuram Sarees',
-      status: 'ACTIVE',
-      displayOrder: 1,
-    },
-    {
-      id: 'cat-2',
-      name: 'Banarasi Brocade Sarees',
-      image: '/images/saree_banarasi_red.png',
-      description: 'Intricate Varanasi gold zari floral motifs and royal pallu heritage.',
-      buttonText: 'EXPLORE BANARASI',
-      buttonLink: '/shop?category=Banarasi Sarees',
-      status: 'ACTIVE',
-      displayOrder: 2,
-    },
-    {
-      id: 'cat-3',
-      name: 'Organza Floral Sarees',
+      name: 'Modern Lightweight Organza Floral',
       image: '/images/saree_organza_floral.png',
       description: 'Ultra-lightweight sheer silk drapes with hand-painted floral embellishments.',
       buttonText: 'EXPLORE ORGANZA',
       buttonLink: '/shop?category=Organza Sarees',
-      status: 'ACTIVE',
+      status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
+      displayOrder: 1,
+    },
+    {
+      id: 'cat-2',
+      name: 'Fancy Tissue Zari Shimmer Saree',
+      image: '/images/saree_kanchipuram_gold.png',
+      description: 'Glistening metallic zari tissue drape designed for modern partywear glamour.',
+      buttonText: 'EXPLORE TISSUE SILK',
+      buttonLink: '/shop?category=Silk Sarees',
+      status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
+      displayOrder: 2,
+    },
+    {
+      id: 'cat-3',
+      name: 'Royal Crimson Banarasi Partywear',
+      image: '/images/saree_banarasi_red.png',
+      description: 'Intricate Varanasi gold zari floral motifs and royal pallu heritage.',
+      buttonText: 'EXPLORE BANARASI',
+      buttonLink: '/shop?category=Banarasi Sarees',
+      status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
       displayOrder: 3,
     },
     {
       id: 'cat-4',
-      name: 'Linen Handloom Sarees',
-      image: '/images/saree_linen_beige.png',
-      description: 'Breathable organic linen sarees designed for minimalist luxury.',
-      buttonText: 'EXPLORE LINEN',
-      buttonLink: '/shop?category=Linen Sarees',
-      status: 'ACTIVE',
+      name: 'Glamour Sequenced Purple Georgette',
+      image: '/images/saree_banarasi_purple.png',
+      description: 'Contemporary cocktail partywear saree with exquisite sequins work.',
+      buttonText: 'EXPLORE GEORGETTE',
+      buttonLink: '/shop?category=Designer Sarees',
+      status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
       displayOrder: 4,
     },
     {
       id: 'cat-5',
-      name: 'Paithani Peacock Sarees',
+      name: 'Handwoven Peacock Paithani Silk',
       image: '/images/saree_paithani_green.png',
       description: 'Maharashtrian pure silk sarees featuring rich peacock motif zari pallus.',
       buttonText: 'EXPLORE PAITHANI',
       buttonLink: '/shop?category=Paithani Sarees',
-      status: 'ACTIVE',
+      status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
       displayOrder: 5,
     },
   ],
   featuredCollections: [
     {
       id: 'col-1',
-      name: 'BRIDAL TROUSSEAU HEIRLOOMS',
-      subtitle: 'Royal Wedding Collection',
-      image: '/images/saree_kanchipuram_gold.png',
-      description: 'Heavy gold zari woven bridal sarees designed for modern royalty.',
-      buttonText: 'SHOP BRIDAL TROUSSEAU',
-      buttonLink: '/shop?category=Bridal Sarees',
+      name: 'Banarasi Zari Brocade Collection',
+      subtitle: 'Editorial Lookbook Tile 1',
+      image: '/images/saree_banarasi_red.png',
+      description: 'Intricate Varanasi gold zari brocade heritage weave.',
+      buttonText: 'Explore',
+      buttonLink: '/shop?category=Banarasi Sarees',
       displayOrder: 1,
     },
     {
       id: 'col-2',
-      name: 'FESTIVE PAITHANI & ZARI WEAVES',
-      subtitle: 'Celebration Collection 2026',
-      image: '/images/saree_paithani_green.png',
-      description: 'Vibrant handcrafted silk sarees made for grand celebrations.',
-      buttonText: 'SHOP FESTIVE WEAVES',
-      buttonLink: '/shop?category=Festival Collection',
+      name: 'Kanchipuram Temple Border',
+      subtitle: 'Editorial Lookbook Tile 2',
+      image: '/images/saree_kanchipuram_gold.png',
+      description: 'South Indian mulberry silk with pure temple zari border.',
+      buttonText: 'Explore',
+      buttonLink: '/shop?category=Kanchipuram Sarees',
       displayOrder: 2,
+    },
+    {
+      id: 'col-3',
+      name: 'LUXURY SILK SAREES',
+      subtitle: "EDITOR'S CHOICE - Large Featured Tile 3",
+      image: '/images/saree_banarasi_purple.png',
+      description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.',
+      buttonText: 'SHOP SILK COLLECTION',
+      buttonLink: '/shop?category=Silk Sarees',
+      displayOrder: 3,
+    },
+    {
+      id: 'col-4',
+      name: 'Paithani Peacock Pallu',
+      subtitle: 'Editorial Lookbook Tile 4',
+      image: '/images/saree_paithani_green.png',
+      description: 'Maharashtrian pure silk with handwoven peacock motif pallu.',
+      buttonText: 'Explore',
+      buttonLink: '/shop?category=Paithani Sarees',
+      displayOrder: 4,
+    },
+    {
+      id: 'col-5',
+      name: 'Scalloped Floral Organza',
+      subtitle: 'Editorial Lookbook Tile 5',
+      image: '/images/saree_organza_floral.png',
+      description: 'Ultra-lightweight organza with scalloped embroidered border.',
+      buttonText: 'Explore',
+      buttonLink: '/shop?category=Organza Sarees',
+      displayOrder: 5,
     },
   ],
   trendingSarees: {
@@ -199,6 +229,20 @@ export const getHomepageCMS = async (req: Request, res: Response): Promise<void>
     if (!cms) {
       cms = await HomepageCMS.create(getDefaultCMSData());
       console.log('[CMS] Initialized default Homepage CMS document in MongoDB Atlas');
+    } else {
+      const defaultData = getDefaultCMSData();
+      let updated = false;
+      if (!cms.featuredCategories || cms.featuredCategories.length < 4 || (cms.featuredCategories[0] && cms.featuredCategories[0].name.includes('Kanchipuram Silk Sarees'))) {
+        cms.featuredCategories = defaultData.featuredCategories;
+        updated = true;
+      }
+      if (!cms.featuredCollections || cms.featuredCollections.length < 5) {
+        cms.featuredCollections = defaultData.featuredCollections;
+        updated = true;
+      }
+      if (updated) {
+        await cms.save().catch(() => {});
+      }
     }
     res.json(cms);
   } catch (error) {

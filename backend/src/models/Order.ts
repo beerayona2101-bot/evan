@@ -31,7 +31,10 @@ export interface IOrder extends Document {
   isDelivered: boolean;
   deliveredAt?: Date;
   trackingNumber?: string;
-  orderStatus: 'Pending' | 'Processing' | 'Shipped' | 'Out For Delivery' | 'Delivered' | 'Cancelled';
+  isStockDeducted?: boolean;
+  cancelledBy?: 'Customer' | 'Admin';
+  cancelReason?: string;
+  orderStatus: 'Pending' | 'Confirmed' | 'Processing' | 'Packed' | 'Shipped' | 'Out For Delivery' | 'Delivered' | 'Cancelled';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -67,10 +70,12 @@ const OrderSchema = new Schema<IOrder>(
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
     trackingNumber: { type: String, default: '' },
+    isStockDeducted: { type: Boolean, default: false },
+    cancelledBy: { type: String, default: '' },
+    cancelReason: { type: String, default: '' },
     orderStatus: {
       type: String,
-      enum: ['Pending', 'Processing', 'Shipped', 'Out For Delivery', 'Delivered', 'Cancelled'],
-      default: 'Processing',
+      default: 'Pending',
     },
   },
   {

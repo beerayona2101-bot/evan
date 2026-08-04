@@ -5,16 +5,23 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-slate-900 py-12 px-4 sm:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-16">
-        
-        {/* Header Hero */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <span className="text-xs font-black uppercase tracking-[0.25em] text-amber-800 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-red-700" /> OUR HERITAGE STORY
+
+        {/* Header Hero with Clean Brand Logo */}
+        <div className="text-center space-y-5 max-w-4xl mx-auto">
+          {/* Clean Logo Image without borders or circular clipping */}
+          <div className="flex justify-center pb-2">
+            <img
+              src="/images/evan_logo_clean.png"
+              alt="EVAN COLLECTIONS Logo"
+              className="w-80 sm:w-[480px] md:w-[620px] h-auto object-contain max-h-[420px] drop-shadow-md hover:scale-[1.01] transition-transform duration-300"
+            />
+          </div>
+
+          <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.3em] text-amber-800 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 text-red-800" /> OUR HERITAGE STORY & ATELIER <Sparkles className="w-4 h-4 text-red-800" />
           </span>
-          <h1 className="font-street text-5xl sm:text-7xl font-black text-slate-900 tracking-tight leading-none uppercase">
-            EVAN COLLECTIONS
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+
+          <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-3xl mx-auto">
             Preserving India's 2,000-year-old weaving legacy through pure Silk Mark certified Banarasi brocades, heirloom Kanchipuram silk sarees, and handcrafted organza weaves.
           </p>
         </div>

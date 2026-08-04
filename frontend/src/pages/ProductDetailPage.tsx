@@ -357,16 +357,49 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {activeTab === 'specs' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed text-slate-600 font-medium">
+            <div className="space-y-6 text-xs leading-relaxed text-slate-700 font-medium">
               <div>
-                <h4 className="font-bold text-slate-900 uppercase text-xs mb-2">Luxury Craft Description</h4>
-                <p>{product.description}</p>
+                <h4 className="font-bold text-slate-900 uppercase text-xs mb-1.5 tracking-wider">LUXURY CRAFT DESCRIPTION</h4>
+                <p className="text-slate-600 leading-relaxed font-normal text-xs">{product.description}</p>
               </div>
-              <div className="space-y-2 bg-amber-50/40 p-5 rounded-2xl border border-amber-200">
-                <p><strong className="text-slate-900">Category:</strong> {product.category || 'Banarasi Silk Sarees'}</p>
-                <p><strong className="text-slate-900">Fabric Composition:</strong> {product.fabric || 'Pure Mulberry Banarasi Silk'}</p>
-                <p><strong className="text-slate-900">Dimensions:</strong> 5.5m Saree + 0.8m Unstitched Blouse</p>
-                <p><strong className="text-slate-900">Care Instructions:</strong> Dry Clean Only. Store wrapped in soft muslin/cotton cloth.</p>
+
+              {/* Comprehensive Product Attributes Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 pt-2">
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">CLOTH & FABRIC TYPE</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.clothType || product.fabric || 'Pure Handloom Silk'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">{product.material || 'Mulberry Weave'}</span>
+                </div>
+
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">THREAD & ZARI MATERIAL</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.threadMaterial || 'Tested Gold Zari & Fine Silk Threads'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">{product.workType || 'Jacquard Weave'}</span>
+                </div>
+
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">COMFORT & BREATHABILITY</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.comfortLevel || 'Soft, Lightweight & Skin-Friendly'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">All-Day Festive Comfort</span>
+                </div>
+
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">COLOR & DYE DETAILS</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.colorDetails || (product.colors && product.colors.join(', ')) || 'Royal Crimson Red & Gold'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">Eco-Friendly Natural Dyes</span>
+                </div>
+
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">DIMENSIONS & WEIGHT</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.sareeLength || '5.5 Meters Saree'} + {product.blousePiece || '0.8m Blouse'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">Weight: {product.sareeWeight || product.weight || '650 Grams'}</span>
+                </div>
+
+                <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">GARMENT CARE</span>
+                  <span className="font-bold text-slate-900 text-xs block">{product.washCare || 'Dry Clean Only'}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">Store in Soft Muslin Cloth</span>
+                </div>
               </div>
             </div>
           ) : activeTab === 'reviews' ? (

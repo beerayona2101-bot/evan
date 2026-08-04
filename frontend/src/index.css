@@ -108,21 +108,18 @@
   scrollbar-width: none;
 }
 
-/* Custom Scrollbar - Ivory & Gold Theme */
+/* Hide Scrollbar Globally Across All Pages & Browsers */
+html,
+body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  overflow-x: hidden;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #faf6f0;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d4af37;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6b1d2f;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }

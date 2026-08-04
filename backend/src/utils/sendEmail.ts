@@ -269,11 +269,16 @@ export const sendOrderDeliveredEmail = async (order: any, recipientEmail: string
 
 /** 11. Order Cancelled Email */
 export const sendOrderCancelledEmail = async (order: any, recipientEmail: string) => {
+  const reasonText = order.cancelReason
+    ? `<div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 12px; border-radius: 8px; margin: 16px 0; color: #991b1b; font-size: 13px; font-weight: bold;">Cancellation Reason: ${order.cancelReason}</div>`
+    : '';
   const html = `
     ${getEmailHeader('ORDER CANCELLED')}
     <div style="padding: 30px;">
       <h2 style="color: #dc2626; font-size: 18px; margin-top: 0;">Order Cancellation Notice</h2>
-      <p style="color: #475569; font-size: 14px;">Order #${order._id} has been cancelled as requested.</p>
+      <p style="color: #475569; font-size: 14px;">Order <strong>#${order._id}</strong> has been cancelled.</p>
+      ${reasonText}
+      <p style="color: #64748b; font-size: 12px;">Any paid amount will be automatically refunded to your original payment method. If you have questions, reply to this email.</p>
     </div>
     ${getEmailFooter()}
   `;

@@ -242,6 +242,7 @@ export const getRevenueAnalytics = async (req: Request, res: Response): Promise<
         aov,
         totalCustomers,
         totalProductsSold,
+        returnedAmount: returnedAmount || refundedAmount || 0,
         revenueToday,
         revenueThisWeek,
         revenueThisMonth,

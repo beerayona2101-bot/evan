@@ -5,10 +5,13 @@ import { api } from '../services/api';
 
 import { useSocket } from '../context/SocketContext';
 import { showToast } from '../components/ToastContainer';
+import { CancelOrderModal } from '../components/CancelOrderModal';
 
 export const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelModalOrder, setCancelModalOrder] = useState<Order | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
   const { socket } = useSocket();
 
   const fetchOrders = () => {
@@ -94,16 +97,44 @@ export const OrdersPage: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                <div className="pt-3 border-t border-slate-200 flex flex-wrap justify-between items-center text-xs gap-3">
                   <span className="text-slate-500 font-medium">Delivery to: {order.shippingAddress.city}, {order.shippingAddress.state}</span>
-                  <div className="font-bold text-sm text-slate-900">
-                    Total: <span className="text-red-600 font-black">₹{order.totalPrice.toLocaleString('en-IN')}</span>
+                  <div className="flex items-center gap-4">
+                    {order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' && (
+                      <button
+                        onClick={() => {
+                          setCancelModalOrder(order);
+                          setShowCancelModal(true);
+                        }}
+                        className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold rounded-xl text-[11px] flex items-center gap-1 border border-red-300 transition-colors"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                    <div className="font-bold text-sm text-slate-900">
+                      Total: <span className="text-red-600 font-black">₹{order.totalPrice.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
                 </div>
+
+                {order.orderStatus === 'Cancelled' && (order as any).cancelReason && (
+                  <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-900 font-semibold text-[11px]">
+                    Cancellation Reason: <strong>{(order as any).cancelReason}</strong>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
+
+        <CancelOrderModal
+          isOpen={showCancelModal}
+          order={cancelModalOrder}
+          onClose={() => setShowCancelModal(false)}
+          onOrderCancelled={(updatedOrder) => {
+            setOrders((prev) => prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
+          }}
+        />
       </div>
     </div>
   );

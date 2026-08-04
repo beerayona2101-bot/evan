@@ -75,13 +75,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const updated = await userApi.updateProfile(updatedData);
-      setUser((prev) => (prev ? { ...prev, ...updated } : null));
+      const newAvatar = updated?.avatar || updatedData.avatar || user?.avatar || '';
+      const updatedUserObj = { ...user, ...updated, avatar: newAvatar };
+      
+      setUser(updatedUserObj as User);
       const currentSaved = localStorage.getItem('evan_user');
       if (currentSaved) {
         const parsed = JSON.parse(currentSaved);
-        localStorage.setItem('evan_user', JSON.stringify({ ...parsed, ...updated }));
+        localStorage.setItem('evan_user', JSON.stringify({ ...parsed, ...updated, avatar: newAvatar }));
       }
-      showToast('Profile updated successfully!', 'success');
+      showToast('Profile & Avatar updated successfully!', 'success');
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Failed to update profile';
       showToast(msg, 'error');

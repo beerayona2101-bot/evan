@@ -18,7 +18,7 @@ const SettingsSchema = new Schema<ISettings>(
       default: 'Hello EVAN Collections, I would like to know more about your sarees.',
     },
     whatsappEnabled: { type: Boolean, default: true },
-    whatsappPosition: { type: String, enum: ['bottom-left', 'bottom-right'], default: 'bottom-left' },
+    whatsappPosition: { type: String, enum: ['bottom-left', 'bottom-right'], default: 'bottom-right' },
     whatsappColor: { type: String, default: '#25D366' },
   },
   {

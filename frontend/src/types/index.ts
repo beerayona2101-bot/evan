@@ -25,6 +25,7 @@ export interface Product {
   sizes: string[];
   colors: string[];
   material?: string;
+  weight?: string;
   countryOfOrigin?: string;
   washCare?: string;
   sku: string;
@@ -50,6 +51,12 @@ export interface Product {
   sareeWidth?: string;
   sareeWeight?: string;
   pattern?: string;
+  clothType?: string;
+  comfortLevel?: string;
+  threadMaterial?: string;
+  colorDetails?: string;
+  transparency?: string;
+  drapeStyle?: string;
   status?: 'active' | 'inactive';
 }
 
@@ -112,7 +119,9 @@ export interface Order {
   isPaid: boolean;
   paidAt?: string;
   isDelivered: boolean;
-  orderStatus: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  cancelledBy?: 'Customer' | 'Admin';
+  cancelReason?: string;
+  orderStatus: 'Pending' | 'Confirmed' | 'Processing' | 'Packed' | 'Shipped' | 'Out For Delivery' | 'Delivered' | 'Cancelled';
   createdAt: string;
 }
 

@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userApi } from '../services/userApi';
 import { orderApi } from '../services/orderApi';
+import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
 import { Order, Product } from '../types';
-import { User as UserIcon, MapPin, Package, Heart, Settings, Plus, Trash2, CheckCircle, Clock, X, Truck, Printer, RefreshCw, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, MapPin, Package, Heart, Settings, Plus, Trash2, CheckCircle, Clock, X, Truck, Printer, RefreshCw, AlertTriangle, ShieldCheck, Camera, Upload, Image as ImageIcon, XCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useSocket } from '../context/SocketContext';
 import { OrderTrackingModal } from '../components/OrderTrackingModal';
+import { CancelOrderModal } from '../components/CancelOrderModal';
 
 export const AccountPage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const { wishlist } = useWishlist();
   const { addToCart } = useCart();
   const { socket } = useSocket();
@@ -23,6 +25,68 @@ export const AccountPage: React.FC = () => {
   // Profile Form State
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
+  const [avatar, setAvatar] = useState(user?.avatar || '');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setPhone(user.phone || '');
+      setAvatar(user.avatar || '');
+    }
+  }, [user]);
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    showToast('Optimizing & preparing photo...', 'info');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 350;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round(height * (MAX_SIZE / width));
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round(width * (MAX_SIZE / height));
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setAvatar(compressedDataUrl);
+
+        try {
+          const uploadRes = await api.post('/upload', { image: compressedDataUrl, folder: 'user_avatars' });
+          if (uploadRes.data?.url) {
+            setAvatar(uploadRes.data.url);
+          }
+        } catch {
+          // Local compressed fallback
+        }
+
+        showToast('Profile photo ready! Click "SAVE PROFILE & AVATAR PHOTO" below.', 'success');
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Address Book State
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -34,6 +98,10 @@ export const AccountPage: React.FC = () => {
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<Order | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('All');
   const [orderSearchQuery, setOrderSearchQuery] = useState<string>('');
+
+  // Cancel Order Modal State
+  const [cancelModalOrder, setCancelModalOrder] = useState<Order | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
 
   // Delete Account Modal
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState<boolean>(false);
@@ -73,8 +141,8 @@ export const AccountPage: React.FC = () => {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await userApi.updateProfile({ name, phone });
-      showToast('Profile updated successfully!', 'success');
+      await updateUser({ name, phone, avatar });
+      showToast('Profile details & Customer Avatar updated live!', 'success');
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Error updating profile', 'error');
     }
@@ -160,8 +228,12 @@ export const AccountPage: React.FC = () => {
         {/* Header Profile Info Banner */}
         <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-amber-400/40 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-700 to-red-900 text-amber-300 font-black text-2xl flex items-center justify-center border-2 border-amber-300 shadow-lg">
-              {user.name.charAt(0).toUpperCase()}
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-700 to-red-900 text-amber-300 font-black text-2xl flex items-center justify-center border-2 border-amber-300 shadow-lg overflow-hidden flex-shrink-0">
+              {(avatar || user.avatar) ? (
+                <img src={avatar || user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0).toUpperCase()
+              )}
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 block">AUTHENTICATED CUSTOMER</span>
@@ -212,7 +284,50 @@ export const AccountPage: React.FC = () => {
               EDIT PERSONAL INFORMATION
             </h3>
 
-            <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-lg text-xs font-semibold">
+            <form onSubmit={handleUpdateProfile} className="space-y-6 max-w-xl text-xs font-semibold">
+              
+              {/* CUSTOMER AVATAR PHOTO UPLOADER SECTION */}
+              <div className="p-5 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-4">
+                <label className="block text-slate-900 font-black uppercase text-xs tracking-wider">
+                  CUSTOMER PROFILE PHOTO / AVATAR
+                </label>
+                
+                <div className="flex items-center gap-5">
+                  <div className="relative group w-20 h-20 rounded-full bg-slate-900 text-amber-300 font-black text-3xl flex items-center justify-center border-2 border-amber-400 shadow-xl overflow-hidden flex-shrink-0">
+                    {avatar ? (
+                      <img src={avatar} alt="Customer Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
+                    <label className="absolute inset-0 bg-slate-950/60 text-amber-300 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-opacity text-[9px] font-black uppercase">
+                      <Camera className="w-5 h-5 mb-0.5" />
+                      <span>Change</span>
+                      <input type="file" accept="image/*" onChange={handleImageFileChange} className="hidden" />
+                    </label>
+                  </div>
+
+                  <div className="space-y-2 flex-1">
+                    <label className="cursor-pointer px-4 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-[11px] rounded-xl border border-amber-300 shadow inline-flex items-center gap-2 transition-all">
+                      <Upload className="w-4 h-4 text-amber-300" /> UPLOAD PHOTO FROM DEVICE
+                      <input type="file" accept="image/*" onChange={handleImageFileChange} className="hidden" />
+                    </label>
+                    <p className="text-[10px] text-slate-500 font-medium">Supports PNG, JPG, WEBP (Max 5MB).</p>
+                  </div>
+                </div>
+
+                {/* Direct Image URL & Preset Selection */}
+                <div className="space-y-2 pt-2 border-t border-amber-200">
+                  <label className="block text-slate-700 font-bold uppercase text-[10px]">Or Paste Profile Photo URL</label>
+                  <input
+                    type="url"
+                    value={avatar}
+                    onChange={(e) => setAvatar(e.target.value)}
+                    placeholder="https://example.com/my-profile-photo.jpg"
+                    className="w-full p-3 bg-white border border-amber-300 rounded-xl text-slate-900 font-medium text-xs shadow-sm"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-slate-700 uppercase font-bold text-[10px] mb-1">Full Name</label>
                 <input
@@ -248,9 +363,9 @@ export const AccountPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-xl shadow-md transition-all border border-amber-300"
+                className="w-full sm:w-auto px-8 py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-xl shadow-lg transition-all border border-amber-300 flex items-center justify-center gap-2"
               >
-                SAVE CHANGES
+                SAVE PROFILE & AVATAR PHOTO
               </button>
             </form>
 
@@ -448,7 +563,7 @@ export const AccountPage: React.FC = () => {
 
                     {/* Order Footer Actions */}
                     <div className="pt-3 border-t border-amber-200 flex flex-wrap justify-between items-center gap-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           onClick={() => handleReorder(o)}
                           className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold rounded-lg text-[10px] flex items-center gap-1 border border-amber-300"
@@ -462,18 +577,65 @@ export const AccountPage: React.FC = () => {
                         >
                           <Printer className="w-3 h-3" /> View Invoice
                         </Link>
+
+                        {o.orderStatus !== 'Cancelled' && o.orderStatus !== 'Delivered' && (
+                          <button
+                            onClick={() => {
+                              setCancelModalOrder(o);
+                              setShowCancelModal(true);
+                            }}
+                            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold rounded-lg text-[10px] flex items-center gap-1 border border-red-300 transition-colors"
+                          >
+                            <XCircle className="w-3.5 h-3.5 text-red-700" /> Cancel Order
+                          </button>
+                        )}
                       </div>
 
                       <div className="font-extrabold text-slate-900 text-sm">
                         Total Amount: <span className="text-red-800 font-street text-base">₹{o.totalPrice.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
+
+                    {o.orderStatus === 'Cancelled' && (() => {
+                      const isCust = (o as any).cancelledBy === 'Customer' || ((o as any).cancelReason || '').toLowerCase().includes('customer');
+                      const reason = (o as any).cancelReason || (isCust ? 'Cancelled by customer' : 'Damaged Product / Quality Inspection Failure');
+                      return (
+                        <div className="p-3 rounded-xl bg-red-100/80 border border-red-300 text-red-950 font-bold text-[11px] flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-red-700 flex-shrink-0" />
+                            <span className="uppercase text-[10px] font-black tracking-wider text-red-800">
+                              {isCust ? '🚫 CANCELLED BY CUSTOMER' : '🛡️ CANCELLED BY ADMIN'}
+                            </span>
+                          </div>
+                          <span className="pl-6 text-[11px] text-red-950 font-semibold">
+                            <strong>Explanation / Reason:</strong> {reason}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>
             )}
           </div>
         )}
+
+      {/* Order Tracking Modal */}
+      <OrderTrackingModal
+        isOpen={!!selectedOrderForTracking}
+        onClose={() => setSelectedOrderForTracking(null)}
+        order={selectedOrderForTracking}
+      />
+
+      {/* Cancel Order Modal */}
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        order={cancelModalOrder}
+        onClose={() => setShowCancelModal(false)}
+        onOrderCancelled={(updatedOrder) => {
+          setOrders((prev) => prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
+        }}
+      />
 
         {/* TAB 4: WISHLIST */}
         {activeTab === 'wishlist' && (

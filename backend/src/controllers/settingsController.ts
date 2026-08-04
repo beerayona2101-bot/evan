@@ -10,7 +10,7 @@ export const getWhatsAppSettings = async (req: Request, res: Response): Promise<
         whatsappNumber: '919490644434',
         whatsappGreeting: 'Hello EVAN Collections, I would like to know more about your sarees.',
         whatsappEnabled: true,
-        whatsappPosition: 'bottom-left',
+        whatsappPosition: 'bottom-right',
         whatsappColor: '#25D366',
       });
     }
@@ -30,7 +30,7 @@ export const updateWhatsAppSettings = async (req: Request, res: Response): Promi
         whatsappNumber: whatsappNumber || '919490644434',
         whatsappGreeting: whatsappGreeting || 'Hello EVAN Collections, I would like to know more about your sarees.',
         whatsappEnabled: whatsappEnabled !== undefined ? whatsappEnabled : true,
-        whatsappPosition: whatsappPosition || 'bottom-left',
+        whatsappPosition: whatsappPosition || 'bottom-right',
         whatsappColor: whatsappColor || '#25D366',
       });
     } else {
