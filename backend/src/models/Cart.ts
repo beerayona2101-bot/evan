@@ -3,8 +3,12 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface ICartItem {
   _id?: mongoose.Types.ObjectId;
   product: mongoose.Types.ObjectId;
+  variantId?: string;
   size: string;
   color: string;
+  hexColor?: string;
+  sku?: string;
+  variantImage?: string;
   quantity: number;
   price: number;
 }
@@ -24,8 +28,12 @@ const CartSchema = new Schema<ICart>(
     items: [
       {
         product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+        variantId: { type: String, default: '' },
         size: { type: String, required: true },
         color: { type: String, required: true },
+        hexColor: { type: String, default: '#800000' },
+        sku: { type: String, default: '' },
+        variantImage: { type: String, default: '' },
         quantity: { type: Number, required: true, default: 1 },
         price: { type: Number, required: true },
       },
@@ -33,8 +41,12 @@ const CartSchema = new Schema<ICart>(
     savedForLater: [
       {
         product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+        variantId: { type: String, default: '' },
         size: { type: String, required: true },
         color: { type: String, required: true },
+        hexColor: { type: String, default: '#800000' },
+        sku: { type: String, default: '' },
+        variantImage: { type: String, default: '' },
         quantity: { type: Number, required: true, default: 1 },
         price: { type: Number, required: true },
       },

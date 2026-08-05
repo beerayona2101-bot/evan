@@ -13,6 +13,7 @@ export const HomePage: React.FC = () => {
   const [cms, setCms] = useState<any>(null);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
   const [active3DIndex, setActive3DIndex] = useState(1);
   const [prevActiveIndex, setPrevActiveIndex] = useState(1);
   const wheelLockRef = useRef(false);
@@ -47,6 +48,14 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     fetchCMS();
     fetchProducts();
+  }, []);
+
+  // Autoplay hero saree carousel slides (Traditional, Fashion Wear, Party Collections)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
   }, []);
 
   // Listen to real-time Socket.IO broadcasts
@@ -175,64 +184,115 @@ export const HomePage: React.FC = () => {
     ? cms.heroBanner.desktopImage
     : '/images/saree_hero_editorial_right_seated.png';
 
+  const defaultHeroSlides = [
+    {
+      id: 'traditional',
+      offerBadge: hero.offerBadge || 'ROYAL SAREE COLLECTION 2026',
+      subtitle: hero.subtitle || 'HERITAGE HANDLOOM',
+      title: hero.title || 'STYLE CLASSIC',
+      description: hero.description || "Explore India's most opulent collection of handcrafted Banarasi brocades, heirloom Kanchipuram silk sarees, and delicate floral organza drapes woven by master artisans.",
+      primaryButtonText: hero.primaryButtonText || 'SEE MORE',
+      primaryButtonLink: hero.primaryButtonLink || '/shop',
+      secondaryButtonText: hero.secondaryButtonText || 'EXPLORE CATALOG',
+      secondaryButtonLink: hero.secondaryButtonLink || '/shop?category=Kanchipuram Sarees',
+      image: heroImage,
+    },
+    {
+      id: 'fashion',
+      offerBadge: 'TRENDING FASHION WEAR 2026',
+      subtitle: 'MODERN DESIGNER DRAPES',
+      title: 'FASHION WEAR',
+      description: 'Discover sleek contemporary silhouettes, lightweight organza & tissue sarees, and modern fusion drapes curated for the trendsetting fashionista.',
+      primaryButtonText: 'EXPLORE FASHION',
+      primaryButtonLink: '/shop?category=Designer Sarees',
+      secondaryButtonText: 'EXPLORE CATALOG',
+      secondaryButtonLink: '/shop',
+      image: '/images/saree_fashion_wear_hero_v3.png',
+    },
+    {
+      id: 'party',
+      offerBadge: 'EXCLUSIVE PARTYWEAR 2026',
+      subtitle: 'CELEBRATION GLAMOUR',
+      title: 'PARTY COLLECTIONS',
+      description: 'Elevate your evening look with opulent sequence work, shimmering tissue zari, vibrant georgettes, and grand festive partywear drapes.',
+      primaryButtonText: 'SHOP PARTYWEAR',
+      primaryButtonLink: '/shop?category=Organza Sarees',
+      secondaryButtonText: 'EXPLORE CATALOG',
+      secondaryButtonLink: '/shop',
+      image: '/images/saree_party_wear_hero_v3.png',
+    },
+  ];
+
+  const heroSlides = (cms?.heroSlides && cms.heroSlides.length > 0)
+    ? cms.heroSlides.filter((s: any) => s.status !== 'INACTIVE')
+    : defaultHeroSlides;
+
+  const safeSlideIndex = heroSlides.length > 0 ? (currentHeroSlide % heroSlides.length) : 0;
+  const activeSlide = heroSlides[safeSlideIndex] || defaultHeroSlides[0];
+
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-slate-900 font-sans overflow-x-hidden">
 
-      {/* 1. LUXURY SAREE HERO BANNER SECTION - 100% FULL-BLEED EDITORIAL BANNER (MODEL ON RIGHT, MATTER ON LEFT) */}
+      {/* 1. LUXURY SAREE HERO BANNER SECTION - 100% FULL-BLEED EDITORIAL BANNER CAROUSEL (3 SLIDES) */}
       {hero.enabled && (
-        <section className="relative w-full mb-6">
+        <section className="relative w-full mb-6 group">
           <div className="relative w-full overflow-hidden bg-[#0b070d] min-h-[440px] sm:min-h-[500px] lg:min-h-[540px] flex items-center">
             
-            {/* Full-bleed Background Image with Subtle Luxury Lighting & Gradient */}
+            {/* Full-bleed Background Images Carousel displaying model face & full saree drape */}
             <div className="absolute inset-0 w-full h-full overflow-hidden">
-              <img
-                src={heroImage}
-                alt="EVAN COLLECTIONS Luxury Saree Model"
-                className="w-full h-full object-cover object-[70%_center] sm:object-right filter brightness-[0.95] contrast-[1.05]"
-              />
+              {heroSlides.map((slide: any, idx: number) => (
+                <img
+                  key={slide.id || idx}
+                  src={slide.image}
+                  alt={`EVAN COLLECTIONS Saree - ${slide.title}`}
+                  className={`absolute inset-0 w-full h-full object-cover object-[75%_center] sm:object-right filter brightness-[0.95] contrast-[1.05] transition-opacity duration-700 ease-in-out ${
+                    idx === safeSlideIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
+                  }`}
+                />
+              ))}
               {/* Left-to-right gradient overlay for text readability & seamless integration */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#09050b] via-[#09050b]/80 to-transparent w-[70%] sm:w-[58%] lg:w-[50%]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#09050b] via-[#09050b]/80 to-transparent w-[70%] sm:w-[58%] lg:w-[50%] z-10" />
             </div>
 
             {/* Left Content Area (Overlaid on the dark left gradient) */}
-            <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-12 lg:px-16 py-8 sm:py-12">
-              <div className="space-y-3 sm:space-y-5 max-w-[85%] sm:max-w-xl flex flex-col justify-center">
+            <div className="relative z-20 max-w-7xl mx-auto w-full px-6 sm:px-12 lg:px-16 py-8 sm:py-12">
+              <div key={activeSlide.id || safeSlideIndex} className="space-y-3 sm:space-y-5 max-w-[85%] sm:max-w-xl flex flex-col justify-center animate-fadeIn">
                 
                 {/* Gold Pill Badge */}
                 <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase w-fit shadow-md">
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
-                  <span>{hero.offerBadge}</span>
+                  <span>{activeSlide.offerBadge}</span>
                 </div>
 
                 {/* Subtitle & Main Headline */}
                 <div className="space-y-1 sm:space-y-1.5">
                   <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.25em] text-amber-500">
-                    {hero.subtitle}
+                    {activeSlide.subtitle}
                   </span>
                   <h1 className="font-street text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-none uppercase drop-shadow-md">
-                    {hero.title}
+                    {activeSlide.title}
                   </h1>
                 </div>
 
                 {/* Description Text */}
                 <p className="text-xs sm:text-sm text-slate-200 font-normal leading-relaxed max-w-lg line-clamp-3 sm:line-clamp-none">
-                  {hero.description}
+                  {activeSlide.description}
                 </p>
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 pt-1">
                   <Link
-                    to={hero.primaryButtonLink || '/shop'}
+                    to={activeSlide.primaryButtonLink || '/shop'}
                     className="px-5 py-2.5 sm:px-7 sm:py-3 bg-slate-950/80 hover:bg-slate-900 text-amber-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all border border-amber-400/50 flex items-center gap-1.5 sm:gap-2"
                   >
-                    <span>{hero.primaryButtonText}</span>
+                    <span>{activeSlide.primaryButtonText || 'SEE MORE'}</span>
                     <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                   </Link>
                   <Link
-                    to={hero.secondaryButtonLink || '/shop?category=Kanchipuram Sarees'}
+                    to={activeSlide.secondaryButtonLink || '/shop'}
                     className="px-5 py-2.5 sm:px-7 sm:py-3 bg-black/30 hover:bg-black/50 text-slate-200 font-bold text-[10px] sm:text-xs uppercase tracking-widest rounded-xl border border-amber-400/40 transition-all shadow-sm"
                   >
-                    {hero.secondaryButtonText}
+                    {activeSlide.secondaryButtonText || 'EXPLORE CATALOG'}
                   </Link>
                 </div>
               </div>
@@ -240,7 +300,7 @@ export const HomePage: React.FC = () => {
 
             {/* Bottom Right Floating Collection Badge */}
             <Link
-              to={hero.secondaryButtonLink || '/shop'}
+              to={activeSlide.secondaryButtonLink || '/shop'}
               className="absolute bottom-5 right-5 sm:right-12 z-20 flex items-center gap-2 sm:gap-4 bg-[#09050b]/80 backdrop-blur-md px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-2xl hover:bg-[#09050b] hover:border-amber-400 transition-all group"
             >
               <span>View Full Saree Collection</span>

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ProductService } from '../services/productService';
-import { Product } from '../models/Product';
+import { Product, IVariant } from '../models/Product';
 import { emitRealtimeEvent } from '../config/socket';
 import mongoose from 'mongoose';
 
@@ -36,10 +36,13 @@ export const getSearchSuggestions = async (req: Request, res: Response): Promise
         { category: { $regex: query, $options: 'i' } },
         { fabric: { $regex: query, $options: 'i' } },
         { tags: { $regex: query, $options: 'i' } },
+        { sku: { $regex: query, $options: 'i' } },
+        { 'variants.sku': { $regex: query, $options: 'i' } },
+        { 'variants.colorName': { $regex: query, $options: 'i' } },
       ],
     })
-      .select('name category price images')
-      .limit(6);
+      .select('name category price images sku variants')
+      .limit(8);
     res.json(suggestions);
   } catch (error) {
     res.json([]);
@@ -109,5 +112,127 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
   } catch (error) {
     emitRealtimeEvent('productDeleted', { id: req.params.id });
     res.json({ message: 'Product deleted successfully' });
+  }
+};
+
+/* ========================================================
+   ENTERPRISE PRODUCT VARIANTS & GALLERY CONTROLLERS
+======================================================== */
+
+export const getProductVariants = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+    res.json(product.variants || []);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const addProductVariant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+    const newVariant: IVariant = {
+      colorName: req.body.colorName || 'Royal Maroon',
+      hexColor: req.body.hexColor || '#800000',
+      sku: req.body.sku || `EVAN-VAR-${Date.now().toString().slice(-4)}`,
+      barcode: req.body.barcode || '',
+      price: req.body.price || product.price,
+      mrp: req.body.mrp || product.mrp,
+      discountPrice: req.body.discountPrice || product.discountPrice || 0,
+      discountPercentage: req.body.discountPercentage || product.discountPercentage || 0,
+      stock: req.body.stock !== undefined ? req.body.stock : 15,
+      images: req.body.images && Array.isArray(req.body.images) ? req.body.images.slice(0, 5) : [product.images[0]],
+      featuredImage: req.body.featuredImage || req.body.images?.[0] || product.images[0],
+      isDefault: req.body.isDefault || false,
+      status: req.body.status || 'active',
+    };
+
+    if (!product.variants) {
+      product.variants = [];
+    }
+
+    if (newVariant.isDefault) {
+      product.variants.forEach((v) => (v.isDefault = false));
+    }
+
+    product.variants.push(newVariant);
+    
+    // Synchronize product colors array
+    if (!product.colors.includes(newVariant.colorName)) {
+      product.colors.push(newVariant.colorName);
+    }
+
+    await product.save();
+    emitRealtimeEvent('productUpdated', product);
+    emitRealtimeEvent('variantUpdated', { productId: product._id, variant: newVariant });
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
+};
+
+export const updateProductVariant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product || !product.variants) {
+      res.status(404).json({ message: 'Product or variant not found' });
+      return;
+    }
+
+    const variantIndex = product.variants.findIndex(
+      (v: any) => v._id?.toString() === req.params.variantId || v.sku === req.params.variantId
+    );
+
+    if (variantIndex === -1) {
+      res.status(404).json({ message: 'Variant not found' });
+      return;
+    }
+
+    const targetVariant = product.variants[variantIndex];
+
+    if (req.body.isDefault) {
+      product.variants.forEach((v) => (v.isDefault = false));
+    }
+
+    Object.assign(targetVariant, req.body);
+    if (req.body.images && Array.isArray(req.body.images)) {
+      targetVariant.images = req.body.images.slice(0, 5);
+    }
+
+    await product.save();
+    emitRealtimeEvent('productUpdated', product);
+    emitRealtimeEvent('variantUpdated', { productId: product._id, variant: targetVariant });
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
+};
+
+export const deleteProductVariant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product || !product.variants) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+
+    product.variants = product.variants.filter(
+      (v: any) => v._id?.toString() !== req.params.variantId && v.sku !== req.params.variantId
+    );
+
+    await product.save();
+    emitRealtimeEvent('productUpdated', product);
+    emitRealtimeEvent('variantUpdated', { productId: product._id, deletedVariantId: req.params.variantId });
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
   }
 };

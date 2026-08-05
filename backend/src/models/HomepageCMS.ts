@@ -49,6 +49,21 @@ export interface IBrandItem {
   status: 'ACTIVE' | 'INACTIVE';
 }
 
+export interface IHeroSlide {
+  id: string;
+  offerBadge: string;
+  subtitle: string;
+  title: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonLink: string;
+  secondaryButtonText: string;
+  secondaryButtonLink: string;
+  image: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  displayOrder: number;
+}
+
 export interface IHomepageCMS extends Document {
   announcementBar: {
     text: string;
@@ -72,6 +87,7 @@ export interface IHomepageCMS extends Document {
     ribbonText: string;
     enabled: boolean;
   };
+  heroSlides: IHeroSlide[];
   featuredCategories: ICategoryCard[];
   featuredCollections: ICollectionCard[];
   trendingSarees: {
@@ -174,6 +190,21 @@ const BrandItemSchema = new Schema({
   status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE' },
 });
 
+const HeroSlideSchema = new Schema({
+  id: { type: String, required: true },
+  offerBadge: { type: String, default: 'ROYAL SAREE COLLECTION 2026' },
+  subtitle: { type: String, default: 'HERITAGE HANDLOOM' },
+  title: { type: String, default: 'STYLE CLASSIC' },
+  description: { type: String, default: "Explore India's most opulent collection of handcrafted Banarasi brocades, heirloom Kanchipuram silk sarees, and delicate floral organza drapes woven by master artisans." },
+  primaryButtonText: { type: String, default: 'SEE MORE' },
+  primaryButtonLink: { type: String, default: '/shop' },
+  secondaryButtonText: { type: String, default: 'EXPLORE CATALOG' },
+  secondaryButtonLink: { type: String, default: '/shop?category=Kanchipuram Sarees' },
+  image: { type: String, required: true },
+  status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE' },
+  displayOrder: { type: Number, default: 0 },
+});
+
 const HomepageCMSSchema = new Schema<IHomepageCMS>(
   {
     announcementBar: {
@@ -198,6 +229,7 @@ const HomepageCMSSchema = new Schema<IHomepageCMS>(
       ribbonText: { type: String, default: 'FESTIVAL SPECIAL' },
       enabled: { type: Boolean, default: true },
     },
+    heroSlides: [HeroSlideSchema],
     featuredCategories: [CategoryCardSchema],
     featuredCollections: [CollectionCardSchema],
     trendingSarees: {

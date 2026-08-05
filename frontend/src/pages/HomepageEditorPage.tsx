@@ -377,114 +377,290 @@ export const HomepageEditorPage: React.FC = () => {
             )}
 
             {/* MODULE 2: HERO BANNER */}
-            {activeSection === 'hero' && (
-              <div className="space-y-4">
-                <div className="border-b border-amber-100 pb-3 flex justify-between items-center">
-                  <div>
-                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 2</span>
-                    <h3 className="font-street text-2xl font-black text-slate-900 uppercase">HERO BANNER EDITOR</h3>
+            {activeSection === 'hero' && (() => {
+              const defaultSlides = [
+                {
+                  id: 'hs-1',
+                  offerBadge: cms.heroBanner?.offerBadge || 'ROYAL SAREE COLLECTION 2026',
+                  subtitle: cms.heroBanner?.subtitle || 'HERITAGE HANDLOOM',
+                  title: cms.heroBanner?.title || 'STYLE CLASSIC',
+                  description: cms.heroBanner?.description || "Explore India's most opulent collection of handcrafted Banarasi brocades, heirloom Kanchipuram silk sarees, and delicate floral organza drapes woven by master artisans.",
+                  primaryButtonText: cms.heroBanner?.primaryButtonText || 'SEE MORE',
+                  primaryButtonLink: cms.heroBanner?.primaryButtonLink || '/shop',
+                  secondaryButtonText: cms.heroBanner?.secondaryButtonText || 'EXPLORE CATALOG',
+                  secondaryButtonLink: cms.heroBanner?.secondaryButtonLink || '/shop?category=Kanchipuram Sarees',
+                  image: cms.heroBanner?.desktopImage || '/images/saree_hero_editorial_right_seated.png',
+                  status: 'ACTIVE',
+                  displayOrder: 1,
+                },
+                {
+                  id: 'hs-2',
+                  offerBadge: 'TRENDING FASHION WEAR 2026',
+                  subtitle: 'MODERN DESIGNER DRAPES',
+                  title: 'FASHION WEAR',
+                  description: 'Discover sleek contemporary silhouettes, lightweight organza & tissue sarees, and modern fusion drapes curated for the trendsetting fashionista.',
+                  primaryButtonText: 'EXPLORE FASHION',
+                  primaryButtonLink: '/shop?category=Designer Sarees',
+                  secondaryButtonText: 'EXPLORE CATALOG',
+                  secondaryButtonLink: '/shop',
+                  image: '/images/saree_fashion_wear_hero_v3.png',
+                  status: 'ACTIVE',
+                  displayOrder: 2,
+                },
+                {
+                  id: 'hs-3',
+                  offerBadge: 'EXCLUSIVE PARTYWEAR 2026',
+                  subtitle: 'CELEBRATION GLAMOUR',
+                  title: 'PARTY COLLECTIONS',
+                  description: 'Elevate your evening look with opulent sequence work, shimmering tissue zari, vibrant georgettes, and grand festive partywear drapes.',
+                  primaryButtonText: 'SHOP PARTYWEAR',
+                  primaryButtonLink: '/shop?category=Organza Sarees',
+                  secondaryButtonText: 'EXPLORE CATALOG',
+                  secondaryButtonLink: '/shop',
+                  image: '/images/saree_party_wear_hero_v3.png',
+                  status: 'ACTIVE',
+                  displayOrder: 3,
+                },
+              ];
+
+              const currentSlides = (cms.heroSlides && cms.heroSlides.length > 0)
+                ? [...cms.heroSlides]
+                : defaultSlides;
+
+              const updateSlides = (newSlides: any[]) => {
+                setCms({ ...cms, heroSlides: newSlides });
+              };
+
+              return (
+                <div className="space-y-6">
+                  {/* Header Bar */}
+                  <div className="border-b border-amber-100 pb-3 flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                      <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">MODULE 2</span>
+                      <h3 className="font-street text-2xl font-black text-slate-900 uppercase">HERO CAROUSEL SLIDES MANAGEMENT</h3>
+                      <p className="text-xs text-slate-500 font-semibold">Add, Edit, Reorder, & Upload Images for Landing Page Hero Carousel Slides</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSlide = {
+                            id: `hs-${Date.now()}`,
+                            offerBadge: 'NEW SAREE COLLECTION 2026',
+                            subtitle: 'EXQUISITE HANDLOOM',
+                            title: 'NEW SAREE DRAPE',
+                            description: 'Explore breathtaking handcrafted luxury sarees woven by master Indian artisans.',
+                            primaryButtonText: 'SHOP NOW',
+                            primaryButtonLink: '/shop',
+                            secondaryButtonText: 'EXPLORE CATALOG',
+                            secondaryButtonLink: '/shop',
+                            image: '/images/saree_hero_editorial_right_seated.png',
+                            status: 'ACTIVE',
+                            displayOrder: currentSlides.length + 1,
+                          };
+                          updateSlides([...currentSlides, newSlide]);
+                        }}
+                        className="px-4 py-2 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow hover:bg-slate-800 transition-all"
+                      >
+                        <Plus className="w-4 h-4" /> ADD HERO SLIDE
+                      </button>
+                      <label className="flex items-center gap-2 cursor-pointer bg-amber-100/60 px-3 py-1.5 rounded-xl border border-amber-300">
+                        <input
+                          type="checkbox"
+                          checked={cms.heroBanner?.enabled ?? true}
+                          onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, enabled: e.target.checked } })}
+                          className="w-4 h-4 accent-red-800 rounded"
+                        />
+                        <span className="text-xs font-bold text-slate-800 uppercase">Enable Hero Carousel</span>
+                      </label>
+                    </div>
                   </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={cms.heroBanner.enabled}
-                      onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, enabled: e.target.checked } })}
-                      className="w-4 h-4 accent-red-800 rounded"
-                    />
-                    <span className="text-xs font-bold text-slate-700 uppercase">Enable Module</span>
-                  </label>
+
+                  {/* List of Carousel Slides */}
+                  <div className="space-y-5">
+                    {currentSlides.map((slide: any, idx: number) => (
+                      <div key={slide.id || idx} className="p-4 sm:p-5 bg-amber-50/60 rounded-2xl border border-amber-300 space-y-4 shadow-sm text-xs">
+                        {/* Slide Card Header */}
+                        <div className="flex flex-wrap justify-between items-center border-b border-amber-200 pb-3 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 bg-amber-900 text-amber-200 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                              SLIDE #{idx + 1}
+                            </span>
+                            <span className="font-extrabold text-slate-900 uppercase text-xs">
+                              {slide.title || `Slide ${idx + 1}`}
+                            </span>
+                            <span className={`px-2 py-0.5 text-[9px] font-black rounded uppercase ${
+                              slide.status === 'INACTIVE' ? 'bg-red-200 text-red-800' : 'bg-emerald-100 text-emerald-800'
+                            }`}>
+                              {slide.status || 'ACTIVE'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Reorder Buttons */}
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...currentSlides];
+                                  const temp = updated[idx - 1];
+                                  updated[idx - 1] = updated[idx];
+                                  updated[idx] = temp;
+                                  updateSlides(updated);
+                                }}
+                                className="p-1.5 bg-white border border-amber-300 rounded-lg text-slate-700 hover:bg-amber-100 text-[10px] font-bold"
+                              >
+                                ↑ Move Up
+                              </button>
+                            )}
+                            {idx < currentSlides.length - 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...currentSlides];
+                                  const temp = updated[idx + 1];
+                                  updated[idx + 1] = updated[idx];
+                                  updated[idx] = temp;
+                                  updateSlides(updated);
+                                }}
+                                className="p-1.5 bg-white border border-amber-300 rounded-lg text-slate-700 hover:bg-amber-100 text-[10px] font-bold"
+                              >
+                                ↓ Move Down
+                              </button>
+                            )}
+
+                            {/* Status Toggle Button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...currentSlides];
+                                updated[idx].status = updated[idx].status === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
+                                updateSlides(updated);
+                              }}
+                              className="px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 text-[10px] font-bold"
+                            >
+                              {slide.status === 'INACTIVE' ? 'Enable Slide' : 'Disable Slide'}
+                            </button>
+
+                            {/* Delete Slide Button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = currentSlides.filter((_: any, i: number) => i !== idx);
+                                updateSlides(updated);
+                              }}
+                              className="px-2.5 py-1 bg-red-100 text-red-700 border border-red-300 rounded-lg hover:bg-red-200 font-bold text-[10px] flex items-center gap-1"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Image Uploader Control */}
+                        <ImageUploaderControl
+                          label={`SLIDE #${idx + 1} HERO IMAGE (UPLOAD FILE OR URL)`}
+                          currentUrl={slide.image}
+                          onUrlChange={(url) => {
+                            const updated = [...currentSlides];
+                            updated[idx].image = url;
+                            updateSlides(updated);
+                          }}
+                        />
+
+                        {/* Fields Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Badge Text (Top Pill)</label>
+                            <input
+                              type="text"
+                              value={slide.offerBadge || ''}
+                              onChange={(e) => {
+                                const updated = [...currentSlides];
+                                updated[idx].offerBadge = e.target.value;
+                                updateSlides(updated);
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Subtitle Text</label>
+                            <input
+                              type="text"
+                              value={slide.subtitle || ''}
+                              onChange={(e) => {
+                                const updated = [...currentSlides];
+                                updated[idx].subtitle = e.target.value;
+                                updateSlides(updated);
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold text-amber-800"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Slide Title / Headline</label>
+                            <input
+                              type="text"
+                              value={slide.title || ''}
+                              onChange={(e) => {
+                                const updated = [...currentSlides];
+                                updated[idx].title = e.target.value;
+                                updateSlides(updated);
+                              }}
+                              className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-black uppercase text-sm"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Primary Button Text & Link</label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                placeholder="Button Text"
+                                value={slide.primaryButtonText || ''}
+                                onChange={(e) => {
+                                  const updated = [...currentSlides];
+                                  updated[idx].primaryButtonText = e.target.value;
+                                  updateSlides(updated);
+                                }}
+                                className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold text-xs"
+                              />
+                              <input
+                                type="text"
+                                placeholder="/shop?category=..."
+                                value={slide.primaryButtonLink || ''}
+                                onChange={(e) => {
+                                  const updated = [...currentSlides];
+                                  updated[idx].primaryButtonLink = e.target.value;
+                                  updateSlides(updated);
+                                }}
+                                className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-mono text-[11px]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Description Paragraph</label>
+                          <textarea
+                            rows={2}
+                            value={slide.description || ''}
+                            onChange={(e) => {
+                              const updated = [...currentSlides];
+                              updated[idx].description = e.target.value;
+                              updateSlides(updated);
+                            }}
+                            className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium text-slate-800"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-
-                <div className="space-y-4 text-xs font-semibold">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Title</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.title}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, title: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Subtitle</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.subtitle}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, subtitle: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold text-amber-800"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Hero Description</label>
-                    <textarea
-                      rows={3}
-                      value={cms.heroBanner.description}
-                      onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, description: e.target.value } })}
-                      className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
-                    />
-                  </div>
-
-                  {/* Desktop Hero Image Upload */}
-                  <ImageUploaderControl
-                    label="DESKTOP HERO IMAGE (UPLOAD OR URL)"
-                    currentUrl={cms.heroBanner.desktopImage}
-                    onUrlChange={(url) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, desktopImage: url } })}
-                  />
-
-                  {/* Mobile Hero Image Upload */}
-                  <ImageUploaderControl
-                    label="MOBILE HERO IMAGE (UPLOAD OR URL)"
-                    currentUrl={cms.heroBanner.mobileImage}
-                    onUrlChange={(url) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, mobileImage: url } })}
-                  />
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Primary CTA Button Text</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.primaryButtonText}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, primaryButtonText: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Primary CTA Button Link</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.primaryButtonLink}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, primaryButtonLink: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Offer Badge Label</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.offerBadge}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, offerBadge: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Ribbon Label</label>
-                      <input
-                        type="text"
-                        value={cms.heroBanner.ribbonText}
-                        onChange={(e) => setCms({ ...cms, heroBanner: { ...cms.heroBanner, ribbonText: e.target.value } })}
-                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold text-red-800"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* MODULE 3: EDITORIAL LOOKBOOK GALLERY (5 TILES) */}
             {activeSection === 'lookbook' && (() => {

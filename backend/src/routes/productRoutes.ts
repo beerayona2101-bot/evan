@@ -7,6 +7,10 @@ import {
   updateProduct,
   deleteProduct,
   getSearchSuggestions,
+  getProductVariants,
+  addProductVariant,
+  updateProductVariant,
+  deleteProductVariant,
 } from '../controllers/productController';
 import { protect, admin } from '../middleware/authMiddleware';
 
@@ -19,5 +23,11 @@ router.get('/:id', getProductById);
 router.post('/', protect, admin, createProduct);
 router.put('/:id', protect, admin, updateProduct);
 router.delete('/:id', protect, admin, deleteProduct);
+
+/* Variant Routes */
+router.get('/:id/variants', getProductVariants);
+router.post('/:id/variants', protect, admin, addProductVariant);
+router.put('/:id/variants/:variantId', protect, admin, updateProductVariant);
+router.delete('/:id/variants/:variantId', protect, admin, deleteProductVariant);
 
 export default router;

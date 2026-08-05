@@ -1,5 +1,22 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IVariant {
+  _id?: string;
+  colorName: string;
+  hexColor: string;
+  sku: string;
+  barcode?: string;
+  price: number;
+  mrp?: number;
+  discountPrice?: number;
+  discountPercentage?: number;
+  stock: number;
+  images: string[];
+  featuredImage?: string;
+  isDefault?: boolean;
+  status: 'active' | 'inactive';
+}
+
 export interface IProduct extends Document {
   name: string;
   slug: string;
@@ -26,6 +43,7 @@ export interface IProduct extends Document {
   images: string[];
   hoverImage?: string;
   galleryImages?: string[];
+  variants?: IVariant[];
   rating: number;
   numReviews: number;
   tags: string[];
@@ -44,10 +62,32 @@ export interface IProduct extends Document {
   sareeWidth: string;
   sareeWeight: string;
   pattern: string;
+  clothType?: string;
+  comfortLevel?: string;
+  threadMaterial?: string;
+  colorDetails?: string;
+  transparency?: string;
+  drapeStyle?: string;
   status: 'active' | 'inactive';
   createdAt: Date;
   updatedAt: Date;
 }
+
+const variantSchema: Schema = new Schema({
+  colorName: { type: String, required: true, trim: true },
+  hexColor: { type: String, required: true, default: '#800000' },
+  sku: { type: String, required: true },
+  barcode: { type: String, default: '' },
+  price: { type: Number, required: true },
+  mrp: { type: Number, default: 0 },
+  discountPrice: { type: Number, default: 0 },
+  discountPercentage: { type: Number, default: 0 },
+  stock: { type: Number, required: true, default: 10 },
+  images: { type: [String], default: [] },
+  featuredImage: { type: String, default: '' },
+  isDefault: { type: Boolean, default: false },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+});
 
 const productSchema: Schema = new Schema(
   {
@@ -76,6 +116,7 @@ const productSchema: Schema = new Schema(
     images: { type: [String], required: true },
     hoverImage: { type: String, default: '' },
     galleryImages: { type: [String], default: [] },
+    variants: { type: [variantSchema], default: [] },
     rating: { type: Number, default: 4.9 },
     numReviews: { type: Number, default: 0 },
     tags: { type: [String], default: [] },

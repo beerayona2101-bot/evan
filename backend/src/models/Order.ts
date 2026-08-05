@@ -7,6 +7,10 @@ export interface IOrderItem {
   price: number;
   size: string;
   color: string;
+  variantId?: string;
+  hexColor?: string;
+  sku?: string;
+  variantImage?: string;
   product: mongoose.Types.ObjectId;
 }
 
@@ -50,6 +54,10 @@ const OrderSchema = new Schema<IOrder>(
         price: { type: Number, required: true },
         size: { type: String, required: true },
         color: { type: String, required: true },
+        variantId: { type: String, default: '' },
+        hexColor: { type: String, default: '#800000' },
+        sku: { type: String, default: '' },
+        variantImage: { type: String, default: '' },
         product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
       },
     ],

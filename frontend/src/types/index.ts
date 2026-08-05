@@ -8,6 +8,23 @@ export interface User {
   token?: string;
 }
 
+export interface ProductVariant {
+  _id?: string;
+  colorName: string;
+  hexColor: string;
+  sku: string;
+  barcode?: string;
+  price: number;
+  mrp?: number;
+  discountPrice?: number;
+  discountPercentage?: number;
+  stock: number;
+  images: string[];
+  featuredImage?: string;
+  isDefault?: boolean;
+  status: 'active' | 'inactive';
+}
+
 export interface Product {
   _id: string;
   name: string;
@@ -33,6 +50,7 @@ export interface Product {
   images: string[];
   hoverImage?: string;
   galleryImages?: string[];
+  variants?: ProductVariant[];
   rating: number;
   numReviews: number;
   tags?: string[];
@@ -84,8 +102,12 @@ export interface Category {
 export interface CartItem {
   _id?: string;
   product: Product;
+  variantId?: string;
   size: string;
   color: string;
+  hexColor?: string;
+  sku?: string;
+  variantImage?: string;
   quantity: number;
   price: number;
 }
@@ -97,6 +119,10 @@ export interface OrderItem {
   price: number;
   size: string;
   color: string;
+  variantId?: string;
+  hexColor?: string;
+  sku?: string;
+  variantImage?: string;
   product: string;
 }
 
