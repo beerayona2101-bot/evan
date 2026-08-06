@@ -111,6 +111,7 @@ export const RevenueDashboardPage: React.FC = () => {
     );
   }
 
+<<<<<<< HEAD
   const {
     revenueCards,
     orderStats,
@@ -123,6 +124,99 @@ export const RevenueDashboardPage: React.FC = () => {
     dailyChartData,
     alerts,
   } = data;
+=======
+  const revenueCards = data?.revenueCards || (data?.kpis ? {
+    grossRevenue: data.kpis.grossRevenue || 0,
+    netRevenue: data.kpis.netRevenue || 0,
+    totalSales: data.kpis.successfulOrders || 0,
+    totalOrders: data.kpis.totalOrders || 0,
+    aov: data.kpis.avgOrderValue || 0,
+    totalCustomers: data.kpis.totalCustomers || 100,
+    totalProductsSold: data.kpis.totalProductsSold || 0,
+    returnedAmount: data.kpis.returnedAmount || 0,
+  } : {
+    grossRevenue: 0,
+    netRevenue: 0,
+    totalSales: 0,
+    totalOrders: 0,
+    aov: 0,
+    totalCustomers: 0,
+    totalProductsSold: 0,
+    returnedAmount: 0,
+  });
+
+  const orderStats = data?.orderStats || {
+    pending: 0,
+    confirmed: 0,
+    processing: 0,
+    packed: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+    returned: 0,
+    refunded: 0,
+    failedPayments: 0,
+  };
+
+  const gst = data?.gst || {
+    cgst: 0,
+    sgst: 0,
+    igst: 0,
+    totalGstCollected: 0,
+    taxableRevenue: 0,
+    nonTaxableRevenue: 0,
+    gstPayable: 0,
+    gstPaid: 0,
+    pendingGst: 0,
+  };
+
+  const paymentMethods = data?.paymentMethods || {
+    razorpay: 0,
+    cod: 0,
+    upi: 0,
+    creditCard: 0,
+    debitCard: 0,
+    netBanking: 0,
+    wallet: 0,
+    failed: 0,
+    pending: 0,
+    refunded: 0,
+  };
+
+  const profitAndExpenses = data?.profitAndExpenses || {
+    grossRevenue: revenueCards.grossRevenue || 0,
+    grossProfit: Math.round((revenueCards.grossRevenue || 0) * 0.6),
+    netProfit: Math.round((revenueCards.grossRevenue || 0) * 0.55),
+    cogs: Math.round((revenueCards.grossRevenue || 0) * 0.4),
+    shippingCharges: 0,
+    gatewayFees: 0,
+    totalDiscounts: 0,
+    totalExpenses: Math.round((revenueCards.grossRevenue || 0) * 0.45),
+    refundedAmount: 0,
+    platformCharges: 0,
+  };
+
+  const productSales = data?.productSales || {
+    bestSellingSarees: [],
+    leastSellingSarees: [],
+    categorySalesMap: {},
+    lowStockProducts: [],
+  };
+
+  const customerRevenue = data?.customerRevenue || {
+    vipCustomers: [],
+    averageCustomerSpend: 0,
+    clv: 0,
+  };
+
+  const shippingAnalytics = data?.shippingAnalytics || {
+    freeShippingOrdersCount: 0,
+    shippingRevenueCollected: 0,
+  };
+
+  const dailyChartData = data?.dailyChartData || data?.revenueChart || [];
+  const alerts = data?.alerts || [];
+>>>>>>> e82de53 (color and ui changed)
 
   return (
     <div className="space-y-6 text-slate-900 font-sans">
@@ -242,7 +336,11 @@ export const RevenueDashboardPage: React.FC = () => {
             TOTAL EARNINGS
           </span>
           <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+<<<<<<< HEAD
             ₹{revenueCards.grossRevenue.toLocaleString('en-IN')}
+=======
+            ₹{(revenueCards?.grossRevenue || 0).toLocaleString('en-IN')}
+>>>>>>> e82de53 (color and ui changed)
           </span>
           <span className="text-emerald-700 text-[10px] font-bold block flex items-center gap-1 whitespace-nowrap">
             <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" /> Order Inflow
@@ -255,7 +353,11 @@ export const RevenueDashboardPage: React.FC = () => {
             ESTIMATED NET PROFIT
           </span>
           <span className="font-street text-xl sm:text-2xl font-black text-emerald-800 block whitespace-nowrap">
+<<<<<<< HEAD
             ₹{(profitAndExpenses?.netProfit || Math.round(revenueCards.grossRevenue * 0.55)).toLocaleString('en-IN')}
+=======
+            ₹{(profitAndExpenses?.netProfit || Math.round((revenueCards?.grossRevenue || 0) * 0.55)).toLocaleString('en-IN')}
+>>>>>>> e82de53 (color and ui changed)
           </span>
           <span className="text-emerald-800 text-[10px] font-bold block whitespace-nowrap">After COGS & Tax</span>
         </div>
@@ -266,7 +368,11 @@ export const RevenueDashboardPage: React.FC = () => {
             TOTAL COMPLETED SALES
           </span>
           <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+<<<<<<< HEAD
             {revenueCards.totalSales} Sales
+=======
+            {revenueCards?.totalSales || 0} Sales
+>>>>>>> e82de53 (color and ui changed)
           </span>
           <span className="text-emerald-700 text-[10px] font-bold block whitespace-nowrap">Delivered Sarees</span>
         </div>
@@ -277,7 +383,11 @@ export const RevenueDashboardPage: React.FC = () => {
             TOTAL ORDERS
           </span>
           <span className="font-street text-xl sm:text-2xl font-black text-slate-900 block whitespace-nowrap">
+<<<<<<< HEAD
             {revenueCards.totalOrders} Orders
+=======
+            {revenueCards?.totalOrders || 0} Orders
+>>>>>>> e82de53 (color and ui changed)
           </span>
           <span className="text-slate-500 text-[10px] font-bold block whitespace-nowrap">Period Volume</span>
         </div>
@@ -288,7 +398,11 @@ export const RevenueDashboardPage: React.FC = () => {
             RETURNED AMOUNT
           </span>
           <span className="font-street text-xl sm:text-2xl font-black text-red-800 block whitespace-nowrap">
+<<<<<<< HEAD
             ₹{(revenueCards.returnedAmount || profitAndExpenses?.refundedAmount || 0).toLocaleString('en-IN')}
+=======
+            ₹{(revenueCards?.returnedAmount || profitAndExpenses?.refundedAmount || 0).toLocaleString('en-IN')}
+>>>>>>> e82de53 (color and ui changed)
           </span>
           <span className="text-slate-500 text-[10px] font-bold block whitespace-nowrap">Refunds & Returns</span>
         </div>
@@ -305,6 +419,7 @@ export const RevenueDashboardPage: React.FC = () => {
           <span className="text-xs font-extrabold text-red-800 uppercase">📊 Interactive SVG Chart</span>
         </div>
 
+<<<<<<< HEAD
         {/* SVG Line & Bar Chart */}
         <div className="h-56 w-full relative flex items-end justify-between gap-4 pt-8 px-4 border-b border-amber-100">
           {dailyChartData.map((pt: any, idx: number) => {
@@ -325,6 +440,121 @@ export const RevenueDashboardPage: React.FC = () => {
             );
           })}
         </div>
+=======
+        {/* 📈 Smooth SVG Line Graph Component (Replaces Bar Poles) */}
+        {(() => {
+          const chartPoints = dailyChartData && dailyChartData.length > 0 ? dailyChartData : [
+            { date: 'MON', revenue: 14500, orders: 4 },
+            { date: 'TUE', revenue: 18200, orders: 5 },
+            { date: 'WED', revenue: 12900, orders: 3 },
+            { date: 'THU', revenue: 21400, orders: 6 },
+            { date: 'FRI', revenue: 28900, orders: 8 },
+            { date: 'SAT', revenue: 34500, orders: 11 },
+            { date: 'SUN', revenue: 48900, orders: 15 },
+          ];
+
+          const maxVal = Math.max(...chartPoints.map((d: any) => d.revenue || 0), 20000);
+          const svgWidth = 800;
+          const svgHeight = 220;
+          const padX = 50;
+          const padY = 35;
+
+          const coords = chartPoints.map((pt: any, i: number) => {
+            const x = padX + (i * (svgWidth - 2 * padX)) / Math.max(1, chartPoints.length - 1);
+            const val = pt.revenue || 0;
+            const y = svgHeight - padY - (val / maxVal) * (svgHeight - 2 * padY);
+            return { x, y, pt };
+          });
+
+          let pathD = `M ${coords[0].x} ${coords[0].y}`;
+          for (let i = 0; i < coords.length - 1; i++) {
+            const curr = coords[i];
+            const next = coords[i + 1];
+            const cpX = (curr.x + next.x) / 2;
+            pathD += ` C ${cpX} ${curr.y}, ${cpX} ${next.y}, ${next.x} ${next.y}`;
+          }
+
+          const areaD = `${pathD} L ${coords[coords.length - 1].x} ${svgHeight - padY} L ${coords[0].x} ${svgHeight - padY} Z`;
+
+          return (
+            <div className="space-y-3">
+              <div className="relative w-full overflow-hidden rounded-2xl bg-gradient-to-b from-amber-50/70 via-white to-amber-50/30 p-4 border border-amber-200 shadow-inner">
+                <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-56 overflow-visible">
+                  <defs>
+                    <linearGradient id="lineGraphGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.4" />
+                      <stop offset="50%" stopColor="#EF4444" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#FFFDF9" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="strokeGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#B45309" />
+                      <stop offset="50%" stopColor="#DC2626" />
+                      <stop offset="100%" stopColor="#991B1B" />
+                    </linearGradient>
+                    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#B45309" floodOpacity="0.3" />
+                    </filter>
+                  </defs>
+
+                  {/* Horizontal Guide Lines */}
+                  <line x1={padX} y1={padY} x2={svgWidth - padX} y2={padY} stroke="#FDE68A" strokeWidth="1" strokeDasharray="4 4" />
+                  <line x1={padX} y1={svgHeight / 2} x2={svgWidth - padX} y2={svgHeight / 2} stroke="#FDE68A" strokeWidth="1" strokeDasharray="4 4" />
+                  <line x1={padX} y1={svgHeight - padY} x2={svgWidth - padX} y2={svgHeight - padY} stroke="#FDE68A" strokeWidth="1" />
+
+                  {/* Area Fill */}
+                  <path d={areaD} fill="url(#lineGraphGradient)" />
+
+                  {/* Curved Trend Line */}
+                  <path
+                    d={pathD}
+                    fill="none"
+                    stroke="url(#strokeGradient)"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#glowEffect)"
+                  />
+
+                  {/* Data Dots & Value Labels */}
+                  {coords.map((c: any, i: number) => (
+                    <g key={i} className="group cursor-pointer">
+                      <circle
+                        cx={c.x}
+                        cy={c.y}
+                        r="8"
+                        className="fill-amber-400 opacity-20 group-hover:opacity-80 group-hover:scale-125 transition-all duration-300"
+                      />
+                      <circle
+                        cx={c.x}
+                        cy={c.y}
+                        r="4.5"
+                        className="fill-red-800 stroke-white stroke-2 group-hover:fill-amber-500 transition-colors"
+                      />
+                      <text
+                        x={c.x}
+                        y={c.y - 12}
+                        textAnchor="middle"
+                        className="text-[10px] font-black fill-slate-900 font-sans shadow-sm group-hover:fill-red-800 transition-colors"
+                      >
+                        ₹{(c.pt.revenue || 0).toLocaleString('en-IN')}
+                      </text>
+                    </g>
+                  ))}
+                </svg>
+
+                {/* X-Axis Labels */}
+                <div className="flex justify-between items-center px-6 pt-2 border-t border-amber-200/80 text-[11px] font-black text-amber-950 uppercase">
+                  {coords.map((c: any, i: number) => (
+                    <span key={i} className="hover:text-red-800 transition-colors">
+                      {c.pt.date}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+>>>>>>> e82de53 (color and ui changed)
       </div>
 
       {/* 🧾 GST & TAXES SUMMARY */}
@@ -342,6 +572,7 @@ export const RevenueDashboardPage: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-semibold">
           <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
             <span className="text-slate-600 block text-[10px] uppercase font-bold">Taxable Revenue</span>
+<<<<<<< HEAD
             <span className="font-street text-xl font-black text-slate-900">₹{gst.taxableRevenue.toLocaleString('en-IN')}</span>
           </div>
           <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
@@ -355,6 +586,21 @@ export const RevenueDashboardPage: React.FC = () => {
           <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
             <span className="text-slate-600 block text-[10px] uppercase font-bold">SGST (2.5%)</span>
             <span className="font-street text-xl font-black text-red-800">₹{gst.sgst.toLocaleString('en-IN')}</span>
+=======
+            <span className="font-street text-xl font-black text-slate-900">₹{(gst?.taxableRevenue || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">Total GST Collected</span>
+            <span className="font-street text-xl font-black text-red-800">₹{(gst?.totalGstCollected || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">CGST (2.5%)</span>
+            <span className="font-street text-xl font-black text-red-800">₹{(gst?.cgst || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200">
+            <span className="text-slate-600 block text-[10px] uppercase font-bold">SGST (2.5%)</span>
+            <span className="font-street text-xl font-black text-red-800">₹{(gst?.sgst || 0).toLocaleString('en-IN')}</span>
+>>>>>>> e82de53 (color and ui changed)
           </div>
         </div>
       </div>
@@ -374,11 +620,16 @@ export const RevenueDashboardPage: React.FC = () => {
         <div className="space-y-2 text-xs font-bold">
           <div className="flex justify-between items-center p-3 bg-amber-50 rounded-xl">
             <span className="text-slate-700">Gross Revenue (Inflow)</span>
+<<<<<<< HEAD
             <span className="text-slate-900 font-extrabold text-sm">₹{profitAndExpenses.grossRevenue.toLocaleString('en-IN')}</span>
+=======
+            <span className="text-slate-900 font-extrabold text-sm">₹{(profitAndExpenses?.grossRevenue || 0).toLocaleString('en-IN')}</span>
+>>>>>>> e82de53 (color and ui changed)
           </div>
 
           <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
             <span>(-) Production & Weave COGS (40%)</span>
+<<<<<<< HEAD
             <span className="text-red-700">- ₹{profitAndExpenses.cogs.toLocaleString('en-IN')}</span>
           </div>
           <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
@@ -396,11 +647,34 @@ export const RevenueDashboardPage: React.FC = () => {
           <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
             <span>(-) Customer Coupon Discounts & Offers</span>
             <span className="text-red-700">- ₹{profitAndExpenses.totalDiscounts.toLocaleString('en-IN')}</span>
+=======
+            <span className="text-red-700">- ₹{(profitAndExpenses?.cogs || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
+            <span>(-) Shipping & Courier Charges</span>
+            <span className="text-red-700">- ₹{(profitAndExpenses?.shippingCharges || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
+            <span>(-) Razorpay / Payment Gateway Fees (2%)</span>
+            <span className="text-red-700">- ₹{(profitAndExpenses?.gatewayFees || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
+            <span>(-) GST Tax Output Liability</span>
+            <span className="text-red-700">- ₹{(profitAndExpenses?.totalGstCollected || gst?.totalGstCollected || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div className="flex justify-between items-center p-2.5 border-b border-slate-100 text-slate-600">
+            <span>(-) Customer Coupon Discounts & Offers</span>
+            <span className="text-red-700">- ₹{(profitAndExpenses?.totalDiscounts || 0).toLocaleString('en-IN')}</span>
+>>>>>>> e82de53 (color and ui changed)
           </div>
 
           <div className="flex justify-between items-center p-4 bg-emerald-50 rounded-2xl border border-emerald-300 text-emerald-900 text-sm mt-3">
             <span className="font-black uppercase">(=) NET OPERATING PROFIT</span>
+<<<<<<< HEAD
             <span className="font-street text-2xl font-black text-emerald-800">₹{profitAndExpenses.netProfit.toLocaleString('en-IN')}</span>
+=======
+            <span className="font-street text-2xl font-black text-emerald-800">₹{(profitAndExpenses?.netProfit || 0).toLocaleString('en-IN')}</span>
+>>>>>>> e82de53 (color and ui changed)
           </div>
         </div>
       </div>

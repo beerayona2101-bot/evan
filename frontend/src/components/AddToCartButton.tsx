@@ -1,7 +1,16 @@
 import React from 'react';
+<<<<<<< HEAD
 import { ShoppingBag, Minus, Plus } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
+=======
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, Minus, Plus } from 'lucide-react';
+import { Product } from '../types';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { showToast } from './ToastContainer';
+>>>>>>> e82de53 (color and ui changed)
 
 interface AddToCartButtonProps {
   product: Product;
@@ -19,14 +28,36 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   variant = 'compact',
 }) => {
   const { getItemQuantityInCart, updateCartItemQuantityByProductId } = useCart();
+<<<<<<< HEAD
+=======
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+>>>>>>> e82de53 (color and ui changed)
   const effectiveColor = color || (product.colors && product.colors.length > 0 ? product.colors[0] : 'Royal Red');
 
   const quantityInCart = getItemQuantityInCart(product._id, size);
   const maxStock = product.stock !== undefined ? product.stock : 99;
 
+<<<<<<< HEAD
   const handleIncrement = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+=======
+  const checkAuth = (): boolean => {
+    if (!user) {
+      showToast('Please log in to add sarees to your cart or wishlist', 'info');
+      navigate('/login');
+      return false;
+    }
+    return true;
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!checkAuth()) return;
+>>>>>>> e82de53 (color and ui changed)
     if (quantityInCart < maxStock) {
       updateCartItemQuantityByProductId(product, quantityInCart + 1, size, effectiveColor);
     }
@@ -35,12 +66,20 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const handleDecrement = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+<<<<<<< HEAD
+=======
+    if (!checkAuth()) return;
+>>>>>>> e82de53 (color and ui changed)
     updateCartItemQuantityByProductId(product, quantityInCart - 1, size, effectiveColor);
   };
 
   const handleInitialAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+<<<<<<< HEAD
+=======
+    if (!checkAuth()) return;
+>>>>>>> e82de53 (color and ui changed)
     updateCartItemQuantityByProductId(product, 1, size, effectiveColor);
   };
 
@@ -49,25 +88,41 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     if (variant === 'full') {
       return (
         <div
+<<<<<<< HEAD
           className={`flex items-center justify-between bg-amber-400 text-slate-950 rounded-xl p-1.5 border-2 border-slate-900 shadow-xl ${className}`}
+=======
+          className={`flex items-center justify-between bg-amber-100 text-amber-950 rounded-xl p-1.5 border-2 border-amber-300 shadow-sm ${className}`}
+>>>>>>> e82de53 (color and ui changed)
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={handleDecrement}
+<<<<<<< HEAD
             className="w-11 h-11 rounded-lg bg-amber-500/35 hover:bg-slate-900 hover:text-amber-300 text-slate-950 flex items-center justify-center transition-all active:scale-95"
+=======
+            className="w-11 h-11 rounded-lg bg-amber-200/80 hover:bg-amber-300 text-amber-950 flex items-center justify-center transition-all active:scale-95"
+>>>>>>> e82de53 (color and ui changed)
             title="Decrease Quantity"
           >
             <Minus className="w-5 h-5 stroke-[3]" />
           </button>
 
+<<<<<<< HEAD
           <span className="text-base font-black text-slate-950 px-4 tracking-wider">
+=======
+          <span className="text-base font-black text-amber-950 px-4 tracking-wider">
+>>>>>>> e82de53 (color and ui changed)
             {quantityInCart}
           </span>
 
           <button
             onClick={handleIncrement}
             disabled={quantityInCart >= maxStock}
+<<<<<<< HEAD
             className="w-11 h-11 rounded-lg bg-amber-500/35 hover:bg-slate-900 hover:text-amber-300 text-slate-950 flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+=======
+            className="w-11 h-11 rounded-lg bg-amber-200/80 hover:bg-amber-300 text-amber-950 flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+>>>>>>> e82de53 (color and ui changed)
             title="Increase Quantity"
           >
             <Plus className="w-5 h-5 stroke-[3]" />
@@ -79,25 +134,41 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     // Compact Mode (for Product Cards) - Vibrant Light Gold Active State
     return (
       <div
+<<<<<<< HEAD
         className={`w-full mt-1.5 py-1 px-1 bg-amber-400 border-2 border-slate-900 text-slate-950 rounded-lg text-xs font-black shadow-md flex items-center justify-between ${className}`}
+=======
+        className={`w-full mt-1.5 py-1 px-1 bg-amber-100 border-2 border-amber-300 text-amber-950 rounded-lg text-xs font-black shadow-sm flex items-center justify-between ${className}`}
+>>>>>>> e82de53 (color and ui changed)
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={handleDecrement}
+<<<<<<< HEAD
           className="w-7 h-7 rounded bg-amber-500/35 hover:bg-slate-900 hover:text-amber-300 text-slate-950 flex items-center justify-center transition-all active:scale-95"
+=======
+          className="w-7 h-7 rounded bg-amber-200/80 hover:bg-amber-300 text-amber-950 flex items-center justify-center transition-all active:scale-95"
+>>>>>>> e82de53 (color and ui changed)
           title="Decrease"
         >
           <Minus className="w-3.5 h-3.5 stroke-[3]" />
         </button>
 
+<<<<<<< HEAD
         <span className="px-2 text-xs font-black text-slate-950 tracking-wider">
+=======
+        <span className="px-2 text-xs font-black text-amber-950 tracking-wider">
+>>>>>>> e82de53 (color and ui changed)
           {quantityInCart}
         </span>
 
         <button
           onClick={handleIncrement}
           disabled={quantityInCart >= maxStock}
+<<<<<<< HEAD
           className="w-7 h-7 rounded bg-amber-500/35 hover:bg-slate-900 hover:text-amber-300 text-slate-950 flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+=======
+          className="w-7 h-7 rounded bg-amber-200/80 hover:bg-amber-300 text-amber-950 flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+>>>>>>> e82de53 (color and ui changed)
           title="Increase"
         >
           <Plus className="w-3.5 h-3.5 stroke-[3]" />
@@ -106,14 +177,24 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     );
   }
 
+<<<<<<< HEAD
   // State 1: Item Not in Cart -> Standard Navy "ADD TO BAG" Button
+=======
+  // State 1: Item Not in Cart -> Soft Light Gold "ADD TO BAG" Button
+>>>>>>> e82de53 (color and ui changed)
   if (variant === 'full') {
     return (
       <button
         onClick={handleInitialAdd}
+<<<<<<< HEAD
         className={`w-full py-4 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg border border-amber-400/40 flex items-center justify-center gap-2 ${className}`}
       >
         <ShoppingBag className="w-4 h-4" /> ADD TO BAG
+=======
+        className={`w-full py-4 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm border border-amber-300 flex items-center justify-center gap-2 ${className}`}
+      >
+        <ShoppingBag className="w-4 h-4 text-amber-800" /> ADD TO BAG
+>>>>>>> e82de53 (color and ui changed)
       </button>
     );
   }
@@ -121,9 +202,15 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   return (
     <button
       onClick={handleInitialAdd}
+<<<<<<< HEAD
       className={`w-full mt-1.5 py-1.5 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-md text-[9.5px] font-black uppercase tracking-wider transition-all shadow flex items-center justify-center gap-1 ${className}`}
     >
       <ShoppingBag className="w-2.5 h-2.5" /> ADD TO BAG
+=======
+      className={`w-full mt-1.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-md text-[9.5px] font-black uppercase tracking-wider transition-all shadow-sm border border-amber-300 flex items-center justify-center gap-1 ${className}`}
+    >
+      <ShoppingBag className="w-2.5 h-2.5 text-amber-800" /> ADD TO BAG
+>>>>>>> e82de53 (color and ui changed)
     </button>
   );
 };

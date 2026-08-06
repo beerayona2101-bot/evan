@@ -10,6 +10,10 @@ import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { AIFashionAssistant } from './components/AIFashionAssistant';
 import { ToastContainer } from './components/ToastContainer';
+<<<<<<< HEAD
+=======
+import { GlobalNavigationController } from './components/GlobalNavigationController';
+>>>>>>> e82de53 (color and ui changed)
 
 // Lazy Loaded Route Components for Performance Optimization
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -50,8 +54,14 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#09090B] selection:bg-amber-400 selection:text-black">
+<<<<<<< HEAD
       {!isAdminRoute && <Navbar />}
       <main className="flex-grow">
+=======
+      <GlobalNavigationController />
+      {!isAdminRoute && <Navbar />}
+      <main className={`flex-grow ${!isAdminRoute ? 'pt-16' : ''}`}>
+>>>>>>> e82de53 (color and ui changed)
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />

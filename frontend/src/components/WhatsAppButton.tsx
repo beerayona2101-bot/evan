@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { api } from '../services/api';
 import { useSocket } from '../context/SocketContext';
+=======
+import { useLocation } from 'react-router-dom';
+import { api } from '../services/api';
+import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
+>>>>>>> e82de53 (color and ui changed)
 
 export interface IWhatsAppSettings {
   whatsappNumber: string;
@@ -11,6 +18,11 @@ export interface IWhatsAppSettings {
 }
 
 export const WhatsAppButton: React.FC = () => {
+<<<<<<< HEAD
+=======
+  const { user } = useAuth();
+  const location = useLocation();
+>>>>>>> e82de53 (color and ui changed)
   const { socket } = useSocket();
   const [settings, setSettings] = useState<IWhatsAppSettings>({
     whatsappNumber: '919490644434',
@@ -45,6 +57,14 @@ export const WhatsAppButton: React.FC = () => {
     };
   }, [socket]);
 
+<<<<<<< HEAD
+=======
+  // Hide WhatsApp floating icon if user is logged in as Admin or if on Admin routes
+  if (user?.role === 'admin' || location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
+>>>>>>> e82de53 (color and ui changed)
   if (!settings.whatsappEnabled) {
     return null;
   }

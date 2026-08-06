@@ -23,7 +23,21 @@ export const GstTaxAnalyticsPage: React.FC<GstTaxAnalyticsPageProps> = ({ onBack
     return <div className="min-h-[50vh] flex items-center justify-center p-8"><div className="w-10 h-10 border-4 border-amber-400 border-t-red-800 rounded-full animate-spin"></div></div>;
   }
 
+<<<<<<< HEAD
   const { gst } = data;
+=======
+  const gst = data?.gst || {
+    cgst: 0,
+    sgst: 0,
+    igst: 0,
+    totalGstCollected: 0,
+    taxableRevenue: 0,
+    nonTaxableRevenue: 0,
+    gstPayable: 0,
+    gstPaid: 0,
+    pendingGst: 0,
+  };
+>>>>>>> e82de53 (color and ui changed)
 
   return (
     <div className="space-y-6 text-slate-900 font-sans">

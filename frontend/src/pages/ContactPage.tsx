@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Mail, Phone, MapPin, MessageSquare, Send, Sparkles, Clock } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
+=======
+import { Mail, Phone, MapPin, MessageSquare, Send, Sparkles, Clock, CheckCircle } from 'lucide-react';
+import { api } from '../services/api';
+import { showToast } from '../components/ToastContainer';
+
+export const ContactPage: React.FC = () => {
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+>>>>>>> e82de53 (color and ui changed)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+<<<<<<< HEAD
     sareeInterest: 'Kanchipuram Silk',
     message: '',
   });
@@ -14,6 +25,42 @@ export const ContactPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+=======
+    sareeInterest: 'Kanchipuram Silk Sarees',
+    message: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.phone || !formData.message) return;
+
+    setLoading(true);
+
+    try {
+      // 1. Submit inquiry to backend API (saves to DB, emails concierge, emits Socket.IO alert)
+      await api.post('/inquiries', formData);
+    } catch (err) {
+      console.warn('[Inquiry API] Fallback handling active:', err);
+    } finally {
+      setLoading(false);
+      setSubmitted(true);
+
+      // 2. Format WhatsApp Alert Message for Admin Helpline 9490644434
+      const waText = `*NEW SAREE INQUIRY - EVAN COLLECTIONS*\n\n` +
+        `👤 *Customer Name:* ${formData.name}\n` +
+        `✉️ *Email Address:* ${formData.email}\n` +
+        `📞 *Phone Number:* ${formData.phone}\n` +
+        `✨ *Saree Interest:* ${formData.sareeInterest}\n` +
+        `💬 *Message / Consultation Details:*\n${formData.message}\n\n` +
+        `🗓️ *Submitted:* ${new Date().toLocaleString('en-IN')}`;
+
+      // 3. Open WhatsApp Web / WhatsApp App directly to Admin Helpline (9490644434)
+      window.open(`https://wa.me/919490644434?text=${encodeURIComponent(waText)}`, '_blank');
+
+      // 4. Notify Customer via Toast
+      showToast('Inquiry submitted! Admin notified via Email & WhatsApp.', 'success');
+    }
+>>>>>>> e82de53 (color and ui changed)
   };
 
   return (
@@ -33,6 +80,7 @@ export const ContactPage: React.FC = () => {
           </p>
         </div>
 
+<<<<<<< HEAD
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
           {/* Left Business Details */}
@@ -110,6 +158,14 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-8">
             <div className="bg-white p-8 sm:p-10 rounded-3xl border border-amber-200 shadow-xl space-y-6">
               <h3 className="font-street text-3xl font-black text-slate-900">SEND A SAREE INQUIRY</h3>
+=======
+        {/* Centered Inquiry Form */}
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="bg-white p-8 sm:p-12 rounded-3xl border border-amber-200 shadow-xl space-y-6">
+            <h3 className="font-street text-3xl font-black text-slate-900 text-center uppercase tracking-wide">
+              SEND A SAREE INQUIRY
+            </h3>
+>>>>>>> e82de53 (color and ui changed)
 
               {submitted ? (
                 <div className="p-8 bg-amber-50 rounded-2xl border border-amber-300 text-center space-y-3">
@@ -187,9 +243,26 @@ export const ContactPage: React.FC = () => {
 
                   <button
                     type="submit"
+<<<<<<< HEAD
                     className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 border border-amber-300"
                   >
                     <Send className="w-4 h-4" /> SUBMIT INQUIRY
+=======
+                    disabled={loading}
+                    className="w-full py-4 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black uppercase text-xs tracking-widest rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 border border-amber-300 disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-800 animate-spin" />
+                        <span>SENDING INQUIRY...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 text-amber-800" />
+                        <span>SUBMIT INQUIRY & NOTIFY ADMIN VIA WHATSAPP & EMAIL</span>
+                      </>
+                    )}
+>>>>>>> e82de53 (color and ui changed)
                   </button>
                 </form>
               )}
@@ -213,8 +286,11 @@ export const ContactPage: React.FC = () => {
                 />
               </div>
             </div>
+<<<<<<< HEAD
           </div>
 
+=======
+>>>>>>> e82de53 (color and ui changed)
         </div>
       </div>
     </div>

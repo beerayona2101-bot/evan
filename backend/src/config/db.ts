@@ -14,6 +14,9 @@ export const connectDB = async (): Promise<void> => {
     console.log(`[Database] MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.warn(`[Database] Local MongoDB offline. Operating in High-Performance Offline Fallback Mode: ${(error as Error).message}`);
+<<<<<<< HEAD
     mongoose.set('bufferCommands', false);
+=======
+>>>>>>> e82de53 (color and ui changed)
   }
 };

@@ -1,11 +1,24 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
+=======
+import { Link, useNavigate } from 'react-router-dom';
+>>>>>>> e82de53 (color and ui changed)
 import { Heart, Star, ShoppingBag } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+<<<<<<< HEAD
 import { AddToCartButton } from './AddToCartButton';
 
+=======
+import { useAuth } from '../context/AuthContext';
+import { showToast } from './ToastContainer';
+import { AddToCartButton } from './AddToCartButton';
+
+import { formatSareeName } from '../utils/sareeUtils';
+
+>>>>>>> e82de53 (color and ui changed)
 interface ProductCardProps {
   product: Product;
 }
@@ -13,6 +26,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+<<<<<<< HEAD
 
   const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
   const mrp = product.mrp || Math.round(product.price * 1.25);
@@ -21,6 +35,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="group bg-white rounded-xl p-2 sm:p-2.5 border border-amber-200/80 hover:border-amber-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
       {/* Ultra Compact Saree Image Container */}
       <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-amber-50/30 mb-1.5">
+=======
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
+  const mrp = product.mrp || Math.round(product.price * 1.25);
+  const formattedName = formatSareeName(product.name, product.category, false, product._id);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      showToast('Please log in to add sarees to your wishlist', 'info');
+      navigate('/login');
+      return;
+    }
+    toggleWishlist(product);
+  };
+
+  return (
+    <div className="group bg-white rounded-xl border border-amber-200/80 hover:border-amber-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+      {/* Ultra Compact Saree Image Container */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-amber-50/30">
+>>>>>>> e82de53 (color and ui changed)
         <Link to={`/product/${product._id}`} className="w-full h-full block">
           <img
             src={product.images[0] || '/images/saree_banarasi_red.png'}
@@ -32,6 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
         </Link>
 
+<<<<<<< HEAD
         {/* Badges */}
         <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10">
           <span className="bg-red-800 text-amber-300 text-[7.5px] font-black uppercase px-1.5 py-0.5 rounded-full shadow border border-amber-300">
@@ -39,6 +78,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
           {product.discountPercentage && product.discountPercentage > 0 && (
             <span className="bg-amber-400 text-slate-950 text-[7.5px] font-black uppercase px-1.5 py-0.5 rounded-full shadow">
+=======
+        {/* Badges - Small Single-Line Pills */}
+        <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10 max-w-[75%]">
+          <span className="bg-red-100/90 text-red-950 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full shadow-sm border border-red-300 whitespace-nowrap truncate">
+            {product.category.includes('Silk') ? 'PURE SILK' : 'HANDLOOM'}
+          </span>
+          {product.discountPercentage && product.discountPercentage > 0 && (
+            <span className="bg-amber-100/90 text-amber-950 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap">
+>>>>>>> e82de53 (color and ui changed)
               {product.discountPercentage}% OFF
             </span>
           )}
@@ -46,7 +94,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Wishlist Action Button */}
         <button
+<<<<<<< HEAD
           onClick={() => toggleWishlist(product)}
+=======
+          onClick={handleWishlistClick}
+>>>>>>> e82de53 (color and ui changed)
           className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-red-700 shadow transition-all z-10"
           title="Add to Wishlist"
         >
@@ -55,7 +107,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Saree Info */}
+<<<<<<< HEAD
       <div className="space-y-0.5 text-center">
+=======
+      <div className="p-2 space-y-0.5 text-center">
+>>>>>>> e82de53 (color and ui changed)
         <Link
           to={`/shop?category=${encodeURIComponent(product.category)}`}
           className="text-[8.5px] font-black uppercase tracking-wider text-amber-800 group-hover:text-red-700 block line-clamp-1 transition-colors"
@@ -65,7 +121,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         
         <Link to={`/product/${product._id}`} className="block">
           <h4 className="font-serif-luxury font-bold text-[11px] leading-tight text-slate-900 line-clamp-1 group-hover:text-red-700 transition-colors">
+<<<<<<< HEAD
             {product.name}
+=======
+            {formattedName}
+>>>>>>> e82de53 (color and ui changed)
           </h4>
         </Link>
 
@@ -80,7 +140,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Pricing Row */}
         <div className="flex items-center justify-center gap-1 font-bold pt-0.5">
           <span className="text-slate-400 text-[9px] line-through">₹{mrp.toLocaleString('en-IN')}</span>
+<<<<<<< HEAD
           <span className="text-red-800 text-xs font-black">₹{displayPrice.toLocaleString('en-IN')}</span>
+=======
+          <span className="text-slate-900 text-xs font-black">₹{displayPrice.toLocaleString('en-IN')}</span>
+>>>>>>> e82de53 (color and ui changed)
         </div>
 
         {/* Quick Add Button with Dynamic Quantity Control */}

@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
+<<<<<<< HEAD
   Plus, Edit2, Trash2, Shield, Package, ShoppingBag, Users, DollarSign, Sparkles, Check, X, Search,
   LayoutDashboard, Tag, ArrowLeft, Bot, Image as ImageIcon, BarChart3, MessageSquare, AlertTriangle,
   FileText, Download, Star, CheckCircle, Clock, Truck, Copy, Archive, Printer, Lock, UserCheck, ExternalLink, RotateCcw, RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+=======
+  Plus, Edit2, Trash2, Shield, Package, ShoppingBag, Users, DollarSign, Sparkles, Check, X, Menu, Search,
+  LayoutDashboard, Tag, ArrowLeft, Bot, Image as ImageIcon, BarChart3, MessageSquare, AlertTriangle,
+  FileText, Download, Star, CheckCircle, Clock, Truck, Copy, Archive, Printer, Lock, UserCheck, ExternalLink, RotateCcw, RefreshCw
+} from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+>>>>>>> e82de53 (color and ui changed)
 import { Product, Order, Category } from '../types';
 import { api } from '../services/api';
 import { productApi } from '../services/productApi';
@@ -15,6 +23,10 @@ import { reviewApi } from '../services/reviewApi';
 import { userApi } from '../services/userApi';
 import { showToast } from '../components/ToastContainer';
 import { useSocket } from '../context/SocketContext';
+<<<<<<< HEAD
+=======
+import { formatSareeName } from '../utils/sareeUtils';
+>>>>>>> e82de53 (color and ui changed)
 
 import { HomepageEditorPage } from './HomepageEditorPage';
 import { RevenueDashboardPage } from './RevenueDashboardPage';
@@ -34,18 +46,77 @@ import { StockWarehouseInventoryAdjuster } from '../components/StockWarehouseInv
 import { AdminCancelOrderModal } from '../components/AdminCancelOrderModal';
 
 export const AdminDashboardPage: React.FC = () => {
+<<<<<<< HEAD
+=======
+  const [isAdminSidebarOpen, setIsAdminSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return false;
+  });
+>>>>>>> e82de53 (color and ui changed)
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [coupons, setCoupons] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(true);
   const { socket } = useSocket();
 
   const [activeTab, setActiveTab] = useState<
     'analytics' | 'products' | 'orders' | 'categories' | 'inventory' | 'customers' | 'reviews' | 'coupons' | 'ai-generator' | 'financials' | 'homepage-editor' | 'settings'
   >('analytics');
+=======
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { socket } = useSocket();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') || 'analytics') as any;
+  const initialCategory = searchParams.get('category');
+
+  const [activeTabState, setActiveTabState] = useState<
+    'analytics' | 'products' | 'orders' | 'categories' | 'inquiries' | 'inventory' | 'customers' | 'reviews' | 'coupons' | 'ai-generator' | 'financials' | 'gst-tax' | 'net-profit' | 'revenue' | 'today-orders' | 'customer-analytics' | 'product-units' | 'refunds' | 'returns' | 'low-stock' | 'top-selling' | 'homepage-editor' | 'settings'
+  >(initialTab);
+
+  const [selectedAdminCategoryState, setSelectedAdminCategoryState] = useState<string | null>(initialCategory);
+
+  // Sync state when browser history changes (e.g. Backspace or Back button)
+  useEffect(() => {
+    const currentTab = (searchParams.get('tab') || 'analytics') as any;
+    const currentCategory = searchParams.get('category');
+    setActiveTabState(currentTab);
+    setSelectedAdminCategoryState(currentCategory || null);
+  }, [searchParams]);
+
+  const activeTab = activeTabState;
+  const selectedAdminCategory = selectedAdminCategoryState;
+
+  const setActiveTab = (newTab: any) => {
+    setActiveTabState(newTab);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', newTab);
+    if (newTab !== 'products') {
+      newParams.delete('category');
+      setSelectedAdminCategoryState(null);
+    }
+    setSearchParams(newParams, { replace: false });
+  };
+
+  const setSelectedAdminCategory = (catName: string | null) => {
+    setSelectedAdminCategoryState(catName);
+    const newParams = new URLSearchParams(searchParams);
+    if (catName) {
+      newParams.set('tab', 'products');
+      newParams.set('category', catName);
+    } else {
+      newParams.delete('category');
+    }
+    setSearchParams(newParams, { replace: false });
+  };
+>>>>>>> e82de53 (color and ui changed)
 
   const [analyticsSubTab, setAnalyticsSubTab] = useState<string>('dashboard');
 
@@ -57,9 +128,12 @@ export const AdminDashboardPage: React.FC = () => {
   const [adminCancelModalOrder, setAdminCancelModalOrder] = useState<Order | null>(null);
   const [showAdminCancelModal, setShowAdminCancelModal] = useState<boolean>(false);
 
+<<<<<<< HEAD
   // Category Filter State for Inventory (null = 3x3 Cards Grid View)
   const [selectedAdminCategory, setSelectedAdminCategory] = useState<string | null>(null);
 
+=======
+>>>>>>> e82de53 (color and ui changed)
   // Modals & Form State
   const [showProductModal, setShowProductModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -264,22 +338,52 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   const handleToggleDbCategoryLive = async (cat: Category) => {
+<<<<<<< HEAD
     try {
       const updated = await categoryApi.patchCategoryStatus(cat._id, { isLive: !cat.isLive });
       setCategories((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
       showToast(`Category "${cat.name}" is now ${updated.isLive ? 'LIVE' : 'OFFLINE'}!`, 'info');
     } catch {
       showToast('Error toggling live state', 'error');
+=======
+    const nextLiveState = !cat.isLive;
+    setCategories((prev) =>
+      prev.map((c) => (c._id === cat._id ? { ...c, isLive: nextLiveState } : c))
+    );
+    try {
+      const updated = await categoryApi.patchCategoryStatus(cat._id, { isLive: nextLiveState });
+      if (updated && updated._id) {
+        setCategories((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
+      }
+      showToast(`Category "${cat.name}" is now ${nextLiveState ? 'LIVE' : 'OFFLINE'}!`, 'info');
+    } catch {
+      // Retain optimistic update
+>>>>>>> e82de53 (color and ui changed)
     }
   };
 
   const handleToggleDbCategoryFeatured = async (cat: Category) => {
+<<<<<<< HEAD
     try {
       const updated = await categoryApi.patchCategoryStatus(cat._id, { featured: !cat.featured });
       setCategories((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
       showToast(`Category "${cat.name}" ${updated.featured ? 'marked as FEATURED' : 'removed from featured'}!`, 'info');
     } catch {
       showToast('Error updating featured status', 'error');
+=======
+    const nextFeaturedState = !cat.featured;
+    setCategories((prev) =>
+      prev.map((c) => (c._id === cat._id ? { ...c, featured: nextFeaturedState } : c))
+    );
+    try {
+      const updated = await categoryApi.patchCategoryStatus(cat._id, { featured: nextFeaturedState });
+      if (updated && updated._id) {
+        setCategories((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
+      }
+      showToast(`Category "${cat.name}" ${nextFeaturedState ? 'marked as STARRED' : 'removed from starred'}!`, 'info');
+    } catch {
+      // Retain optimistic update
+>>>>>>> e82de53 (color and ui changed)
     }
   };
 
@@ -325,20 +429,34 @@ export const AdminDashboardPage: React.FC = () => {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
+<<<<<<< HEAD
       const [prodRes, orderRes, catRes, coupRes, userRes] = await Promise.all([
+=======
+      const [prodRes, orderRes, catRes, coupRes, userRes, inqRes] = await Promise.all([
+>>>>>>> e82de53 (color and ui changed)
         productApi.getProducts().catch(() => []),
         orderApi.getAllOrders().catch(() => []),
         categoryApi.getCategories().catch(() => []),
         couponApi.getCoupons().catch(() => []),
         userApi.getAllUsers().catch(() => []),
+<<<<<<< HEAD
+=======
+        api.get('/inquiries').then((r) => r.data).catch(() => []),
+>>>>>>> e82de53 (color and ui changed)
       ]);
       setProducts(prodRes);
       setOrders(orderRes);
       setCategories(catRes);
       setCoupons(coupRes);
       setCustomers(userRes);
+<<<<<<< HEAD
     } catch {
     } fontally: {
+=======
+      setInquiries(inqRes || []);
+    } catch {
+    } finally {
+>>>>>>> e82de53 (color and ui changed)
       setLoading(false);
     }
   };
@@ -347,6 +465,21 @@ export const AdminDashboardPage: React.FC = () => {
     fetchAdminData();
   }, []);
 
+<<<<<<< HEAD
+=======
+  // Listen for global Escape key closeActiveModals event
+  useEffect(() => {
+    const handleClose = () => {
+      setShowProductModal(false);
+      setShowCategoryModal(false);
+      setShowCategoryCardModal(false);
+      setShowCouponModal(false);
+    };
+    window.addEventListener('closeActiveModals', handleClose);
+    return () => window.removeEventListener('closeActiveModals', handleClose);
+  }, []);
+
+>>>>>>> e82de53 (color and ui changed)
   // Socket.IO Listener for Multi-Client Synchronization
   useEffect(() => {
     if (!socket) return;
@@ -356,6 +489,14 @@ export const AdminDashboardPage: React.FC = () => {
       showToast(`NEW ORDER RECEIVED! Order #${newOrder._id} (₹${newOrder.totalPrice.toLocaleString('en-IN')})`, 'success');
     };
 
+<<<<<<< HEAD
+=======
+    const handleInquirySubmitted = (newInquiry: any) => {
+      setInquiries((prev) => [newInquiry, ...prev]);
+      showToast(`NEW SAREE INQUIRY! ${newInquiry.name} (${newInquiry.phone}) - ${newInquiry.sareeInterest}`, 'success');
+    };
+
+>>>>>>> e82de53 (color and ui changed)
     const handleOrderUpdate = (updatedOrder: Order) => {
       setOrders((prev) => prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
     };
@@ -379,6 +520,10 @@ export const AdminDashboardPage: React.FC = () => {
     };
 
     socket.on('orderCreated', handleNewOrder);
+<<<<<<< HEAD
+=======
+    socket.on('inquirySubmitted', handleInquirySubmitted);
+>>>>>>> e82de53 (color and ui changed)
     socket.on('orderUpdated', handleOrderUpdate);
     socket.on('productCreated', fetchAdminData);
     socket.on('productUpdated', handleProductUpdated);
@@ -387,6 +532,10 @@ export const AdminDashboardPage: React.FC = () => {
 
     return () => {
       socket.off('orderCreated', handleNewOrder);
+<<<<<<< HEAD
+=======
+      socket.off('inquirySubmitted', handleInquirySubmitted);
+>>>>>>> e82de53 (color and ui changed)
       socket.off('orderUpdated', handleOrderUpdate);
       socket.off('productCreated', fetchAdminData);
       socket.off('productUpdated', handleProductUpdated);
@@ -486,8 +635,14 @@ export const AdminDashboardPage: React.FC = () => {
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< HEAD
     const payload = {
       name: formData.name,
+=======
+    const formattedName = formatSareeName(formData.name, formData.category);
+    const payload = {
+      name: formattedName,
+>>>>>>> e82de53 (color and ui changed)
       description: formData.description,
       price: Number(formData.price),
       discountPrice: formData.discountPrice ? Number(formData.discountPrice) : 0,
@@ -893,6 +1048,7 @@ export const AdminDashboardPage: React.FC = () => {
     });
 
   return (
+<<<<<<< HEAD
     <div className="h-screen w-screen bg-[#FFFDF9] text-slate-900 flex font-sans overflow-hidden">
       {/* Sidebar Navigation - Fixed locked position on screen */}
       <aside className="w-64 h-full bg-slate-900 text-white p-6 hidden md:flex flex-col justify-between border-r border-amber-500/20 shadow-2xl z-30 flex-shrink-0 overflow-hidden">
@@ -988,31 +1144,292 @@ export const AdminDashboardPage: React.FC = () => {
                 }`}
             >
               <MessageSquare className="w-4 h-4 text-amber-400" /> Settings & Contact
+=======
+    <div className="h-screen w-screen bg-[#FFFDF9] text-slate-900 flex flex-col font-sans overflow-hidden relative">
+      {/* Mobile Top Navigation Bar */}
+      <header className="lg:hidden bg-[#FFFDF9]/95 backdrop-blur-md text-slate-900 px-4 py-3 border-b border-amber-200/80 shadow-sm flex items-center justify-between z-30 flex-shrink-0">
+        {/* Left: Hamburger Icon Button to open/close sidebar */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsAdminSidebarOpen((prev) => !prev);
+          }}
+          className="p-2 rounded-xl bg-amber-100/70 text-slate-800 hover:text-red-800 focus:outline-none transition-colors border border-amber-300 flex items-center justify-center shadow-sm"
+          aria-label="Toggle Navigation Sidebar"
+        >
+          {isAdminSidebarOpen ? <X className="w-5 h-5 text-red-700" /> : <Menu className="w-5 h-5 text-red-700" />}
+        </button>
+
+        {/* Center: EVAN COLLECTIONS Logo & Brand Name */}
+        <div className="flex items-center space-x-2">
+          <img
+            src="/favicon.png"
+            alt="EVAN COLLECTIONS"
+            className="w-7 h-7 rounded-full object-cover border border-amber-300 shadow-sm"
+          />
+          <div className="flex flex-col leading-none text-center">
+            <span className="font-street text-base font-black tracking-wider text-slate-900">
+              EVAN COLLECTIONS
+            </span>
+            <span className="text-[7px] uppercase tracking-[0.2em] font-extrabold text-amber-800">
+              ADMIN DASHBOARD
+            </span>
+          </div>
+        </div>
+
+        {/* Right Spacer for balanced centering */}
+        <div className="w-9" />
+      </header>
+
+      {/* Invisible Hover Sensor Zone along left screen edge (Desktop only) */}
+      <div
+        onMouseEnter={() => {
+          if (window.innerWidth >= 1024) setIsAdminSidebarOpen(true);
+        }}
+        className="hidden lg:block fixed top-0 left-0 bottom-0 w-5 z-30"
+      />
+
+      {/* Dismissal Backdrop when Sidebar is Open */}
+      {isAdminSidebarOpen && (
+        <div
+          onClick={() => setIsAdminSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-950/50 backdrop-blur-xs z-30 transition-opacity"
+        />
+      )}
+
+      {/* Sidebar Navigation - Hover-Triggered Auto Sidebar / Mobile Drawer */}
+      <aside
+        onMouseEnter={() => {
+          if (window.innerWidth >= 1024) setIsAdminSidebarOpen(true);
+        }}
+        className={`fixed top-0 left-0 h-full bg-[#FFFDF9] text-slate-900 p-6 flex flex-col justify-between border-r border-amber-300/80 shadow-2xl z-40 flex-shrink-0 transition-all duration-300 ease-in-out ${
+          isAdminSidebarOpen
+            ? 'w-64 translate-x-0 opacity-100 shadow-2xl pointer-events-auto'
+            : 'w-64 -translate-x-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="space-y-6">
+          <div className="flex items-center justify-between pt-2">
+            <Link to="/" className="flex items-center space-x-3" onClick={() => setIsAdminSidebarOpen(false)}>
+              <img
+                src="/favicon.png"
+                alt="EVAN COLLECTIONS Logo"
+                className="w-9 h-9 rounded-full object-cover shadow border border-amber-300"
+              />
+              <div className="flex flex-col leading-none">
+                <span className="font-street text-2xl font-black tracking-wider text-slate-900">EVAN</span>
+                <span className="text-[7.5px] uppercase tracking-[0.25em] font-extrabold text-amber-800">ADMIN ATELIER</span>
+              </div>
+            </Link>
+            <button
+              onClick={() => setIsAdminSidebarOpen(false)}
+              className="lg:hidden p-1.5 rounded-lg text-slate-600 hover:text-red-800 hover:bg-amber-100/60 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5 text-red-700" />
+            </button>
+          </div>
+
+          <nav className="space-y-1 text-xs font-extrabold uppercase tracking-wider max-h-[75vh] overflow-y-auto no-scrollbar pr-1">
+            <button
+              onClick={() => { setActiveTab('analytics'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <BarChart3 className="w-4 h-4 text-amber-700" /> Analytics & Reports
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('products'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'products' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Package className="w-4 h-4 text-amber-700" /> Saree Inventory
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('orders'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <ShoppingBag className="w-4 h-4 text-amber-700" /> Orders ({orders.length})
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('categories'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'categories' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Tag className="w-4 h-4 text-amber-700" /> Categories & Weaves
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('inquiries'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inquiries' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <MessageSquare className="w-4 h-4 text-amber-700" /> Inquiries & Alerts ({inquiries.length})
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('inventory'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inventory' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <AlertTriangle className="w-4 h-4 text-amber-700" /> Stock & Warehouse
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('customers'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'customers' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Users className="w-4 h-4 text-amber-700" /> Customer CRM
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('coupons'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'coupons' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Sparkles className="w-4 h-4 text-amber-700" /> Coupons & Offers
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('financials'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'financials' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <DollarSign className="w-4 h-4 text-amber-700" /> Earnings & Taxes
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('homepage-editor'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'homepage-editor' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <LayoutDashboard className="w-4 h-4 text-amber-700" /> Homepage Editor
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('settings'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <MessageSquare className="w-4 h-4 text-amber-700" /> Settings & Contact
+>>>>>>> e82de53 (color and ui changed)
             </button>
           </nav>
         </div>
 
         {/* STORE FRONT PAGE Button */}
+<<<<<<< HEAD
         <div className="pt-4 border-t border-slate-800">
+=======
+        <div className="pt-4 border-t border-amber-200">
+>>>>>>> e82de53 (color and ui changed)
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
+<<<<<<< HEAD
             className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-300 transition-colors uppercase tracking-wider"
           >
             <ExternalLink className="w-4 h-4 text-red-500" /> Store Front Page
+=======
+            className="flex items-center gap-2 text-xs font-extrabold text-slate-700 hover:text-red-900 transition-colors uppercase tracking-wider"
+          >
+            <ExternalLink className="w-4 h-4 text-red-700" /> Store Front Page
+>>>>>>> e82de53 (color and ui changed)
           </a>
         </div>
       </aside>
 
+<<<<<<< HEAD
       {/* Main Content Area - Independently scrollable */}
       <main className="flex-1 h-full overflow-y-auto p-6 sm:p-8 space-y-6">
+=======
+      {/* Main Content Area - Independently scrollable with click-outside auto-close */}
+      <main
+        onClick={() => {
+          if (isAdminSidebarOpen) {
+            setIsAdminSidebarOpen(false);
+          }
+        }}
+        className="flex-1 h-full overflow-y-auto p-2 sm:p-3 space-y-4"
+      >
+>>>>>>> e82de53 (color and ui changed)
 
         {/* TAB 1: Analytics & Reports Overview */}
         {activeTab === 'analytics' && <AnalyticsSummaryDashboard onNavigate={(targetTab) => setActiveTab(targetTab as any)} />}
 
+<<<<<<< HEAD
         {/* TAB 10: Financials & Taxes */}
         {activeTab === 'financials' && <RevenueDashboardPage />}
+=======
+        {/* TAB 10: Financials & Taxes / Earnings & GST (With Sub-Navigation Tabs) */}
+        {(activeTab === 'financials' || activeTab === 'gst-tax' || activeTab === 'net-profit' || activeTab === 'revenue') && (
+          <div className="space-y-6">
+            {/* Top Sub-Navigation Pill Toolbar for Financials & Tax Filings */}
+            <div className="bg-white p-3 rounded-2xl border border-amber-300 shadow-md flex flex-wrap items-center gap-2 text-xs font-black">
+              <button
+                onClick={() => setActiveTab('financials')}
+                className={`px-4 py-2 rounded-xl transition-all uppercase tracking-wider ${
+                  activeTab === 'financials'
+                    ? 'bg-red-800 text-amber-300 shadow border border-amber-300/50 font-black'
+                    : 'bg-amber-50 text-slate-700 hover:bg-amber-100'
+                }`}
+              >
+                💰 EARNINGS OVERVIEW
+              </button>
+              <button
+                onClick={() => setActiveTab('gst-tax')}
+                className={`px-4 py-2 rounded-xl transition-all uppercase tracking-wider ${
+                  activeTab === 'gst-tax'
+                    ? 'bg-red-800 text-amber-300 shadow border border-amber-300/50 font-black'
+                    : 'bg-amber-50 text-slate-700 hover:bg-amber-100'
+                }`}
+              >
+                🧾 GST & TAX FILING (5%)
+              </button>
+              <button
+                onClick={() => setActiveTab('net-profit')}
+                className={`px-4 py-2 rounded-xl transition-all uppercase tracking-wider ${
+                  activeTab === 'net-profit'
+                    ? 'bg-red-800 text-amber-300 shadow border border-amber-300/50 font-black'
+                    : 'bg-amber-50 text-slate-700 hover:bg-amber-100'
+                }`}
+              >
+                💵 NET PROFIT & P&L
+              </button>
+              <button
+                onClick={() => setActiveTab('revenue')}
+                className={`px-4 py-2 rounded-xl transition-all uppercase tracking-wider ${
+                  activeTab === 'revenue'
+                    ? 'bg-red-800 text-amber-300 shadow border border-amber-300/50 font-black'
+                    : 'bg-amber-50 text-slate-700 hover:bg-amber-100'
+                }`}
+              >
+                📈 DETAILED REVENUE ENGINE
+              </button>
+            </div>
+
+            {activeTab === 'financials' && <RevenueDashboardPage />}
+            {activeTab === 'gst-tax' && <GstTaxAnalyticsPage onBack={() => setActiveTab('financials')} />}
+            {activeTab === 'net-profit' && <NetProfitAnalyticsPage onBack={() => setActiveTab('financials')} />}
+            {activeTab === 'revenue' && <RevenueAnalyticsPage onBack={() => setActiveTab('financials')} />}
+          </div>
+        )}
+
+        {/* Analytics Deep-Dive Sub-Pages */}
+        {activeTab === 'today-orders' && <TodayOrdersPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'customer-analytics' && <CustomerAnalyticsPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'product-units' && <ProductUnitsAnalyticsPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'refunds' && <RefundsAnalyticsPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'returns' && <ReturnsAnalyticsPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'low-stock' && <LowStockInventoryPage onBack={() => setActiveTab('analytics')} />}
+        {activeTab === 'top-selling' && <TopSellingProductsPage onBack={() => setActiveTab('analytics')} />}
+>>>>>>> e82de53 (color and ui changed)
 
         {/* TAB 2: Products / Saree Inventory */}
         {activeTab === 'products' && (
@@ -1033,21 +1450,37 @@ export const AdminDashboardPage: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleOpenAddCardModal}
+<<<<<<< HEAD
                       className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow border border-amber-300 flex items-center gap-1.5"
                     >
                       <Plus className="w-4 h-4 text-amber-400" /> Add New Category Card
+=======
+                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-sm border border-amber-300 flex items-center gap-1.5 transition-all"
+                    >
+                      <Plus className="w-4 h-4 text-amber-700" /> Add New Category Card
+>>>>>>> e82de53 (color and ui changed)
                     </button>
 
                     <button
                       onClick={handleOpenCreateModal}
+<<<<<<< HEAD
                       className="px-4 py-2 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow border border-amber-300 flex items-center gap-1.5"
                     >
                       <Plus className="w-4 h-4" /> Add Saree
+=======
+                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-900 font-black text-xs uppercase tracking-wider rounded-xl shadow-sm border border-red-300 flex items-center gap-1.5 transition-all"
+                    >
+                      <Plus className="w-4 h-4 text-red-700" /> Add Saree
+>>>>>>> e82de53 (color and ui changed)
                     </button>
 
                     <button
                       onClick={handleExportCSV}
+<<<<<<< HEAD
                       className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-black text-xs uppercase tracking-wider rounded-xl border border-amber-300 flex items-center gap-1.5"
+=======
+                      className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-slate-900 font-black text-xs uppercase tracking-wider rounded-xl border border-amber-300 flex items-center gap-1.5 transition-all"
+>>>>>>> e82de53 (color and ui changed)
                     >
                       <Download className="w-3.5 h-3.5 text-red-700" /> Export Excel
                     </button>
@@ -1066,6 +1499,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <div
                         key={catCard.id || catCard.name}
                         onClick={() => setSelectedAdminCategory(catCard.name)}
+<<<<<<< HEAD
                         className="group relative bg-amber-50/50 hover:bg-slate-900 rounded-3xl p-5 border border-amber-200 hover:border-amber-400 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-4"
                       >
                         <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-amber-300/60 shadow">
@@ -1075,24 +1509,48 @@ export const AdminDashboardPage: React.FC = () => {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                           <div className="absolute top-3 left-3 bg-red-800 text-amber-300 text-[9px] font-black uppercase px-3 py-1 rounded-full shadow border border-amber-300">
+=======
+                        className="group relative bg-white hover:bg-amber-50/80 rounded-3xl overflow-hidden border border-amber-200 hover:border-amber-400 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                      >
+                        {/* Full-Bleed Image Header (0 margin/padding around top image) */}
+                        <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-amber-200 shadow-sm bg-amber-50">
+                          <img
+                            src={catCard.image}
+                            alt={catCard.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-3 left-3 bg-red-100/90 text-red-950 text-[9px] font-black uppercase px-3 py-1 rounded-full shadow-sm border border-red-300 backdrop-blur-sm">
+>>>>>>> e82de53 (color and ui changed)
                             {catCard.fabric}
                           </div>
 
                           {/* Action Overlay: Edit & Delete Card */}
                           <div className="absolute top-3 right-3 flex items-center gap-1.5">
+<<<<<<< HEAD
                             <span className="bg-amber-300 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow">
+=======
+                            <span className="bg-amber-100/90 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300 backdrop-blur-sm">
+>>>>>>> e82de53 (color and ui changed)
                               {count} SAREES
                             </span>
                             <button
                               onClick={(e) => handleOpenEditCardModal(catCard, e)}
+<<<<<<< HEAD
                               className="p-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 rounded-full shadow border border-amber-500 transition-all"
+=======
+                              className="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-full shadow-sm border border-amber-300 transition-all"
+>>>>>>> e82de53 (color and ui changed)
                               title="Edit Category Card Name & Image"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={(e) => handleDeleteCategoryCard(catCard, e)}
+<<<<<<< HEAD
                               className="p-1.5 bg-red-800 hover:bg-red-900 text-amber-300 rounded-full shadow border border-amber-300 transition-all"
+=======
+                              className="p-1.5 bg-red-100 hover:bg-red-200 text-red-900 rounded-full shadow-sm border border-red-300 transition-all"
+>>>>>>> e82de53 (color and ui changed)
                               title="Delete Category Card"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1100,6 +1558,7 @@ export const AdminDashboardPage: React.FC = () => {
                           </div>
                         </div>
 
+<<<<<<< HEAD
                         <div className="space-y-1">
                           <h4 className="font-street text-xl font-black text-slate-900 group-hover:text-amber-300 transition-colors uppercase">
                             {catCard.name}
@@ -1113,6 +1572,24 @@ export const AdminDashboardPage: React.FC = () => {
                           <span>VIEW {catCard.name}</span>
                           <span className="text-sm font-bold">→</span>
                         </button>
+=======
+                        {/* Padded Content Area */}
+                        <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 space-y-4">
+                          <div className="space-y-1">
+                            <h4 className="font-street text-xl font-black text-slate-900 group-hover:text-red-900 transition-colors uppercase">
+                              {catCard.name}
+                            </h4>
+                            <p className="text-xs text-slate-600 font-medium line-clamp-2">
+                              {catCard.desc}
+                            </p>
+                          </div>
+
+                          <button className="w-full py-3 bg-red-100 hover:bg-red-200 text-red-900 font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 border border-red-300">
+                            <span>VIEW {catCard.name}</span>
+                            <span className="text-sm font-bold">→</span>
+                          </button>
+                        </div>
+>>>>>>> e82de53 (color and ui changed)
                       </div>
                     );
                   })}
@@ -1195,7 +1672,11 @@ export const AdminDashboardPage: React.FC = () => {
                               className="w-12 h-16 object-cover rounded-xl border border-amber-300 shadow-sm"
                             />
                             <div>
+<<<<<<< HEAD
                               <span className="font-bold text-slate-900 text-sm block line-clamp-1">{prod.name}</span>
+=======
+                              <span className="font-bold text-slate-900 text-sm block line-clamp-1">{formatSareeName(prod.name, prod.category, true)}</span>
+>>>>>>> e82de53 (color and ui changed)
                               <span className="text-[10px] text-slate-500 font-bold uppercase">{prod.fabric || 'Pure Silk'}</span>
                             </div>
                           </td>
@@ -1618,6 +2099,7 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
 
             {/* MongoDB Category Cards Grid */}
+<<<<<<< HEAD
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDbCategories.map((cat) => (
                 <div
@@ -1695,6 +2177,91 @@ export const AdminDashboardPage: React.FC = () => {
                       <button
                         onClick={() => handleOpenEditDbCategoryModal(cat)}
                         className="flex-1 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1 border border-amber-300 transition-all"
+=======
+            {/* Full-Width Database Category Cards (One by One in Rows) */}
+            <div className="flex flex-col gap-4 w-full">
+              {filteredDbCategories.map((cat) => (
+                <div
+                  key={cat._id}
+                  className={`relative w-full rounded-3xl p-5 sm:p-6 border transition-all duration-300 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-sm hover:shadow-lg ${
+                    cat.status === 'ARCHIVED'
+                      ? 'bg-red-50/40 border-red-200'
+                      : cat.isLive
+                        ? 'bg-white border-amber-200/90 hover:border-amber-400'
+                        : 'bg-slate-100/60 border-slate-300'
+                  }`}
+                >
+                  {/* Left Section: Name, Order Index, Description & Metadata */}
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-street text-xl sm:text-2xl font-black text-slate-900 uppercase">
+                        {cat.name}
+                      </h4>
+                      <span className="text-[10px] font-bold font-mono text-slate-500 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+                        Order #{cat.displayOrder || 0}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 font-medium max-w-3xl">
+                      {cat.description || 'Authentic handcrafted saree collection.'}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-4 text-[10px] text-slate-500 font-semibold pt-1">
+                      <span>Created By: <strong className="text-slate-800">{cat.createdBy || 'Admin'}</strong></span>
+                      <span>• Last Updated: <strong className="text-slate-800">{new Date(cat.updatedAt || Date.now()).toLocaleDateString()}</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Right Section: Badges Toolbar & Action Buttons */}
+                  <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center gap-3 flex-shrink-0">
+                    
+                    {/* Status & Live & Starred Badges Toolbar */}
+                    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-amber-50/80 rounded-2xl border border-amber-200">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm border ${
+                          cat.status === 'ACTIVE'
+                            ? 'bg-amber-100 text-amber-950 border-amber-300'
+                            : 'bg-red-100 text-red-950 border-red-300'
+                        }`}
+                      >
+                        {cat.status}
+                      </span>
+
+                      <button
+                        onClick={() => handleToggleDbCategoryLive(cat)}
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm transition-all border ${
+                          cat.isLive
+                            ? 'bg-red-100 text-red-950 hover:bg-red-200 border-red-300'
+                            : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200 font-bold'
+                        }`}
+                        title="Click to toggle Live/Offline"
+                      >
+                        {cat.isLive ? '● LIVE' : '○ OFFLINE'}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleDbCategoryFeatured(cat)}
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm transition-all border ${
+                          cat.featured
+                            ? 'bg-amber-100 text-amber-950 hover:bg-amber-200 border-amber-300 font-black'
+                            : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200 font-bold'
+                        }`}
+                        title="Click to toggle Starred Category"
+                      >
+                        {cat.featured ? '★ STARRED' : '☆ STAR'}
+                      </button>
+
+                      <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300">
+                        {cat.productCount || 0} SAREES
+                      </span>
+                    </div>
+
+                    {/* Action Buttons: Edit, Delete, View */}
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <button
+                        onClick={() => handleOpenEditDbCategoryModal(cat)}
+                        className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center gap-1 border border-amber-300 transition-all shadow-sm"
+>>>>>>> e82de53 (color and ui changed)
                       >
                         <Edit2 className="w-3.5 h-3.5 text-red-800" /> Edit
                       </button>
@@ -1702,14 +2269,22 @@ export const AdminDashboardPage: React.FC = () => {
                       {cat.status === 'ARCHIVED' ? (
                         <button
                           onClick={() => handleRestoreDbCategory(cat._id)}
+<<<<<<< HEAD
                           className="flex-1 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1 transition-all"
+=======
+                          className="px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-extrabold text-xs rounded-xl flex items-center gap-1 transition-all shadow-sm"
+>>>>>>> e82de53 (color and ui changed)
                         >
                           <RotateCcw className="w-3.5 h-3.5" /> Restore
                         </button>
                       ) : (
                         <button
                           onClick={() => handleDeleteDbCategory(cat)}
+<<<<<<< HEAD
                           className="flex-1 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1 transition-all"
+=======
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center gap-1 transition-all shadow-sm"
+>>>>>>> e82de53 (color and ui changed)
                         >
                           <Trash2 className="w-3.5 h-3.5" /> Delete
                         </button>
@@ -1720,10 +2295,17 @@ export const AdminDashboardPage: React.FC = () => {
                           setSelectedAdminCategory(cat.name);
                           setActiveTab('products');
                         }}
+<<<<<<< HEAD
                         className="p-2 bg-slate-900 hover:bg-slate-800 text-amber-300 rounded-xl transition-all"
                         title="View Category Items in Inventory"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
+=======
+                        className="p-2.5 bg-amber-100/70 hover:bg-amber-200 text-slate-900 rounded-xl transition-all border border-amber-300 shadow-sm"
+                        title="View Category Items in Inventory"
+                      >
+                        <ExternalLink className="w-4 h-4 text-red-800" />
+>>>>>>> e82de53 (color and ui changed)
                       </button>
                     </div>
                   </div>
@@ -2270,6 +2852,82 @@ export const AdminDashboardPage: React.FC = () => {
 
 
 
+<<<<<<< HEAD
+=======
+        {/* TAB 10.5: Inquiries & WhatsApp Alerts Feed */}
+        {activeTab === 'inquiries' && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-3xl border border-amber-200 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-red-700" /> LIVE SAREE INQUIRIES & CONCIERGE FEED
+                </span>
+                <h2 className="font-street text-2xl sm:text-3xl font-black text-slate-900 uppercase mt-0.5">
+                  CUSTOMER INQUIRIES ({inquiries.length})
+                </h2>
+              </div>
+              <button
+                onClick={fetchAdminData}
+                className="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-950 font-extrabold text-xs uppercase tracking-wider rounded-xl border border-amber-300 shadow-sm flex items-center justify-center gap-2 self-start sm:self-auto"
+              >
+                <RefreshCw className="w-4 h-4 text-amber-800" /> REFRESH INQUIRIES
+              </button>
+            </div>
+
+            {inquiries.length === 0 ? (
+              <div className="bg-white p-12 rounded-3xl border border-amber-200 text-center space-y-3 shadow-md">
+                <MessageSquare className="w-10 h-10 text-amber-400 mx-auto" />
+                <h3 className="font-street text-xl font-black text-slate-900">NO INQUIRIES RECEIVED YET</h3>
+                <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
+                  Customer consultation requests submitted via the Contact page or WhatsApp will appear here in real-time.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {inquiries.map((inq: any, idx: number) => (
+                  <div key={inq._id || idx} className="bg-white p-6 rounded-2xl border border-amber-200/90 shadow-md space-y-3 hover:border-amber-400 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 block">SAREE INTEREST</span>
+                        <span className="font-street font-extrabold text-base text-slate-900">{inq.sareeInterest || 'General Inquiry'}</span>
+                      </div>
+                      <span className="bg-emerald-100 text-emerald-950 border border-emerald-300 text-[8px] font-black px-2.5 py-0.5 rounded-full uppercase">
+                        {inq.status || 'New'}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <div className="flex flex-wrap items-center gap-2 text-slate-800 font-bold">
+                        <span>👤 {inq.name}</span>
+                        <span>•</span>
+                        <span>📞 {inq.phone}</span>
+                      </div>
+                      <p className="text-slate-500 font-medium">✉️ {inq.email}</p>
+                    </div>
+
+                    <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200 text-xs font-medium text-slate-800 leading-relaxed">
+                      "{inq.message}"
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-amber-100 text-[10px] text-slate-500 font-bold">
+                      <span>🗓️ {new Date(inq.createdAt || Date.now()).toLocaleString('en-IN')}</span>
+                      <a
+                        href={`https://wa.me/91${inq.phone.replace(/\D/g, '')}?text=Hi%20${encodeURIComponent(inq.name)},%20thank%20you%20for%20contacting%20EVAN%20COLLECTIONS%20regarding%20your%20${encodeURIComponent(inq.sareeInterest)}%20inquiry!`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg uppercase tracking-wider text-[9px] flex items-center gap-1.5 shadow-sm"
+                      >
+                        <MessageSquare className="w-3 h-3" /> REPLY VIA WHATSAPP
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+>>>>>>> e82de53 (color and ui changed)
         {/* TAB 11: Homepage Editor */}
         {activeTab === 'homepage-editor' && <HomepageEditorPage />}
 

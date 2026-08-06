@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import { ShieldCheck, Truck, RefreshCw, Award, Heart, Mail, Phone, MapPin } from 'lucide-react';
+=======
+import { ShieldCheck, Truck, RefreshCw, Award, Heart, Mail, Phone, MapPin, Clock } from 'lucide-react';
+>>>>>>> e82de53 (color and ui changed)
 
 export const Footer: React.FC = () => {
   return (
@@ -52,7 +56,11 @@ export const Footer: React.FC = () => {
 
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
+<<<<<<< HEAD
         {/* Company Bio */}
+=======
+        {/* Company Bio & Contact Info */}
+>>>>>>> e82de53 (color and ui changed)
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center space-x-2.5">
             <img
@@ -65,6 +73,7 @@ export const Footer: React.FC = () => {
           <p className="text-xs text-slate-400 leading-relaxed font-medium max-w-sm">
             EVAN COLLECTIONS is India's premier luxury saree destination celebrating royal Banarasi brocades, heirloom Kanchipuram silks, delicate floral organzas, and handcrafted linen sarees.
           </p>
+<<<<<<< HEAD
           <div className="space-y-1.5 text-xs font-bold text-amber-400">
             <div className="flex items-center space-x-2">
               <Phone className="w-4 h-4 text-red-500" />
@@ -73,6 +82,41 @@ export const Footer: React.FC = () => {
             <div className="flex items-center space-x-2">
               <MapPin className="w-4 h-4 text-red-500" />
               <span>Heritage Silk House, MG Road, Bengaluru - 560001</span>
+=======
+
+          {/* Luxury Contact Information Block */}
+          <div className="space-y-3 pt-2 text-xs font-semibold border-t border-slate-800">
+            <div className="flex items-start space-x-3 text-slate-300">
+              <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Atelier Address</span>
+                <span className="text-slate-300">Heritage Silk House, MG Road, Bengaluru - 560001</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 text-slate-300">
+              <Phone className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Phone / Helpline</span>
+                <span className="text-slate-300">9490644434</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 text-slate-300">
+              <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Email Concierge</span>
+                <span className="text-slate-300">concierge@evan.com</span>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 text-slate-300">
+              <Clock className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Business Hours</span>
+                <span className="text-slate-300">Monday – Sunday: 10:00 AM – 8:30 PM IST</span>
+              </div>
+>>>>>>> e82de53 (color and ui changed)
             </div>
           </div>
         </div>

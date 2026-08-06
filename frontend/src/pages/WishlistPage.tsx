@@ -69,9 +69,15 @@ export const WishlistPage: React.FC = () => {
             return (
               <div
                 key={product._id}
+<<<<<<< HEAD
                 className="group bg-white rounded-3xl p-4 border border-amber-200/90 hover:border-amber-400 hover:shadow-xl transition-all flex flex-col justify-between relative overflow-hidden"
               >
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 mb-3">
+=======
+                className="group bg-white rounded-2xl border border-amber-200/90 hover:border-amber-400 hover:shadow-xl transition-all flex flex-col justify-between relative overflow-hidden"
+              >
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100">
+>>>>>>> e82de53 (color and ui changed)
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images[0] || '/images/saree_banarasi_red.png'}
@@ -89,7 +95,11 @@ export const WishlistPage: React.FC = () => {
                   </button>
                 </div>
 
+<<<<<<< HEAD
                 <div className="space-y-2 text-center">
+=======
+                <div className="p-3 space-y-2 text-center">
+>>>>>>> e82de53 (color and ui changed)
                   <span className="text-[9px] font-black uppercase tracking-wider text-amber-800 block">
                     {product.fabric || product.category}
                   </span>

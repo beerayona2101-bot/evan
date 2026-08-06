@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+<<<<<<< HEAD
     "start": "node dist/server.js"
+=======
+    "start": "tsc && node dist/server.js"
+>>>>>>> e82de53 (color and ui changed)
   },
   "dependencies": {
     "@types/multer": "^2.2.0",

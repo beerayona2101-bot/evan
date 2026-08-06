@@ -74,9 +74,15 @@ export const CustomerDashboardPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Customer Header Banner */}
+<<<<<<< HEAD
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-amber-200 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-red-800 text-amber-300 flex items-center justify-center font-black text-2xl shadow-xl border-2 border-amber-300">
+=======
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-amber-200 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-950 flex items-center justify-center font-black text-2xl shadow-md border-2 border-amber-300 flex-shrink-0">
+>>>>>>> e82de53 (color and ui changed)
               {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
             </div>
             <div>
@@ -91,12 +97,21 @@ export const CustomerDashboardPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+<<<<<<< HEAD
             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center">
               <span className="text-[10px] font-black text-amber-800 block uppercase">EVAN WALLET</span>
               <span className="font-street text-2xl font-black text-red-800">₹2,500</span>
             </div>
             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center">
               <span className="text-[10px] font-black text-amber-800 block uppercase">MY SAREE ORDERS</span>
+=======
+            <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 text-center shadow-sm">
+              <span className="text-[10px] font-black text-amber-900 block uppercase">EVAN WALLET</span>
+              <span className="font-street text-2xl font-black text-amber-950">₹2,500</span>
+            </div>
+            <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 text-center shadow-sm">
+              <span className="text-[10px] font-black text-amber-900 block uppercase">MY SAREE ORDERS</span>
+>>>>>>> e82de53 (color and ui changed)
               <span className="font-street text-2xl font-black text-slate-900">{orders.length}</span>
             </div>
           </div>
@@ -110,43 +125,75 @@ export const CustomerDashboardPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('orders')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+<<<<<<< HEAD
                 activeTab === 'orders' ? 'bg-red-800 text-amber-300 shadow' : 'text-slate-700 hover:bg-amber-50'
               }`}
             >
               <ShoppingBag className="w-4 h-4" /> My Saree Orders
+=======
+                activeTab === 'orders' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4 text-amber-700" /> My Saree Orders
+>>>>>>> e82de53 (color and ui changed)
             </button>
 
             <button
               onClick={() => setActiveTab('addresses')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+<<<<<<< HEAD
                 activeTab === 'addresses' ? 'bg-red-800 text-amber-300 shadow' : 'text-slate-700 hover:bg-amber-50'
               }`}
             >
               <MapPin className="w-4 h-4" /> Address Book
+=======
+                activeTab === 'addresses' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
+              }`}
+            >
+              <MapPin className="w-4 h-4 text-amber-700" /> Address Book
+>>>>>>> e82de53 (color and ui changed)
             </button>
 
             <button
               onClick={() => setActiveTab('wallet')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+<<<<<<< HEAD
                 activeTab === 'wallet' ? 'bg-red-800 text-amber-300 shadow' : 'text-slate-700 hover:bg-amber-50'
               }`}
             >
               <Wallet className="w-4 h-4" /> EVAN Wallet & Coupons
+=======
+                activeTab === 'wallet' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
+              }`}
+            >
+              <Wallet className="w-4 h-4 text-amber-700" /> EVAN Wallet & Coupons
+>>>>>>> e82de53 (color and ui changed)
             </button>
 
             <button
               onClick={() => setActiveTab('returns')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+<<<<<<< HEAD
                 activeTab === 'returns' ? 'bg-red-800 text-amber-300 shadow' : 'text-slate-700 hover:bg-amber-50'
               }`}
             >
               <RefreshCw className="w-4 h-4" /> Returns & Exchanges
+=======
+                activeTab === 'returns' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
+              }`}
+            >
+              <RefreshCw className="w-4 h-4 text-amber-700" /> Returns & Exchanges
+>>>>>>> e82de53 (color and ui changed)
             </button>
 
             <button
               onClick={() => setActiveTab('support')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+<<<<<<< HEAD
                 activeTab === 'support' ? 'bg-red-800 text-amber-300 shadow' : 'text-slate-700 hover:bg-amber-50'
+=======
+                activeTab === 'support' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
+>>>>>>> e82de53 (color and ui changed)
               }`}
             >
               <MessageSquare className="w-4 h-4" /> Concierge & Support

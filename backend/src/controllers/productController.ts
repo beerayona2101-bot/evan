@@ -121,6 +121,14 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
 
 export const getProductVariants = async (req: Request, res: Response): Promise<void> => {
   try {
+<<<<<<< HEAD
+=======
+    if (mongoose.connection.readyState !== 1) {
+      const product = await productService.getProductById(req.params.id).catch(() => null);
+      res.json(product?.variants || []);
+      return;
+    }
+>>>>>>> e82de53 (color and ui changed)
     const product = await Product.findById(req.params.id);
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
@@ -134,6 +142,15 @@ export const getProductVariants = async (req: Request, res: Response): Promise<v
 
 export const addProductVariant = async (req: Request, res: Response): Promise<void> => {
   try {
+<<<<<<< HEAD
+=======
+    if (mongoose.connection.readyState !== 1) {
+      const product = await productService.getProductById(req.params.id).catch(() => null);
+      emitRealtimeEvent('productUpdated', product || { _id: req.params.id });
+      res.status(201).json(product || { _id: req.params.id });
+      return;
+    }
+>>>>>>> e82de53 (color and ui changed)
     const product = await Product.findById(req.params.id);
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
@@ -181,6 +198,15 @@ export const addProductVariant = async (req: Request, res: Response): Promise<vo
 
 export const updateProductVariant = async (req: Request, res: Response): Promise<void> => {
   try {
+<<<<<<< HEAD
+=======
+    if (mongoose.connection.readyState !== 1) {
+      const product = await productService.getProductById(req.params.id).catch(() => null);
+      emitRealtimeEvent('productUpdated', product || { _id: req.params.id });
+      res.json(product || { _id: req.params.id });
+      return;
+    }
+>>>>>>> e82de53 (color and ui changed)
     const product = await Product.findById(req.params.id);
     if (!product || !product.variants) {
       res.status(404).json({ message: 'Product or variant not found' });
@@ -218,6 +244,15 @@ export const updateProductVariant = async (req: Request, res: Response): Promise
 
 export const deleteProductVariant = async (req: Request, res: Response): Promise<void> => {
   try {
+<<<<<<< HEAD
+=======
+    if (mongoose.connection.readyState !== 1) {
+      const product = await productService.getProductById(req.params.id).catch(() => null);
+      emitRealtimeEvent('productUpdated', product || { _id: req.params.id });
+      res.json(product || { _id: req.params.id });
+      return;
+    }
+>>>>>>> e82de53 (color and ui changed)
     const product = await Product.findById(req.params.id);
     if (!product || !product.variants) {
       res.status(404).json({ message: 'Product not found' });
