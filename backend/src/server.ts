@@ -22,10 +22,7 @@ import uploadRoutes from './routes/uploadRoutes';
 import homepageRoutes from './routes/homepageRoutes';
 import revenueRoutes from './routes/revenueRoutes';
 import settingsRoutes from './routes/settingsRoutes';
-<<<<<<< HEAD
-=======
 import inquiryRoutes from './routes/inquiryRoutes';
->>>>>>> e82de53 (color and ui changed)
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
 dotenv.config();
@@ -65,10 +62,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/homepage', homepageRoutes);
 app.use('/api/analytics', revenueRoutes);
 app.use('/api/settings', settingsRoutes);
-<<<<<<< HEAD
-=======
 app.use('/api/inquiries', inquiryRoutes);
->>>>>>> e82de53 (color and ui changed)
 
 // Production static file serving for unified deployment
 const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');

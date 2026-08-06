@@ -44,13 +44,8 @@ export const CartDrawer: React.FC = () => {
           {/* Drawer Header */}
           <div className="p-5 bg-amber-50/80 border-b border-amber-200 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-<<<<<<< HEAD
-              <div className="w-8 h-8 rounded-full bg-red-800 flex items-center justify-center shadow-sm">
-                <ShoppingBag className="w-4 h-4 text-amber-300" />
-=======
               <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center shadow-sm">
                 <ShoppingBag className="w-4 h-4 text-amber-800" />
->>>>>>> e82de53 (color and ui changed)
               </div>
               <div>
                 <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 block">EVAN SAREE BAG</span>
@@ -87,11 +82,7 @@ export const CartDrawer: React.FC = () => {
                     closeCartDrawer();
                     navigate('/shop');
                   }}
-<<<<<<< HEAD
-                  className="mt-2 px-6 py-3 bg-red-800 text-amber-300 text-xs font-black uppercase tracking-widest rounded-xl shadow-lg hover:bg-red-900 transition-all border border-amber-300"
-=======
                   className="mt-2 px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-300 shadow-sm transition-all"
->>>>>>> e82de53 (color and ui changed)
                 >
                   Explore Saree Catalog
                 </button>
@@ -155,11 +146,7 @@ export const CartDrawer: React.FC = () => {
                       </div>
 
                       <div className="text-right">
-<<<<<<< HEAD
-                        <span className="font-extrabold text-xs text-red-800 block">
-=======
                         <span className="font-extrabold text-xs text-slate-900 block">
->>>>>>> e82de53 (color and ui changed)
                           ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                         </span>
                       </div>
@@ -195,11 +182,7 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm font-black text-slate-900 border-t border-amber-200 pt-2">
                   <span>Total Amount</span>
-<<<<<<< HEAD
-                  <span className="text-red-800 font-street text-xl">₹{total.toLocaleString('en-IN')}</span>
-=======
                   <span className="text-slate-900 font-street text-xl">₹{total.toLocaleString('en-IN')}</span>
->>>>>>> e82de53 (color and ui changed)
                 </div>
               </div>
 
@@ -209,11 +192,7 @@ export const CartDrawer: React.FC = () => {
                     closeCartDrawer();
                     navigate('/cart');
                   }}
-<<<<<<< HEAD
-                  className="py-3 bg-amber-100 hover:bg-amber-200 text-slate-900 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 transition-all text-center"
-=======
                   className="py-3 bg-amber-100/70 hover:bg-amber-200 text-slate-900 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 transition-all text-center"
->>>>>>> e82de53 (color and ui changed)
                 >
                   View Shopping Bag
                 </button>
@@ -222,17 +201,10 @@ export const CartDrawer: React.FC = () => {
                     closeCartDrawer();
                     navigate('/checkout');
                   }}
-<<<<<<< HEAD
-                  className="py-3 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 shadow-md transition-all flex items-center justify-center gap-1"
-                >
-                  <span>Checkout</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-=======
                   className="py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 shadow-sm transition-all flex items-center justify-center gap-1"
                 >
                   <span>Checkout</span>
                   <ArrowRight className="w-3.5 h-3.5 text-amber-800" />
->>>>>>> e82de53 (color and ui changed)
                 </button>
               </div>
             </div>

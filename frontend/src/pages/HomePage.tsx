@@ -6,12 +6,6 @@ import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useSocket } from '../context/SocketContext';
-<<<<<<< HEAD
-import { AddToCartButton } from '../components/AddToCartButton';
-
-export const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-=======
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/ToastContainer';
 import { AddToCartButton } from '../components/AddToCartButton';
@@ -20,29 +14,18 @@ import { formatSareeName } from '../utils/sareeUtils';
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
->>>>>>> e82de53 (color and ui changed)
   const [cms, setCms] = useState<any>(null);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
-<<<<<<< HEAD
-  const [active3DIndex, setActive3DIndex] = useState(1);
-  const [prevActiveIndex, setPrevActiveIndex] = useState(1);
-=======
   const [active3DIndex, setActive3DIndex] = useState(2);
   const [prevActiveIndex, setPrevActiveIndex] = useState(2);
   const active3DIndexRef = useRef(active3DIndex);
->>>>>>> e82de53 (color and ui changed)
   const wheelLockRef = useRef(false);
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { socket } = useSocket();
 
-<<<<<<< HEAD
-  const handleSelectCard = (targetIdx: number) => {
-    setPrevActiveIndex(active3DIndex);
-    setActive3DIndex(targetIdx);
-=======
   useEffect(() => {
     active3DIndexRef.current = active3DIndex;
   }, [active3DIndex]);
@@ -53,7 +36,6 @@ export const HomePage: React.FC = () => {
     setPrevActiveIndex(active3DIndexRef.current);
     setActive3DIndex(normalizedTarget);
     active3DIndexRef.current = normalizedTarget;
->>>>>>> e82de53 (color and ui changed)
   };
 
   const fetchCMS = () => {
@@ -121,19 +103,12 @@ export const HomePage: React.FC = () => {
     if (!isMouseDown) return;
     const diff = mouseStartX - e.clientX;
     if (Math.abs(diff) > 35) {
-<<<<<<< HEAD
-      if (diff > 0) {
-        handleSelectCard((active3DIndex + 1) % sareeCollectionCards.length);
-      } else {
-        handleSelectCard((active3DIndex - 1 + sareeCollectionCards.length) % sareeCollectionCards.length);
-=======
       const cardsCount = sareeCollectionCards?.length || 5;
       const curr = active3DIndexRef.current;
       if (diff > 0) {
         handleSelectCard((curr + 1) % cardsCount);
       } else {
         handleSelectCard((curr - 1 + cardsCount) % cardsCount);
->>>>>>> e82de53 (color and ui changed)
       }
       setIsMouseDown(false);
     }
@@ -152,19 +127,12 @@ export const HomePage: React.FC = () => {
     const currentTouch = e.targetTouches[0].clientX;
     const diff = touchStart - currentTouch;
     if (Math.abs(diff) > 35) {
-<<<<<<< HEAD
-      if (diff > 0) {
-        handleSelectCard((active3DIndex + 1) % sareeCollectionCards.length);
-      } else {
-        handleSelectCard((active3DIndex - 1 + sareeCollectionCards.length) % sareeCollectionCards.length);
-=======
       const cardsCount = sareeCollectionCards?.length || 5;
       const curr = active3DIndexRef.current;
       if (diff > 0) {
         handleSelectCard((curr + 1) % cardsCount);
       } else {
         handleSelectCard((curr - 1 + cardsCount) % cardsCount);
->>>>>>> e82de53 (color and ui changed)
       }
       setTouchStart(null);
     }
@@ -176,19 +144,12 @@ export const HomePage: React.FC = () => {
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (Math.abs(delta) > 10) {
       wheelLockRef.current = true;
-<<<<<<< HEAD
-      if (delta > 0) {
-        handleSelectCard((active3DIndex + 1) % sareeCollectionCards.length);
-      } else {
-        handleSelectCard((active3DIndex - 1 + sareeCollectionCards.length) % sareeCollectionCards.length);
-=======
       const cardsCount = sareeCollectionCards?.length || 5;
       const curr = active3DIndexRef.current;
       if (delta > 0) {
         handleSelectCard((curr + 1) % cardsCount);
       } else {
         handleSelectCard((curr - 1 + cardsCount) % cardsCount);
->>>>>>> e82de53 (color and ui changed)
       }
       setTimeout(() => {
         wheelLockRef.current = false;
@@ -264,11 +225,7 @@ export const HomePage: React.FC = () => {
       primaryButtonLink: '/shop?category=Designer Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-<<<<<<< HEAD
-      image: '/images/saree_fashion_wear_hero_v3.png',
-=======
       image: '/images/saree_palace_courtyard_trio.jpg',
->>>>>>> e82de53 (color and ui changed)
     },
     {
       id: 'party',
@@ -280,11 +237,7 @@ export const HomePage: React.FC = () => {
       primaryButtonLink: '/shop?category=Organza Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-<<<<<<< HEAD
-      image: '/images/saree_party_wear_hero_v3.png',
-=======
       image: '/images/saree_palace_courtyard_trio.jpg',
->>>>>>> e82de53 (color and ui changed)
     },
   ];
 
@@ -559,11 +512,7 @@ export const HomePage: React.FC = () => {
                       transformStyle: 'preserve-3d',
                       transition: isWrapping
                         ? 'opacity 300ms ease-in-out'
-<<<<<<< HEAD
-                        : 'transform 700ms ease-out, opacity 700ms ease-out',
-=======
                         : 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1), opacity 700ms ease-out',
->>>>>>> e82de53 (color and ui changed)
                     }}
                     className={`absolute top-0 cursor-pointer ${
                       isActive
@@ -578,16 +527,6 @@ export const HomePage: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
 
-<<<<<<< HEAD
-                    {/* Top Tag Pill */}
-                    <div className="relative z-10 flex justify-between items-center">
-                      <span className="bg-white/90 backdrop-blur-md text-slate-900 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
-                        {card.tag}
-                      </span>
-                      {isActive && (
-                        <span className="bg-red-800 text-amber-300 text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow border border-amber-300 animate-pulse">
-                          CLICK TO VIEW COLLECTION
-=======
                     {/* Top Tag Pill - Small & Strictly Single Line */}
                     <div className="relative z-10 flex items-center justify-between gap-1.5 w-full">
                       <span className="bg-white/90 backdrop-blur-md text-slate-900 group-hover:bg-amber-100 group-hover:text-amber-950 transition-colors text-[8.5px] font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-sm border border-amber-200/60 whitespace-nowrap truncate max-w-[65%]">
@@ -596,42 +535,24 @@ export const HomePage: React.FC = () => {
                       {isActive && (
                         <span className="bg-red-100 text-red-950 text-[8px] font-extrabold uppercase px-2 py-0.5 rounded-full shadow-sm border border-red-300 whitespace-nowrap">
                           VIEW COLLECTION
->>>>>>> e82de53 (color and ui changed)
                         </span>
                       )}
                     </div>
 
                     {/* Bottom Info Overlay */}
                     <div className="relative z-10 text-left text-white space-y-1.5">
-<<<<<<< HEAD
-                      <h4 className="font-serif-luxury font-extrabold text-base line-clamp-1 text-amber-200 group-hover:text-amber-400 group-hover:scale-[1.02] transition-all duration-300">
-=======
                       <h4 className="font-serif-luxury font-extrabold text-base line-clamp-1 text-amber-200 group-hover:text-amber-300 group-hover:scale-[1.02] transition-all duration-300">
->>>>>>> e82de53 (color and ui changed)
                         {card.title}
                       </h4>
                       <div className="flex items-center justify-between pt-1">
                         <div>
-<<<<<<< HEAD
-                          <span className="text-xs font-bold text-amber-400 group-hover:text-white transition-colors block">{card.price}</span>
-=======
                           <span className="text-xs font-bold text-amber-300 group-hover:text-white transition-colors block">{card.price}</span>
->>>>>>> e82de53 (color and ui changed)
                           <span className="text-[11px] font-extrabold text-slate-300 group-hover:text-amber-200 transition-colors">{card.rupeePrice}</span>
                         </div>
                         {isActive ? (
                           <Link
                             to={card.buttonLink}
                             onClick={(e) => e.stopPropagation()}
-<<<<<<< HEAD
-                            className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-lg transition-all"
-                          >
-                            <span>SHOP COLLECTION</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </Link>
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-amber-400 group-hover:text-slate-950 text-white flex items-center justify-center transition-colors">
-=======
                             className="px-3.5 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-sm border border-amber-300 transition-all"
                           >
                             <span>SHOP COLLECTION</span>
@@ -639,7 +560,6 @@ export const HomePage: React.FC = () => {
                           </Link>
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-amber-100 group-hover:text-amber-950 text-white flex items-center justify-center transition-colors">
->>>>>>> e82de53 (color and ui changed)
                             <ArrowRight className="w-3.5 h-3.5" />
                           </div>
                         )}
@@ -669,13 +589,8 @@ export const HomePage: React.FC = () => {
             {featuredProducts.slice(0, cms?.newArrivals?.maxItems || 4).map((product, idx) => {
               const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
               return (
-<<<<<<< HEAD
-                <div key={idx} className="group bg-white rounded-3xl p-4 border border-amber-200/90 hover:border-amber-400 hover:shadow-2xl transition-all flex flex-col justify-between">
-                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 mb-3 cursor-pointer">
-=======
                 <div key={idx} className="group bg-white rounded-2xl border border-amber-200/90 hover:border-amber-400 hover:shadow-2xl transition-all flex flex-col justify-between overflow-hidden">
                   <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100 cursor-pointer">
->>>>>>> e82de53 (color and ui changed)
                     <Link to={`/product/${product._id}`}>
                       <img
                         src={product.images[0] || '/images/saree_banarasi_red.png'}
@@ -692,9 +607,6 @@ export const HomePage: React.FC = () => {
                       </span>
                     </div>
                     <button
-<<<<<<< HEAD
-                      onClick={() => toggleWishlist(product)}
-=======
                       onClick={() => {
                         if (!user) {
                           showToast('Please log in to add sarees to your wishlist', 'info');
@@ -703,24 +615,16 @@ export const HomePage: React.FC = () => {
                         }
                         toggleWishlist(product);
                       }}
->>>>>>> e82de53 (color and ui changed)
                       className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-slate-700 hover:text-red-700 shadow"
                     >
                       <Heart className={`w-4 h-4 ${isInWishlist(product._id) ? 'fill-current text-red-700' : ''}`} />
                     </button>
                   </div>
 
-<<<<<<< HEAD
-                  <div className="space-y-1 text-center">
-                    <Link to={`/product/${product._id}`}>
-                      <h4 className="font-serif-luxury font-bold text-sm text-slate-900 line-clamp-1 hover:text-red-800 transition-colors">
-                        {product.name}
-=======
                   <div className="p-3 text-center space-y-1">
                     <Link to={`/product/${product._id}`}>
                       <h4 className="font-serif-luxury font-bold text-sm text-slate-900 line-clamp-1 hover:text-red-800 transition-colors" title={formatSareeName(product.name, product.category, false, product._id)}>
                         {formatSareeName(product.name, product.category, false, product._id)}
->>>>>>> e82de53 (color and ui changed)
                       </h4>
                     </Link>
                     <div className="flex items-center justify-center gap-1 text-amber-500 text-xs">

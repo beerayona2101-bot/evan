@@ -1,19 +1,11 @@
 import { Request, Response } from 'express';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
->>>>>>> e82de53 (color and ui changed)
 import { Category } from '../models/Category';
 import { Product } from '../models/Product';
 import { AuditLog } from '../models/AuditLog';
 import { emitRealtimeEvent } from '../config/socket';
 import { uploadImageToCloudinary } from '../utils/cloudinary';
 
-<<<<<<< HEAD
-// Helper for Audit Log
-const createAuditLog = async (req: Request, action: string, details: string, targetId?: string) => {
-  try {
-=======
 const SAREE_CATEGORIES_20 = [
   'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Cotton Sarees', 'Linen Sarees',
   'Organza Sarees', 'Georgette Sarees', 'Chiffon Sarees', 'Crepe Sarees', 'Tussar Silk',
@@ -38,7 +30,6 @@ const FALLBACK_CATEGORIES = SAREE_CATEGORIES_20.map((name, i) => ({
 const createAuditLog = async (req: Request, action: string, details: string, targetId?: string) => {
   try {
     if (mongoose.connection.readyState !== 1) return;
->>>>>>> e82de53 (color and ui changed)
     await AuditLog.create({
       user: (req as any).user?._id || null,
       adminName: (req as any).user?.name || 'Admin',
@@ -56,14 +47,11 @@ const createAuditLog = async (req: Request, action: string, details: string, tar
 // GET /api/categories
 export const getCategories = async (req: Request, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-=======
     if (mongoose.connection.readyState !== 1) {
       res.json(FALLBACK_CATEGORIES);
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     const { status, featured, isLive, search, sort, includeArchived, includeDeleted } = req.query;
 
     const query: any = {};
@@ -122,11 +110,7 @@ export const getCategories = async (req: Request, res: Response): Promise<void> 
 
     res.json(categoriesWithCount);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     res.json(FALLBACK_CATEGORIES);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
@@ -289,10 +273,6 @@ export const patchCategoryStatus = async (req: Request, res: Response): Promise<
     const { id } = req.params;
     const { status, isLive, featured } = req.body;
 
-<<<<<<< HEAD
-    const category = await Category.findById(id);
-    if (!category) {
-=======
     // 1. Handle fallback categories (IDs starting with 'cat-') or when Mongoose DB is disconnected
     if (id.startsWith('cat-') || mongoose.connection.readyState !== 1) {
       const fallbackCat = FALLBACK_CATEGORIES.find((c) => c._id === id || c.slug === id);
@@ -324,7 +304,6 @@ export const patchCategoryStatus = async (req: Request, res: Response): Promise<
         res.json(fallbackCat);
         return;
       }
->>>>>>> e82de53 (color and ui changed)
       res.status(404).json({ message: 'Category not found' });
       return;
     }
@@ -338,11 +317,7 @@ export const patchCategoryStatus = async (req: Request, res: Response): Promise<
     await createAuditLog(
       req,
       'PATCH_CATEGORY_STATUS',
-<<<<<<< HEAD
-      `Updated status for "${updatedCategory.name}" (Status: ${updatedCategory.status}, Live: ${updatedCategory.isLive})`,
-=======
       `Updated status for "${updatedCategory.name}" (Status: ${updatedCategory.status}, Live: ${updatedCategory.isLive}, Featured: ${updatedCategory.featured})`,
->>>>>>> e82de53 (color and ui changed)
       String(updatedCategory._id)
     );
     emitRealtimeEvent('categoryUpdated', updatedCategory);

@@ -1,11 +1,4 @@
 import { Response } from 'express';
-<<<<<<< HEAD
-import { Cart } from '../models/Cart';
-import { AuthRequest } from '../middleware/authMiddleware';
-
-export const getCart = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-=======
 import mongoose from 'mongoose';
 import { Cart } from '../models/Cart';
 import { AuthRequest } from '../middleware/authMiddleware';
@@ -29,7 +22,6 @@ export const getCart = async (req: AuthRequest, res: Response): Promise<void> =>
       res.json(cart);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     let cart = await Cart.findOne({ user: req.user?._id })
       .populate('items.product')
       .populate('savedForLater.product');
@@ -38,21 +30,14 @@ export const getCart = async (req: AuthRequest, res: Response): Promise<void> =>
     }
     res.json(cart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const addToCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const { productId, size, color, quantity, price } = req.body;
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const { productId, size, color, quantity, price } = req.body;
 
@@ -69,7 +54,6 @@ export const addToCart = async (req: AuthRequest, res: Response): Promise<void> 
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     let cart = await Cart.findOne({ user: req.user?._id });
     if (!cart) {
       cart = new Cart({ user: req.user?._id, items: [], savedForLater: [] });
@@ -91,23 +75,14 @@ export const addToCart = async (req: AuthRequest, res: Response): Promise<void> 
       .populate('savedForLater.product');
     res.json(updatedCart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const updateCartItemQuantity = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const { quantity } = req.body;
-    const { itemId } = req.params;
-
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const { quantity } = req.body;
     const { itemId } = req.params;
@@ -126,7 +101,6 @@ export const updateCartItemQuantity = async (req: AuthRequest, res: Response): P
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     const cart = await Cart.findOne({ user: req.user?._id });
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
@@ -148,20 +122,14 @@ export const updateCartItemQuantity = async (req: AuthRequest, res: Response): P
       .populate('savedForLater.product');
     res.json(updatedCart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const removeFromCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     if (mongoose.connection.readyState !== 1) {
       const cart = await getOrCreateFallbackCart(userId);
@@ -170,7 +138,6 @@ export const removeFromCart = async (req: AuthRequest, res: Response): Promise<v
       res.json(cart);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     const cart = await Cart.findOne({ user: req.user?._id });
     if (cart) {
       cart.items = cart.items.filter((item: any) => item._id.toString() !== req.params.itemId);
@@ -184,21 +151,14 @@ export const removeFromCart = async (req: AuthRequest, res: Response): Promise<v
       res.status(404).json({ message: 'Cart not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const saveForLater = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const { itemId } = req.body;
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const { itemId } = req.body;
     if (mongoose.connection.readyState !== 1) {
@@ -212,7 +172,6 @@ export const saveForLater = async (req: AuthRequest, res: Response): Promise<voi
       res.json(cart);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     const cart = await Cart.findOne({ user: req.user?._id });
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
@@ -232,21 +191,14 @@ export const saveForLater = async (req: AuthRequest, res: Response): Promise<voi
       .populate('savedForLater.product');
     res.json(updatedCart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const moveToCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const { itemId } = req.body;
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const { itemId } = req.body;
     if (mongoose.connection.readyState !== 1) {
@@ -259,7 +211,6 @@ export const moveToCart = async (req: AuthRequest, res: Response): Promise<void>
       res.json(cart);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     const cart = await Cart.findOne({ user: req.user?._id });
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
@@ -278,21 +229,14 @@ export const moveToCart = async (req: AuthRequest, res: Response): Promise<void>
       .populate('savedForLater.product');
     res.json(updatedCart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const syncCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const { localItems } = req.body;
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const { localItems } = req.body;
 
@@ -323,7 +267,6 @@ export const syncCart = async (req: AuthRequest, res: Response): Promise<void> =
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     let cart = await Cart.findOne({ user: req.user?._id });
     if (!cart) {
       cart = new Cart({ user: req.user?._id, items: [], savedForLater: [] });
@@ -331,12 +274,8 @@ export const syncCart = async (req: AuthRequest, res: Response): Promise<void> =
 
     if (Array.isArray(localItems)) {
       for (const item of localItems) {
-<<<<<<< HEAD
-        const pId = item.product._id || item.product;
-=======
         const pId = item.productId || (item.product && (item.product._id || item.product)) || item.product;
         if (!pId) continue;
->>>>>>> e82de53 (color and ui changed)
         const existingIdx = cart.items.findIndex(
           (i) => i.product.toString() === pId && i.size === item.size && i.color === item.color
         );
@@ -360,20 +299,14 @@ export const syncCart = async (req: AuthRequest, res: Response): Promise<void> =
       .populate('savedForLater.product');
     res.json(updatedCart);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     res.json(cart);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const clearCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     if (mongoose.connection.readyState !== 1) {
       const cart = await getOrCreateFallbackCart(userId);
@@ -381,7 +314,6 @@ export const clearCart = async (req: AuthRequest, res: Response): Promise<void> 
       res.json({ message: 'Cart cleared' });
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     const cart = await Cart.findOne({ user: req.user?._id });
     if (cart) {
       cart.items = [];
@@ -389,13 +321,9 @@ export const clearCart = async (req: AuthRequest, res: Response): Promise<void> 
     }
     res.json({ message: 'Cart cleared' });
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const userId = req.user?._id?.toString() || 'user-1';
     const cart = await getOrCreateFallbackCart(userId);
     cart.items = [];
     res.json({ message: 'Cart cleared' });
->>>>>>> e82de53 (color and ui changed)
   }
 };

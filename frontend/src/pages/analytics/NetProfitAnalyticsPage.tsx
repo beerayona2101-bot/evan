@@ -23,9 +23,6 @@ export const NetProfitAnalyticsPage: React.FC<NetProfitAnalyticsPageProps> = ({ 
     return <div className="min-h-[50vh] flex items-center justify-center p-8"><div className="w-10 h-10 border-4 border-amber-400 border-t-red-800 rounded-full animate-spin"></div></div>;
   }
 
-<<<<<<< HEAD
-  const { profitAndExpenses } = data;
-=======
   const profitAndExpenses = data?.profitAndExpenses || {
     grossRevenue: 0,
     grossProfit: 0,
@@ -42,7 +39,6 @@ export const NetProfitAnalyticsPage: React.FC<NetProfitAnalyticsPageProps> = ({ 
   if (profitAndExpenses.totalGstCollected === undefined) {
     profitAndExpenses.totalGstCollected = data?.gst?.totalGstCollected || Math.round((profitAndExpenses.grossRevenue || 0) * 0.05);
   }
->>>>>>> e82de53 (color and ui changed)
 
   return (
     <div className="space-y-6 text-slate-900 font-sans">

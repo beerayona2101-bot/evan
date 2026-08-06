@@ -43,11 +43,13 @@ export const AnalyticsSummaryDashboard: React.FC<AnalyticsSummaryDashboardProps>
     setLoading(true);
     try {
       const [analyticsRes, ordersRes] = await Promise.all([
-        api.get('/analytics/revenue?period=today'),
+        api.get('/analytics/revenue?period=today').catch(() => ({ data: null })),
         api.get('/orders').catch(() => ({ data: [] })),
       ]);
 
-      setData(analyticsRes.data);
+      if (analyticsRes && analyticsRes.data) {
+        setData(analyticsRes.data);
+      }
 
       // Transform orders into full day activity log feed
       const rawOrders: any[] = ordersRes.data || [];

@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-<<<<<<< HEAD
-import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon, Sparkles } from 'lucide-react';
-=======
 import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon } from 'lucide-react';
->>>>>>> e82de53 (color and ui changed)
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -22,10 +18,6 @@ export const Navbar: React.FC = () => {
     return null;
   }
 
-<<<<<<< HEAD
-  return (
-    <header className="sticky top-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-2.5 px-4 sm:px-8 shadow-sm mb-1">
-=======
   // Helper to determine active navigation route
   const isActive = (path: string, exactQuery?: string) => {
     if (exactQuery) {
@@ -42,7 +34,6 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-2.5 px-4 sm:px-8 shadow-sm">
->>>>>>> e82de53 (color and ui changed)
       {/* EVAN COLLECTIONS Seamless Header */}
       <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
         {/* Mobile menu button */}
@@ -71,22 +62,6 @@ export const Navbar: React.FC = () => {
         </Link>
 
         {/* Desktop Navigation Links */}
-<<<<<<< HEAD
-        <nav className="hidden md:flex items-center space-x-6 text-[11px] font-black tracking-widest uppercase text-slate-800">
-          <Link to="/" className="hover:text-red-700 transition-colors">
-            HOME
-          </Link>
-          <Link to="/shop" className="hover:text-red-700 transition-colors">
-            COLLECTIONS
-          </Link>
-          <Link to="/about" className="hover:text-red-700 transition-colors">
-            ABOUT US
-          </Link>
-          <Link to="/contact" className="hover:text-red-700 transition-colors">
-            CONTACT US
-          </Link>
-          <Link to="/faq" className="hover:text-red-700 transition-colors">
-=======
         <nav className="hidden md:flex items-center space-x-6 text-[11px] font-black tracking-widest uppercase">
           <Link
             to="/"
@@ -136,16 +111,10 @@ export const Navbar: React.FC = () => {
                 : 'text-slate-800 hover:text-red-700'
             }`}
           >
->>>>>>> e82de53 (color and ui changed)
             FAQS
           </Link>
           <Link
             to="/shop?sort=newest"
-<<<<<<< HEAD
-            className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-400/20 text-red-800 font-extrabold text-[9px] rounded-full border border-amber-400/40 hover:bg-amber-400/30 transition-all shadow-sm"
-          >
-            <Sparkles className="w-2.5 h-2.5 text-red-700" /> OFFERS
-=======
             className={`transition-all py-1 ${
               isActive('/shop', 'sort=newest')
                 ? 'text-red-700 font-black border-b-2 border-red-700'
@@ -153,38 +122,11 @@ export const Navbar: React.FC = () => {
             }`}
           >
             OFFERS
->>>>>>> e82de53 (color and ui changed)
           </Link>
         </nav>
 
         {/* Right Header Icons */}
         <div className="flex items-center space-x-3.5 text-slate-800">
-<<<<<<< HEAD
-          {/* Wishlist Icon with Counter */}
-          <Link to="/wishlist" className="p-1.5 hover:text-red-700 transition-colors relative" aria-label="Wishlist">
-            <Heart className="w-4 h-4" />
-            {wishlist.length > 0 && (
-              <span className="absolute top-0 right-0 bg-red-700 text-white font-black text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-amber-300">
-                {wishlist.length}
-              </span>
-            )}
-          </Link>
-
-          {/* Cart Icon with Counter - Navigates directly to /cart */}
-          <Link
-            to="/cart"
-            className="p-1.5 hover:text-red-700 transition-colors relative"
-            aria-label="Shopping Bag"
-            title="View Shopping Bag Page"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            {totalItemsCount > 0 && (
-              <span className="absolute top-0 right-0 bg-red-800 text-amber-300 font-black text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-amber-300">
-                {totalItemsCount}
-              </span>
-            )}
-          </Link>
-=======
           {/* Wishlist Icon with Counter - Rendered ONLY when user is logged in */}
           {user && (
             <Link
@@ -221,7 +163,6 @@ export const Navbar: React.FC = () => {
               )}
             </Link>
           )}
->>>>>>> e82de53 (color and ui changed)
 
           {/* Customer / Admin Profile Menu */}
           <div className="relative">
@@ -230,15 +171,11 @@ export const Navbar: React.FC = () => {
                 onClick={() => setUserDropdown(!userDropdown)}
                 className="flex items-center space-x-2 focus:outline-none"
               >
-<<<<<<< HEAD
-                <div className="w-8 h-8 rounded-full bg-red-800 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow overflow-hidden">
-=======
                 <div
                   className={`w-8 h-8 rounded-full bg-red-800 text-amber-300 font-extrabold text-xs flex items-center justify-center border border-amber-300 shadow overflow-hidden transition-all ${
                     isActive('/account') ? 'ring-2 ring-red-700 ring-offset-1' : ''
                   }`}
                 >
->>>>>>> e82de53 (color and ui changed)
                   {user.avatar ? (
                     <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
@@ -249,13 +186,9 @@ export const Navbar: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-<<<<<<< HEAD
-                className="p-2 hover:text-red-700 transition-colors flex items-center gap-1 font-extrabold text-xs"
-=======
                 className={`p-2 transition-colors flex items-center gap-1 font-extrabold text-xs ${
                   isActive('/login') || isActive('/register') ? 'text-red-700' : 'hover:text-red-700'
                 }`}
->>>>>>> e82de53 (color and ui changed)
               >
                 <UserIcon className="w-5 h-5" />
               </Link>
@@ -281,13 +214,9 @@ export const Navbar: React.FC = () => {
                 <Link
                   to="/account"
                   onClick={() => setUserDropdown(false)}
-<<<<<<< HEAD
-                  className="block px-4 py-2 hover:bg-amber-50 transition-colors font-bold"
-=======
                   className={`block px-4 py-2 hover:bg-amber-50 transition-colors font-bold ${
                     isActive('/account') ? 'text-red-700 bg-amber-50/50' : ''
                   }`}
->>>>>>> e82de53 (color and ui changed)
                 >
                   My Account & Orders
                 </Link>
@@ -320,23 +249,6 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden mt-3 p-6 bg-white rounded-3xl border border-amber-300 shadow-2xl space-y-4 text-xs font-black tracking-widest uppercase">
-<<<<<<< HEAD
-          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-900">
-            Home
-          </Link>
-          <Link to="/shop" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-900">
-            Collections
-          </Link>
-          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-900">
-            About Us
-          </Link>
-          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-900">
-            Contact Us
-          </Link>
-          <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-900">
-            FAQs
-          </Link>
-=======
           <Link
             to="/"
             onClick={() => setMobileMenuOpen(false)}
@@ -391,7 +303,6 @@ export const Navbar: React.FC = () => {
           >
             Offers
           </Link>
->>>>>>> e82de53 (color and ui changed)
           {user?.role === 'admin' && (
             <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-red-800 font-black">
               Admin Dashboard

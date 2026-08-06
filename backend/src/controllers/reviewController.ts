@@ -1,24 +1,16 @@
 import { Response } from 'express';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
->>>>>>> e82de53 (color and ui changed)
 import { Review } from '../models/Review';
 import { Product } from '../models/Product';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { emitRealtimeEvent } from '../config/socket';
 
-<<<<<<< HEAD
-=======
 const FALLBACK_REVIEWS: Map<string, any[]> = new Map();
 
->>>>>>> e82de53 (color and ui changed)
 export const createProductReview = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { rating, comment, productId: bodyProductId } = req.body;
     const productId = req.params.productId || bodyProductId;
-<<<<<<< HEAD
-=======
 
     if (mongoose.connection.readyState !== 1 || !mongoose.Types.ObjectId.isValid(productId)) {
       const rev = {
@@ -39,7 +31,6 @@ export const createProductReview = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     const product = await Product.findById(productId);
 
     if (product) {
@@ -70,9 +61,6 @@ export const createProductReview = async (req: AuthRequest, res: Response): Prom
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const rev = {
       _id: `rev-${Date.now()}`,
       user: req.user?._id || 'user-1',
@@ -82,18 +70,11 @@ export const createProductReview = async (req: AuthRequest, res: Response): Prom
       createdAt: new Date(),
     };
     res.status(201).json(rev);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const getProductReviews = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const reviews = await Review.find({ product: req.params.productId }).sort({ createdAt: -1 });
-    res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     const productId = req.params.productId;
     if (mongoose.connection.readyState !== 1 || !mongoose.Types.ObjectId.isValid(productId)) {
       const reviews = FALLBACK_REVIEWS.get(productId) || [];
@@ -105,6 +86,5 @@ export const getProductReviews = async (req: AuthRequest, res: Response): Promis
   } catch (error) {
     const reviews = FALLBACK_REVIEWS.get(req.params.productId) || [];
     res.json(reviews);
->>>>>>> e82de53 (color and ui changed)
   }
 };

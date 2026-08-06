@@ -13,14 +13,7 @@ export class ProductService {
 
     if (category && category !== 'All') {
       const cleanCat = category.trim();
-<<<<<<< HEAD
-      query.$or = [
-        { category: { $regex: cleanCat, $options: 'i' } },
-        { tags: { $regex: cleanCat, $options: 'i' } },
-      ];
-=======
       query.category = { $regex: cleanCat, $options: 'i' };
->>>>>>> e82de53 (color and ui changed)
     }
 
     if (fabric && fabric !== 'All') {

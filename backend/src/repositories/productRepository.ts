@@ -22,50 +22,32 @@ const UNSPLASH_SAREE_IMAGES = [
 ];
 
 const SAREE_CATEGORIES_20 = [
-<<<<<<< HEAD
-  'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Cotton Sarees', 'Linen Sarees',
-  'Organza Sarees', 'Georgette Sarees', 'Chiffon Sarees', 'Crepe Sarees', 'Tussar Silk',
-  'Handloom Sarees', 'Designer Sarees', 'Wedding Sarees', 'Bridal Sarees', 'Party Wear Sarees',
-  'Casual Sarees', 'Printed Sarees', 'Festival Collection', 'Office Wear', 'Daily Wear'
-=======
   'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Organza Sarees', 'Paithani Sarees',
   'Cotton Sarees', 'Linen Sarees', 'Georgette Sarees', 'Chiffon Sarees', 'Tussar Silk',
   'Handloom Sarees', 'Bandhani Sarees', 'Mysore Silk Sarees', 'Designer Sarees', 'Printed Sarees',
   'Crepe Sarees', 'Wedding Sarees', 'Bridal Sarees', 'Party Wear Sarees', 'Festival Collection'
->>>>>>> e82de53 (color and ui changed)
 ];
 
 const FABRICS_MAP: Record<string, string> = {
   'Silk Sarees': 'Pure Mulberry Silk',
   'Kanchipuram Sarees': 'Pure Kanchipuram Silk',
   'Banarasi Sarees': 'Royal Banarasi Brocade Silk',
-<<<<<<< HEAD
-  'Cotton Sarees': 'Mulmul Soft Organic Cotton',
-  'Linen Sarees': 'Pure Handloom Linen',
-  'Organza Sarees': 'Delicate Floral Organza',
-=======
   'Organza Sarees': 'Delicate Floral Organza',
   'Paithani Sarees': 'Pure Paithani Silk Zari',
   'Cotton Sarees': 'Mulmul Soft Organic Cotton',
   'Linen Sarees': 'Pure Handloom Linen',
->>>>>>> e82de53 (color and ui changed)
   'Georgette Sarees': 'Faux Silk Georgette',
   'Chiffon Sarees': 'Pure Chiffon Zari',
   'Tussar Silk': 'Pure Tussar Silk',
   'Handloom Sarees': 'Artisanal Handloom Weave',
-<<<<<<< HEAD
-=======
   'Bandhani Sarees': 'Kutch Tie-Dye Bandhej Silk',
   'Mysore Silk Sarees': 'Pure Mysore Gold Zari Silk',
->>>>>>> e82de53 (color and ui changed)
   'Designer Sarees': 'High-Fashion Designer Silk',
   'Wedding Sarees': 'Heavy Zari Wedding Brocade',
   'Bridal Sarees': 'Royal Bridal Trousseau Silk',
   'Party Wear Sarees': 'Shimmer Party Wear Silk',
 };
 
-<<<<<<< HEAD
-=======
 const CATEGORY_TITLES_MAP: Record<string, string[]> = {
   'Banarasi Sarees': [
     'Kadwa Zari Brocade', 'Tanchoi Silk Brocade', 'Katan Silk Jangla', 'Shikargah Brocade',
@@ -117,7 +99,6 @@ const LUXURY_SAREE_TITLES_25 = [
   'Anaya Splendor', 'Meenakshi Garden', 'Shrishti Zari', 'Anandam Royal', 'Suryavanshi Gold'
 ];
 
->>>>>>> e82de53 (color and ui changed)
 const generate500Sarees = (): any[] => {
   const list: any[] = [];
   let globalIdCounter = 1;
@@ -125,18 +106,12 @@ const generate500Sarees = (): any[] => {
   for (let c = 0; c < SAREE_CATEGORIES_20.length; c++) {
     const catName = SAREE_CATEGORIES_20[c];
     const catFabric = FABRICS_MAP[catName] || 'Pure Handloom Silk';
-<<<<<<< HEAD
-
-    for (let p = 1; p <= 25; p++) {
-      const name = `EVAN COLLECTIONS ${catName} Royal Heirloom Saree Vol.${p}`;
-=======
     const catTitles = CATEGORY_TITLES_MAP[catName] || LUXURY_SAREE_TITLES_25;
 
     for (let p = 1; p <= 25; p++) {
       const baseTitle = catTitles[(p - 1) % catTitles.length];
       const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
       const name = `${baseTitle} ${cleanCatName} Saree Vol.${p} by EVAN COLLECTIONS`;
->>>>>>> e82de53 (color and ui changed)
       const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
       const discountPrice = Math.round(basePrice * 0.84);
       const mrp = Math.round(basePrice * 1.28);
@@ -197,36 +172,6 @@ const generate500Sarees = (): any[] => {
 const ALL_500_FALLBACK_SAREES = generate500Sarees();
 
 export class ProductRepository {
-<<<<<<< HEAD
-  private getFallback(query: any = {}): IProduct[] {
-    let results = [...ALL_500_FALLBACK_SAREES];
-
-    if (query.category && query.category !== 'All') {
-      const cleanCat = query.category.toString().toLowerCase().trim();
-      results = results.filter(
-        (p) => p.category.toLowerCase().includes(cleanCat) || cleanCat.includes(p.category.toLowerCase())
-      );
-      if (results.length === 0) {
-        results = ALL_500_FALLBACK_SAREES.filter((p) => p.category.toLowerCase().includes('silk'));
-      }
-    }
-
-    if (query.fabric && query.fabric !== 'All') {
-      const cleanFab = query.fabric.toString().toLowerCase().trim();
-      const filtered = results.filter((p) => p.fabric && p.fabric.toLowerCase().includes(cleanFab));
-      if (filtered.length > 0) results = filtered;
-    }
-
-    if (query.occasion && query.occasion !== 'All') {
-      const cleanOcc = query.occasion.toString().toLowerCase().trim();
-      const filtered = results.filter((p) => p.occasion && p.occasion.toLowerCase().includes(cleanOcc));
-      if (filtered.length > 0) results = filtered;
-    }
-
-    if (query.search) {
-      const searchLower = query.search.toString().toLowerCase().trim();
-      const filtered = results.filter(
-=======
   private extractQueryString(val: any): string {
     if (!val) return '';
     if (typeof val === 'string') return val.trim();
@@ -296,17 +241,12 @@ export class ProductRepository {
     if (searchVal) {
       const searchLower = searchVal.toLowerCase();
       results = results.filter(
->>>>>>> e82de53 (color and ui changed)
         (p) =>
           p.name.toLowerCase().includes(searchLower) ||
           p.description.toLowerCase().includes(searchLower) ||
           p.category.toLowerCase().includes(searchLower) ||
           p.fabric.toLowerCase().includes(searchLower)
       );
-<<<<<<< HEAD
-      if (filtered.length > 0) results = filtered;
-=======
->>>>>>> e82de53 (color and ui changed)
     }
 
     return results as any;

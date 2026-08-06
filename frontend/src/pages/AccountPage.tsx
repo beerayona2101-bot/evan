@@ -226,15 +226,9 @@ export const AccountPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header Profile Info Banner */}
-<<<<<<< HEAD
-        <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-amber-400/40 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-700 to-red-900 text-amber-300 font-black text-2xl flex items-center justify-center border-2 border-amber-300 shadow-lg overflow-hidden flex-shrink-0">
-=======
         <div className="bg-[#FFFDF9] text-slate-900 p-6 sm:p-8 rounded-3xl border border-amber-300 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-950 font-black text-2xl flex items-center justify-center border-2 border-amber-300 shadow-md overflow-hidden flex-shrink-0">
->>>>>>> e82de53 (color and ui changed)
               {(avatar || user.avatar) ? (
                 <img src={avatar || user.avatar} alt={user.name} className="w-full h-full object-cover" />
               ) : (
@@ -242,25 +236,15 @@ export const AccountPage: React.FC = () => {
               )}
             </div>
             <div>
-<<<<<<< HEAD
-              <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 block">AUTHENTICATED CUSTOMER</span>
-              <h1 className="font-street text-3xl sm:text-4xl font-black text-amber-300">{user.name}</h1>
-              <p className="text-xs text-slate-400 font-medium">{user.email} • {user.phone || 'Phone not set'}</p>
-=======
               <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 block">AUTHENTICATED CUSTOMER</span>
               <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900 uppercase">{user.name}</h1>
               <p className="text-xs text-slate-500 font-bold">{user.email} • {user.phone || 'Phone not set'}</p>
->>>>>>> e82de53 (color and ui changed)
             </div>
           </div>
 
           <button
             onClick={logout}
-<<<<<<< HEAD
-            className="px-6 py-2.5 bg-red-900/60 hover:bg-red-800 text-amber-300 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-300/60 transition-all shadow"
-=======
             className="px-6 py-2.5 bg-red-100 hover:bg-red-200 text-red-900 text-xs font-extrabold uppercase tracking-widest rounded-xl border border-red-300 transition-all shadow-sm"
->>>>>>> e82de53 (color and ui changed)
           >
             Sign Out
           </button>
@@ -282,19 +266,11 @@ export const AccountPage: React.FC = () => {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap ${
                   isActive
-<<<<<<< HEAD
-                    ? 'bg-slate-900 text-amber-300 shadow-md border border-amber-300'
-                    : 'bg-white text-slate-700 hover:bg-amber-50 border border-amber-200'
-                }`}
-              >
-                <IconComp className="w-4 h-4 text-amber-500" />
-=======
                     ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black'
                     : 'bg-white text-slate-700 hover:bg-amber-50 border border-amber-200 font-bold'
                 }`}
               >
                 <IconComp className="w-4 h-4 text-amber-700" />
->>>>>>> e82de53 (color and ui changed)
                 <span>{tab.label}</span>
               </button>
             );

@@ -1,14 +1,9 @@
 import { Request, Response } from 'express';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
->>>>>>> e82de53 (color and ui changed)
 import { Coupon } from '../models/Coupon';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { emitRealtimeEvent } from '../config/socket';
 
-<<<<<<< HEAD
-=======
 const FALLBACK_COUPONS = [
   {
     _id: 'c-1',
@@ -39,7 +34,6 @@ const FALLBACK_COUPONS = [
   },
 ];
 
->>>>>>> e82de53 (color and ui changed)
 export const validateCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
     const { code, cartTotal } = req.body;
@@ -48,9 +42,6 @@ export const validateCoupon = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-<<<<<<< HEAD
-    const coupon = await Coupon.findOne({ code: code.toUpperCase(), isActive: true });
-=======
     const uppercaseCode = code.toUpperCase();
 
     if (mongoose.connection.readyState !== 1) {
@@ -71,7 +62,6 @@ export const validateCoupon = async (req: Request, res: Response): Promise<void>
     }
 
     const coupon = await Coupon.findOne({ code: uppercaseCode, isActive: true });
->>>>>>> e82de53 (color and ui changed)
     if (!coupon) {
       res.status(404).json({ message: 'Invalid or expired coupon code' });
       return;
@@ -108,12 +98,6 @@ export const validateCoupon = async (req: Request, res: Response): Promise<void>
 
 export const getCoupons = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const coupons = await Coupon.find({}).sort({ createdAt: -1 });
-    res.json(coupons);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     if (mongoose.connection.readyState !== 1) {
       res.json(FALLBACK_COUPONS);
       return;
@@ -122,15 +106,12 @@ export const getCoupons = async (req: AuthRequest, res: Response): Promise<void>
     res.json(coupons);
   } catch (error) {
     res.json(FALLBACK_COUPONS);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const createCoupon = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { code, discountType, discountAmount, minPurchase, expirationDate } = req.body;
-<<<<<<< HEAD
-=======
     if (mongoose.connection.readyState !== 1) {
       const newC = {
         _id: `c-${Date.now()}`,
@@ -146,7 +127,6 @@ export const createCoupon = async (req: AuthRequest, res: Response): Promise<voi
       res.status(201).json(newC);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     const coupon = new Coupon({
       code: code.toUpperCase(),
       discountType,
@@ -165,8 +145,6 @@ export const createCoupon = async (req: AuthRequest, res: Response): Promise<voi
 
 export const deleteCoupon = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-=======
     if (mongoose.connection.readyState !== 1) {
       const idx = FALLBACK_COUPONS.findIndex((c) => c._id === req.params.id);
       if (idx > -1) FALLBACK_COUPONS.splice(idx, 1);
@@ -174,7 +152,6 @@ export const deleteCoupon = async (req: AuthRequest, res: Response): Promise<voi
       res.json({ message: 'Coupon removed successfully' });
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     await Coupon.findByIdAndDelete(req.params.id);
     emitRealtimeEvent('couponUpdated', { id: req.params.id, deleted: true });
     res.json({ message: 'Coupon removed successfully' });

@@ -1,20 +1,11 @@
-<<<<<<< HEAD
-import React from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
-import { CheckCircle2, Package, Printer, ArrowRight, ShieldCheck } from 'lucide-react';
-=======
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { CheckCircle2, Package, Printer, ArrowRight, ShieldCheck } from 'lucide-react';
 import { orderApi } from '../services/orderApi';
->>>>>>> e82de53 (color and ui changed)
 
 export const OrderSuccessPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
-<<<<<<< HEAD
-  const orderData = location.state?.order;
-=======
   const [orderData, setOrderData] = useState<any>(location.state?.order || null);
 
   useEffect(() => {
@@ -24,7 +15,6 @@ export const OrderSuccessPage: React.FC = () => {
       }).catch(() => {});
     }
   }, [id, orderData]);
->>>>>>> e82de53 (color and ui changed)
 
   const handlePrintInvoice = () => {
     window.print();

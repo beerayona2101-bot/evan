@@ -14,10 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/ToastContainer';
 import { Review } from '../types';
 import { useSocket } from '../context/SocketContext';
-<<<<<<< HEAD
-=======
 import { formatSareeName } from '../utils/sareeUtils';
->>>>>>> e82de53 (color and ui changed)
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -156,8 +153,6 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
   // Determine current active gallery images based on variant selection
   const activeGalleryImages: string[] = (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0)
     ? selectedVariant.images
@@ -182,7 +177,6 @@ export const ProductDetailPage: React.FC = () => {
     return () => window.removeEventListener('navigateGallery', handleGallery as EventListener);
   }, [activeGalleryImages, selectedImage]);
 
->>>>>>> e82de53 (color and ui changed)
   if (loading || !product) {
     return (
       <div className="min-h-screen bg-[#FFFDF9] flex items-center justify-center p-8">
@@ -194,14 +188,6 @@ export const ProductDetailPage: React.FC = () => {
     );
   }
 
-<<<<<<< HEAD
-  // Determine current active gallery images based on variant selection
-  const activeGalleryImages: string[] = (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0)
-    ? selectedVariant.images
-    : (product.images && product.images.length > 0 ? product.images : ['/images/saree_banarasi_red.png']);
-
-=======
->>>>>>> e82de53 (color and ui changed)
   const displayPrice = selectedVariant ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price) : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price);
   const mrp = selectedVariant ? (selectedVariant.mrp || Math.round(selectedVariant.price * 1.25)) : (product.mrp || Math.round(product.price * 1.25));
   const activeStock = selectedVariant ? selectedVariant.stock : (product.stock !== undefined ? product.stock : 25);
@@ -227,20 +213,15 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
-<<<<<<< HEAD
-=======
     if (!user) {
       showToast('Please log in to purchase sarees', 'info');
       navigate('/login');
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     addToCart(product, 'Free Size', selectedColor);
     navigate('/checkout');
   };
 
-<<<<<<< HEAD
-=======
   const handleWishlistToggle = () => {
     if (!user) {
       showToast('Please log in to add sarees to your wishlist', 'info');
@@ -250,7 +231,6 @@ export const ProductDetailPage: React.FC = () => {
     toggleWishlist(product);
   };
 
->>>>>>> e82de53 (color and ui changed)
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-slate-900 py-3 sm:py-5 px-3 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
@@ -315,11 +295,7 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               <h1 className="font-serif-luxury text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
-<<<<<<< HEAD
-                {product.name}
-=======
                 {formatSareeName(product.name, product.category)}
->>>>>>> e82de53 (color and ui changed)
               </h1>
               
               {/* Ratings */}
@@ -335,19 +311,11 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Dynamic Price Row */}
-<<<<<<< HEAD
-            <div className="bg-amber-50/60 p-3 sm:p-4 rounded-2xl border border-amber-200 space-y-0.5">
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-2xl sm:text-3xl font-black text-red-800">₹{displayPrice.toLocaleString('en-IN')}</span>
-                <span className="text-xs text-slate-400 line-through">MRP ₹{mrp.toLocaleString('en-IN')}</span>
-                <span className="bg-amber-400 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
-=======
             <div className="bg-amber-50/60 p-3 sm:p-4 rounded-2xl border border-amber-200 space-y-0.5 shadow-sm">
               <div className="flex items-baseline gap-2.5">
                 <span className="text-2xl sm:text-3xl font-black text-slate-900">₹{displayPrice.toLocaleString('en-IN')}</span>
                 <span className="text-xs text-slate-400 line-through">MRP ₹{mrp.toLocaleString('en-IN')}</span>
                 <span className="bg-amber-100 text-amber-950 border border-amber-300 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-sm">
->>>>>>> e82de53 (color and ui changed)
                   SAVE {product.discountPercentage || 20}%
                 </span>
               </div>
@@ -456,11 +424,7 @@ export const ProductDetailPage: React.FC = () => {
                 BUY NOW
               </button>
               <button
-<<<<<<< HEAD
-                onClick={() => toggleWishlist(product)}
-=======
                 onClick={handleWishlistToggle}
->>>>>>> e82de53 (color and ui changed)
                 className={`p-3.5 rounded-xl border transition-all ${
                   isInWishlist(product._id) ? 'bg-red-50 text-red-700 border-red-300' : 'bg-white text-slate-700 border-amber-200 hover:border-amber-400'
                 }`}

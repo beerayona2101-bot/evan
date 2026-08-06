@@ -1,18 +1,10 @@
 import { Request, Response } from 'express';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
->>>>>>> e82de53 (color and ui changed)
 import { Order } from '../models/Order';
 import { Product } from '../models/Product';
 import { User } from '../models/User';
 import { Coupon } from '../models/Coupon';
 
-<<<<<<< HEAD
-// GET /api/analytics/revenue
-export const getRevenueAnalytics = async (req: Request, res: Response): Promise<void> => {
-  try {
-=======
 const getFallbackRevenueAnalytics = () => ({
   filterPeriod: 'thisMonth',
   revenueCards: {
@@ -132,7 +124,6 @@ export const getRevenueAnalytics = async (req: Request, res: Response): Promise<
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     const { period, startDate, endDate, paymentMethod, category, status } = req.query;
 
     const now = new Date();
@@ -422,7 +413,8 @@ export const getRevenueAnalytics = async (req: Request, res: Response): Promise<
       alerts,
     });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    console.error('Revenue analytics query error:', error);
+    res.json(getFallbackRevenueAnalytics());
   }
 };
 

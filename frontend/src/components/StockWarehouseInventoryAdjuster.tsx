@@ -14,10 +14,7 @@ import {
 import { Product } from '../types';
 import { productApi } from '../services/productApi';
 import { showToast } from './ToastContainer';
-<<<<<<< HEAD
-=======
 import { formatSareeName } from '../utils/sareeUtils';
->>>>>>> e82de53 (color and ui changed)
 
 interface StockWarehouseInventoryAdjusterProps {
   products: Product[];
@@ -250,23 +247,6 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                 <div
                   key={catName}
                   onClick={() => setSelectedCategory(catName)}
-<<<<<<< HEAD
-                  className="bg-white rounded-3xl p-5 border border-amber-300 shadow-md hover:shadow-xl hover:border-red-800 transition-all cursor-pointer group flex flex-col justify-between space-y-4"
-                >
-                  <div className="space-y-3">
-                    <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-amber-300/80 shadow-sm bg-slate-900">
-                      <img
-                        src={sampleImage}
-                        alt={catName}
-                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow">
-                        {catItems.length} SAREE TYPES
-                      </div>
-                    </div>
-
-                    <div>
-=======
                   className="bg-white rounded-3xl overflow-hidden border border-amber-300 shadow-md hover:shadow-xl hover:border-red-800 transition-all cursor-pointer group flex flex-col justify-between"
                 >
                   {/* Full-Bleed Image (0 margin/padding around top image) */}
@@ -284,7 +264,6 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                   {/* Card Details Area */}
                   <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 space-y-4">
                     <div className="space-y-1">
->>>>>>> e82de53 (color and ui changed)
                       <h4 className="font-street text-xl font-black text-slate-900 group-hover:text-red-800 transition-colors uppercase">
                         {catName}
                       </h4>
@@ -293,24 +272,6 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                         <strong className="text-red-800 font-black text-sm">{catStockTotal} units</strong>
                       </div>
                     </div>
-<<<<<<< HEAD
-                  </div>
-
-                  <div className="pt-3 border-t border-amber-100 flex items-center justify-between">
-                    {catLowStock > 0 ? (
-                      <span className="text-[10px] font-extrabold text-red-700 bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-red-600" /> {catLowStock} Low Stock Alert
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Stock Healthy
-                      </span>
-                    )}
-
-                    <span className="text-xs font-black text-red-800 uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Adjust <ChevronRight className="w-4 h-4" />
-                    </span>
-=======
 
                     <div className="pt-3 border-t border-amber-100 flex items-center justify-between">
                       {catLowStock > 0 ? (
@@ -327,7 +288,6 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                         Adjust <ChevronRight className="w-4 h-4" />
                       </span>
                     </div>
->>>>>>> e82de53 (color and ui changed)
                   </div>
                 </div>
               );
@@ -379,11 +339,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                         className="w-14 h-14 object-cover object-top rounded-xl border border-amber-300 shadow-sm flex-shrink-0"
                       />
                       <div>
-<<<<<<< HEAD
-                        <h4 className="font-extrabold text-slate-900 text-sm">{p.name}</h4>
-=======
                         <h4 className="font-extrabold text-slate-900 text-sm">{formatSareeName(p.name, p.category, true)}</h4>
->>>>>>> e82de53 (color and ui changed)
                         <div className="flex flex-wrap items-center gap-2 text-slate-500 font-semibold text-[11px] mt-0.5">
                           <span>SKU: <strong className="text-slate-800 font-mono">{p.sku || 'N/A'}</strong></span>
                           <span>• Category: <strong className="text-amber-900">{p.category}</strong></span>
@@ -405,39 +361,19 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                       </div>
                     </div>
 
-<<<<<<< HEAD
-                    {/* Right Manual Stock Controls */}
-=======
                     {/* Right Manual Stock Controls - All elements unified at exact same height (h-10) */}
->>>>>>> e82de53 (color and ui changed)
                     <div className="flex items-center gap-2 self-end md:self-center flex-shrink-0 bg-white p-2 rounded-2xl border border-amber-300 shadow-inner">
                       {/* Decrement Button */}
                       <button
                         type="button"
                         onClick={() => handleAdjustStockDelta(p._id, p.stock, -1)}
-<<<<<<< HEAD
-                        className="p-1.5 bg-amber-100 hover:bg-amber-200 text-slate-900 font-bold rounded-lg border border-amber-300 transition-all"
-=======
                         className="h-10 w-10 flex items-center justify-center bg-amber-100 hover:bg-amber-200 text-slate-900 font-bold rounded-xl border border-amber-300 transition-all flex-shrink-0"
->>>>>>> e82de53 (color and ui changed)
                         title="Subtract 1"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
 
                       {/* Manual Direct Number Input */}
-<<<<<<< HEAD
-                      <div className="flex flex-col items-center">
-                        <label className="text-[8px] font-black text-slate-500 uppercase tracking-tighter">EDIT STOCK</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={currentVal}
-                          onChange={(e) => handleStockInputChange(p._id, e.target.value)}
-                          className="w-16 p-1.5 bg-amber-50 border border-amber-400 rounded-lg font-black text-center text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-800"
-                        />
-                      </div>
-=======
                       <input
                         type="number"
                         min="0"
@@ -445,17 +381,12 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                         onChange={(e) => handleStockInputChange(p._id, e.target.value)}
                         className="h-10 w-16 bg-amber-50 border border-amber-400 rounded-xl font-black text-center text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-800 flex-shrink-0"
                       />
->>>>>>> e82de53 (color and ui changed)
 
                       {/* Increment Button */}
                       <button
                         type="button"
                         onClick={() => handleAdjustStockDelta(p._id, p.stock, +1)}
-<<<<<<< HEAD
-                        className="p-1.5 bg-amber-100 hover:bg-amber-200 text-slate-900 font-bold rounded-lg border border-amber-300 transition-all"
-=======
                         className="h-10 w-10 flex items-center justify-center bg-amber-100 hover:bg-amber-200 text-slate-900 font-bold rounded-xl border border-amber-300 transition-all flex-shrink-0"
->>>>>>> e82de53 (color and ui changed)
                         title="Add 1"
                       >
                         <Plus className="w-4 h-4" />
@@ -466,11 +397,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
                         type="button"
                         onClick={() => handleSaveStock(p)}
                         disabled={isSaving}
-<<<<<<< HEAD
-                        className={`px-3.5 py-2 font-black text-xs uppercase rounded-xl shadow-md border flex items-center gap-1 transition-all ${
-=======
                         className={`h-10 px-4 font-black text-xs uppercase rounded-xl shadow-md border flex items-center justify-center gap-1.5 transition-all flex-shrink-0 ${
->>>>>>> e82de53 (color and ui changed)
                           isModified
                             ? 'bg-red-800 hover:bg-red-900 text-amber-300 border-amber-300 animate-pulse'
                             : 'bg-emerald-800 hover:bg-emerald-900 text-amber-300 border-emerald-400'

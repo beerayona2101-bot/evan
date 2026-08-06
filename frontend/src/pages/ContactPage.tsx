@@ -1,10 +1,4 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { Mail, Phone, MapPin, MessageSquare, Send, Sparkles, Clock } from 'lucide-react';
-
-export const ContactPage: React.FC = () => {
-  const [submitted, setSubmitted] = useState(false);
-=======
 import { Mail, Phone, MapPin, MessageSquare, Send, Sparkles, Clock, CheckCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
@@ -12,20 +6,10 @@ import { showToast } from '../components/ToastContainer';
 export const ContactPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
->>>>>>> e82de53 (color and ui changed)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-<<<<<<< HEAD
-    sareeInterest: 'Kanchipuram Silk',
-    message: '',
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-=======
     sareeInterest: 'Kanchipuram Silk Sarees',
     message: '',
   });
@@ -60,7 +44,6 @@ export const ContactPage: React.FC = () => {
       // 4. Notify Customer via Toast
       showToast('Inquiry submitted! Admin notified via Email & WhatsApp.', 'success');
     }
->>>>>>> e82de53 (color and ui changed)
   };
 
   return (
@@ -80,92 +63,12 @@ export const ContactPage: React.FC = () => {
           </p>
         </div>
 
-<<<<<<< HEAD
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-
-          {/* Left Business Details */}
-          <div className="lg:col-span-5 bg-slate-900 text-white p-8 sm:p-10 rounded-3xl space-y-8 shadow-2xl border border-amber-400/30">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 block mb-1">HERITAGE ATELIER</span>
-              <h3 className="font-street text-3xl font-black text-amber-300">EVAN COLLECTIONS</h3>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                Connect with our expert drape consultants for personalized wedding trousseau consultations.
-              </p>
-            </div>
-
-            <div className="space-y-4 text-xs font-medium">
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-white block">Atelier Address</span>
-                  <span className="text-slate-300">Heritage Silk House, MG Road, Bengaluru - 560001</span>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <div>
-                  <span className="font-bold text-white block">Phone / Helpline</span>
-                  <span className="text-slate-300">9490644434</span>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <div>
-                  <span className="font-bold text-white block">Email Concierge</span>
-                  <span className="text-slate-300">concierge@evan.com</span>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <Clock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-white block">Business Hours</span>
-                  <span className="text-slate-300">Monday – Sunday: 10:00 AM – 8:30 PM IST</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Media Links */}
-            <div className="pt-4 border-t border-slate-800 space-y-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-400 block">FOLLOW OUR HANDLOOM ATELIER</span>
-              <div className="flex items-center space-x-3 text-xs font-bold text-slate-300">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors">Instagram</a>
-                <span>•</span>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors">Facebook</a>
-                <span>•</span>
-                <a href="https://pinterest.com" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors">Pinterest</a>
-                <span>•</span>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors">YouTube</a>
-              </div>
-            </div>
-
-            {/* WhatsApp Link Button */}
-            <div className="pt-2">
-              <a
-                href="https://wa.me/919490644434?text=Hi%20EVAN%20Collections,%20I%20am%20interested%20in%20your%20saree%20collection."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 border border-emerald-400"
-              >
-                <MessageSquare className="w-4 h-4" /> CHAT ON WHATSAPP
-              </a>
-            </div>
-          </div>
-
-          {/* Right Contact Form & Google Map */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-amber-200 shadow-xl space-y-6">
-              <h3 className="font-street text-3xl font-black text-slate-900">SEND A SAREE INQUIRY</h3>
-=======
         {/* Centered Inquiry Form */}
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="bg-white p-8 sm:p-12 rounded-3xl border border-amber-200 shadow-xl space-y-6">
             <h3 className="font-street text-3xl font-black text-slate-900 text-center uppercase tracking-wide">
               SEND A SAREE INQUIRY
             </h3>
->>>>>>> e82de53 (color and ui changed)
 
               {submitted ? (
                 <div className="p-8 bg-amber-50 rounded-2xl border border-amber-300 text-center space-y-3">
@@ -243,11 +146,6 @@ export const ContactPage: React.FC = () => {
 
                   <button
                     type="submit"
-<<<<<<< HEAD
-                    className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 border border-amber-300"
-                  >
-                    <Send className="w-4 h-4" /> SUBMIT INQUIRY
-=======
                     disabled={loading}
                     className="w-full py-4 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black uppercase text-xs tracking-widest rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 border border-amber-300 disabled:opacity-50"
                   >
@@ -262,7 +160,6 @@ export const ContactPage: React.FC = () => {
                         <span>SUBMIT INQUIRY & NOTIFY ADMIN VIA WHATSAPP & EMAIL</span>
                       </>
                     )}
->>>>>>> e82de53 (color and ui changed)
                   </button>
                 </form>
               )}
@@ -286,11 +183,6 @@ export const ContactPage: React.FC = () => {
                 />
               </div>
             </div>
-<<<<<<< HEAD
-          </div>
-
-=======
->>>>>>> e82de53 (color and ui changed)
         </div>
       </div>
     </div>

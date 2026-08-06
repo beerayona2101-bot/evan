@@ -38,14 +38,10 @@ export const RevenueAnalyticsPage: React.FC<RevenueAnalyticsPageProps> = ({ onBa
     );
   }
 
-<<<<<<< HEAD
-  const { revenueCards, dailyChartData, paymentMethods, productSales } = data;
-=======
   const revenueCards = data?.revenueCards || { grossRevenue: 0, netRevenue: 0, totalSales: 0, totalOrders: 0, aov: 0, totalCustomers: 0, totalProductsSold: 0, returnedAmount: 0 };
   const dailyChartData = data?.dailyChartData || data?.revenueChart || [];
   const paymentMethods = data?.paymentMethods || { razorpay: 0, cod: 0, upi: 0, creditCard: 0, debitCard: 0, netBanking: 0, wallet: 0, failed: 0, pending: 0, refunded: 0 };
   const productSales = data?.productSales || { bestSellingSarees: [], leastSellingSarees: [], categorySalesMap: {}, lowStockProducts: [] };
->>>>>>> e82de53 (color and ui changed)
 
   return (
     <div className="space-y-6 text-slate-900 font-sans">
@@ -132,17 +128,6 @@ export const RevenueAnalyticsPage: React.FC<RevenueAnalyticsPageProps> = ({ onBa
       {/* Revenue Trend Graph */}
       <div className="bg-white p-6 rounded-3xl border border-amber-300 shadow-xl space-y-4">
         <h3 className="font-street text-2xl font-black text-slate-900 uppercase">REVENUE TREND GRAPH</h3>
-<<<<<<< HEAD
-        <div className="h-56 w-full flex items-end justify-between gap-3 pt-6 border-b border-amber-100">
-          {dailyChartData.map((pt: any, i: number) => (
-            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-              <span className="text-[10px] font-bold text-slate-600 mb-1">₹{pt.revenue.toLocaleString('en-IN')}</span>
-              <div style={{ height: `${Math.max(20, Math.round((pt.revenue / 40000) * 100))}%` }} className="w-full bg-gradient-to-t from-red-900 to-amber-500 rounded-t-xl"></div>
-              <span className="text-[10px] font-black uppercase text-slate-500 mt-1">{pt.date}</span>
-            </div>
-          ))}
-        </div>
-=======
         {/* 📈 Smooth SVG Line Graph Component */}
         {(() => {
           const chartPoints = dailyChartData && dailyChartData.length > 0 ? dailyChartData : [
@@ -220,7 +205,6 @@ export const RevenueAnalyticsPage: React.FC<RevenueAnalyticsPageProps> = ({ onBa
             </div>
           );
         })()}
->>>>>>> e82de53 (color and ui changed)
       </div>
 
       {/* Breakdown Grids */}

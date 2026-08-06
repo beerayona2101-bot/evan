@@ -14,8 +14,6 @@ import {
 } from '../utils/sendEmail';
 import mongoose from 'mongoose';
 
-<<<<<<< HEAD
-=======
 const FALLBACK_ORDERS: any[] = [
   {
     _id: 'ord-1001',
@@ -74,7 +72,6 @@ const FALLBACK_ORDERS: any[] = [
   },
 ];
 
->>>>>>> e82de53 (color and ui changed)
 export const addOrderItems = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { orderItems, shippingAddress, paymentMethod, itemsPrice, taxPrice, shippingPrice, totalPrice } = req.body;
@@ -84,8 +81,6 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-<<<<<<< HEAD
-=======
     if (mongoose.connection.readyState !== 1) {
       const newOrd = {
         _id: `ord-${Date.now()}`,
@@ -109,7 +104,6 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     const order = new Order({
       user: req.user?._id,
       orderItems,
@@ -161,16 +155,6 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
 
 export const getOrderById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
-    if (order) {
-      res.json(order);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -190,18 +174,11 @@ export const getOrderById = async (req: AuthRequest, res: Response): Promise<voi
   } catch (error) {
     const match = FALLBACK_ORDERS.find((o) => o._id === req.params.id || String(o._id) === String(req.params.id)) || FALLBACK_ORDERS[0];
     res.json(match);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const getMyOrders = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const orders = await Order.find({ user: req.user?._id }).sort({ createdAt: -1 });
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     if (mongoose.connection.readyState !== 1) {
       res.json(FALLBACK_ORDERS);
       return;
@@ -210,18 +187,11 @@ export const getMyOrders = async (req: AuthRequest, res: Response): Promise<void
     res.json(orders);
   } catch (error) {
     res.json(FALLBACK_ORDERS);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const getOrders = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const orders = await Order.find({}).populate('user', 'id name email').sort({ createdAt: -1 });
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     if (mongoose.connection.readyState !== 1) {
       res.json(FALLBACK_ORDERS);
       return;
@@ -230,15 +200,11 @@ export const getOrders = async (req: AuthRequest, res: Response): Promise<void> 
     res.json(orders);
   } catch (error) {
     res.json(FALLBACK_ORDERS);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const updateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const existingOrder = await Order.findById(req.params.id);
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -275,7 +241,6 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
     }
 
     const existingOrder = await Order.findById(id);
->>>>>>> e82de53 (color and ui changed)
     if (!existingOrder) {
       res.status(404).json({ message: 'Order not found' });
       return;
@@ -392,24 +357,17 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
 
     res.json(updatedOrder);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const match = FALLBACK_ORDERS.find((o) => o._id === req.params.id || String(o._id) === String(req.params.id));
     if (match) {
       res.json(match);
     } else {
       res.status(500).json({ message: (error as Error).message });
     }
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const order = await Order.findOne({ _id: req.params.id, user: req.user?._id });
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -468,7 +426,6 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
     }
 
     const order = await Order.findOne({ _id: id, user: req.user?._id });
->>>>>>> e82de53 (color and ui changed)
     if (order) {
       if (order.orderStatus === 'Delivered') {
         res.status(400).json({ message: 'Delivered orders cannot be cancelled' });
@@ -494,9 +451,6 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const match = FALLBACK_ORDERS.find((o) => o._id === req.params.id || String(o._id) === String(req.params.id));
     if (match) {
       match.orderStatus = 'Cancelled';
@@ -506,15 +460,11 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
     } else {
       res.status(500).json({ message: (error as Error).message });
     }
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const requestOrderReturn = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const order = await Order.findOne({ _id: req.params.id, user: req.user?._id });
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -531,7 +481,6 @@ export const requestOrderReturn = async (req: AuthRequest, res: Response): Promi
     }
 
     const order = await Order.findOne({ _id: id, user: req.user?._id });
->>>>>>> e82de53 (color and ui changed)
     if (order) {
       order.orderStatus = 'Processing';
       const updatedOrder = await order.save();
@@ -541,9 +490,6 @@ export const requestOrderReturn = async (req: AuthRequest, res: Response): Promi
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const match = FALLBACK_ORDERS.find((o) => o._id === req.params.id || String(o._id) === String(req.params.id));
     if (match) {
       match.orderStatus = 'Processing';
@@ -551,15 +497,11 @@ export const requestOrderReturn = async (req: AuthRequest, res: Response): Promi
     } else {
       res.status(500).json({ message: (error as Error).message });
     }
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const updateOrderToDelivered = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const order = await Order.findById(req.params.id);
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -578,24 +520,17 @@ export const updateOrderToDelivered = async (req: AuthRequest, res: Response): P
     }
 
     const order = await Order.findById(id);
->>>>>>> e82de53 (color and ui changed)
     if (order) {
       order.isDelivered = true;
       order.deliveredAt = new Date();
       order.orderStatus = 'Delivered';
       const updatedOrder = await order.save();
       emitRealtimeEvent('orderUpdated', updatedOrder);
-<<<<<<< HEAD
-=======
       res.json(updatedOrder);
->>>>>>> e82de53 (color and ui changed)
     } else {
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const match = FALLBACK_ORDERS.find((o) => o._id === req.params.id || String(o._id) === String(req.params.id));
     if (match) {
       match.isDelivered = true;
@@ -605,18 +540,11 @@ export const updateOrderToDelivered = async (req: AuthRequest, res: Response): P
     } else {
       res.status(500).json({ message: (error as Error).message });
     }
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 export const deleteOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-    const order = await Order.findById(req.params.id);
-    if (order) {
-      await order.deleteOne();
-      emitRealtimeEvent('orderDeleted', { id: req.params.id });
-=======
     const { id } = req.params;
     const isObjectId = mongoose.Types.ObjectId.isValid(id);
 
@@ -634,21 +562,16 @@ export const deleteOrder = async (req: AuthRequest, res: Response): Promise<void
     if (order) {
       await order.deleteOne();
       emitRealtimeEvent('orderDeleted', { id });
->>>>>>> e82de53 (color and ui changed)
       res.json({ message: 'Order removed successfully' });
     } else {
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const idx = FALLBACK_ORDERS.findIndex((o) => o._id === req.params.id || String(o._id) === String(req.params.id));
     if (idx > -1) {
       FALLBACK_ORDERS.splice(idx, 1);
     }
     emitRealtimeEvent('orderDeleted', { id: req.params.id });
     res.json({ message: 'Order removed successfully' });
->>>>>>> e82de53 (color and ui changed)
   }
 };

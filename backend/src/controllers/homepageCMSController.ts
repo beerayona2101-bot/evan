@@ -1,8 +1,5 @@
 import { Request, Response } from 'express';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
->>>>>>> e82de53 (color and ui changed)
 import { HomepageCMS } from '../models/HomepageCMS';
 import { AuditLog } from '../models/AuditLog';
 import { emitRealtimeEvent } from '../config/socket';
@@ -71,11 +68,7 @@ const getDefaultCMSData = () => ({
       primaryButtonLink: '/shop?category=Designer Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-<<<<<<< HEAD
-      image: '/images/saree_fashion_wear_hero_v3.png',
-=======
       image: '/images/saree_palace_courtyard_trio.jpg',
->>>>>>> e82de53 (color and ui changed)
       status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
       displayOrder: 2,
     },
@@ -89,11 +82,7 @@ const getDefaultCMSData = () => ({
       primaryButtonLink: '/shop?category=Organza Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-<<<<<<< HEAD
-      image: '/images/saree_party_wear_hero_v3.png',
-=======
       image: '/images/saree_palace_courtyard_trio.jpg',
->>>>>>> e82de53 (color and ui changed)
       status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
       displayOrder: 3,
     },
@@ -278,11 +267,6 @@ const getDefaultCMSData = () => ({
   },
 });
 
-<<<<<<< HEAD
-// GET /api/homepage
-export const getHomepageCMS = async (req: Request, res: Response): Promise<void> => {
-  try {
-=======
 let FALLBACK_CMS_DATA: any = getDefaultCMSData();
 
 // GET /api/homepage
@@ -292,7 +276,6 @@ export const getHomepageCMS = async (req: Request, res: Response): Promise<void>
       res.json(FALLBACK_CMS_DATA);
       return;
     }
->>>>>>> e82de53 (color and ui changed)
     let cms = await HomepageCMS.findOne();
     if (!cms) {
       cms = await HomepageCMS.create(getDefaultCMSData());
@@ -312,24 +295,16 @@ export const getHomepageCMS = async (req: Request, res: Response): Promise<void>
         await cms.save().catch(() => {});
       }
     }
-<<<<<<< HEAD
-    res.json(cms);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-=======
     FALLBACK_CMS_DATA = cms;
     res.json(cms);
   } catch (error) {
     res.json(FALLBACK_CMS_DATA);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
 // PUT /api/homepage (Full Update)
 export const updateHomepageCMS = async (req: Request, res: Response): Promise<void> => {
   try {
-<<<<<<< HEAD
-=======
     if (mongoose.connection.readyState !== 1) {
       FALLBACK_CMS_DATA = { ...FALLBACK_CMS_DATA, ...req.body, updatedAt: new Date(), _id: 'fallback-cms-id' };
       emitRealtimeEvent('homepageCMSUpdated', FALLBACK_CMS_DATA);
@@ -337,7 +312,6 @@ export const updateHomepageCMS = async (req: Request, res: Response): Promise<vo
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     let cms = await HomepageCMS.findOne();
     if (!cms) {
       cms = new HomepageCMS(getDefaultCMSData());
@@ -354,12 +328,8 @@ export const updateHomepageCMS = async (req: Request, res: Response): Promise<vo
 
     res.json(saved);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     FALLBACK_CMS_DATA = { ...FALLBACK_CMS_DATA, ...req.body, updatedAt: new Date(), _id: 'fallback-cms-id' };
     res.json(FALLBACK_CMS_DATA);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
@@ -367,8 +337,6 @@ export const updateHomepageCMS = async (req: Request, res: Response): Promise<vo
 export const updateHomepageSection = async (req: Request, res: Response): Promise<void> => {
   try {
     const { sectionKey } = req.params;
-<<<<<<< HEAD
-=======
 
     if (mongoose.connection.readyState !== 1) {
       (FALLBACK_CMS_DATA as any)[sectionKey] = req.body;
@@ -378,7 +346,6 @@ export const updateHomepageSection = async (req: Request, res: Response): Promis
       return;
     }
 
->>>>>>> e82de53 (color and ui changed)
     let cms = await HomepageCMS.findOne();
     if (!cms) {
       cms = new HomepageCMS(getDefaultCMSData());
@@ -395,13 +362,9 @@ export const updateHomepageSection = async (req: Request, res: Response): Promis
 
     res.json(saved);
   } catch (error) {
-<<<<<<< HEAD
-    res.status(500).json({ message: (error as Error).message });
-=======
     const { sectionKey } = req.params;
     (FALLBACK_CMS_DATA as any)[sectionKey] = req.body;
     res.json(FALLBACK_CMS_DATA);
->>>>>>> e82de53 (color and ui changed)
   }
 };
 
