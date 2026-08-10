@@ -157,7 +157,7 @@ export const ContactPage: React.FC = () => {
                     ) : (
                       <>
                         <Send className="w-4 h-4 text-amber-800" />
-                        <span>SUBMIT INQUIRY & NOTIFY ADMIN VIA WHATSAPP & EMAIL</span>
+                        <span>SUBMIT INQUIRY</span>
                       </>
                     )}
                   </button>

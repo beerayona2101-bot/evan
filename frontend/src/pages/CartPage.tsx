@@ -360,8 +360,8 @@ export const CartPage: React.FC = () => {
 
           </div>
 
-          {/* Right Column - Comprehensive Cart Summary */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Right Column - Comprehensive Cart Summary (Sticky Fixed on Desktop) */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20 z-20 self-start">
             <div className="bg-white p-6 rounded-3xl border border-amber-200 shadow-xl space-y-4">
               <h2 className="font-serif-luxury text-2xl font-extrabold text-slate-900 border-b border-amber-200 pb-3">
                 ORDER SUMMARY

@@ -83,9 +83,9 @@ export const getUserAddresses = async (req: AuthRequest, res: Response): Promise
 
 export const addAddress = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { fullName, phone, street, city, state, postalCode, country, isDefault } = req.body;
+    const { fullName, phone, houseNo, street, area, city, district, state, postalCode, country, addressType, latitude, longitude, isDefault } = req.body;
     if (mongoose.connection.readyState !== 1) {
-      const newAddr: any = { _id: `addr-${Date.now()}`, fullName, phone, street, city, state, postalCode, country: country || 'India', isDefault: isDefault || false };
+      const newAddr: any = { _id: `addr-${Date.now()}`, fullName, phone, houseNo, street, area, city, district, state, postalCode, country: country || 'India', addressType: addressType || 'Home', latitude, longitude, isDefault: isDefault || false };
       if (!req.user?.addresses) (req.user as any).addresses = [];
       if (isDefault) {
         req.user?.addresses.forEach((a: any) => (a.isDefault = false));
@@ -102,11 +102,17 @@ export const addAddress = async (req: AuthRequest, res: Response): Promise<void>
       user: req.user?._id,
       fullName,
       phone,
+      houseNo,
       street,
+      area,
       city,
+      district,
       state,
       postalCode,
       country: country || 'India',
+      addressType: addressType || 'Home',
+      latitude,
+      longitude,
       isDefault: isDefault || false,
     });
 
@@ -119,9 +125,9 @@ export const addAddress = async (req: AuthRequest, res: Response): Promise<void>
 
 export const updateAddress = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { fullName, phone, street, city, state, postalCode, country, isDefault } = req.body;
+    const { fullName, phone, houseNo, street, area, city, district, state, postalCode, country, addressType, latitude, longitude, isDefault } = req.body;
     if (mongoose.connection.readyState !== 1) {
-      const newAddr: any = { _id: req.params.id, fullName, phone, street, city, state, postalCode, country: country || 'India', isDefault: isDefault || false };
+      const newAddr: any = { _id: req.params.id, fullName, phone, houseNo, street, area, city, district, state, postalCode, country: country || 'India', addressType: addressType || 'Home', latitude, longitude, isDefault: isDefault || false };
       if (req.user?.addresses) {
         const idx = req.user.addresses.findIndex((a: any) => a._id === req.params.id);
         if (idx > -1) {
@@ -139,7 +145,7 @@ export const updateAddress = async (req: AuthRequest, res: Response): Promise<vo
 
     const address = await Address.findOneAndUpdate(
       { _id: req.params.id, user: req.user?._id },
-      { fullName, phone, street, city, state, postalCode, country, isDefault },
+      { fullName, phone, houseNo, street, area, city, district, state, postalCode, country, addressType, latitude, longitude, isDefault },
       { new: true }
     );
 

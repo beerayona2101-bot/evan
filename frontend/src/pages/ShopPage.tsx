@@ -65,8 +65,10 @@ export const ShopPage: React.FC = () => {
   const searchQuery = searchParams.get('search') || searchParams.get('q') || '';
   const sortOption = searchParams.get('sort') || 'newest';
 
-  const fetchProducts = () => {
-    setLoading(true);
+  const fetchProducts = (isInitial = false) => {
+    if (isInitial || products.length === 0) {
+      setLoading(true);
+    }
     const params: any = {};
     if (selectedCategory !== 'All') params.category = selectedCategory;
     if (selectedFabric !== 'All') params.fabric = selectedFabric;

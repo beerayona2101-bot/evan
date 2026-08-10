@@ -113,16 +113,7 @@ export const Navbar: React.FC = () => {
           >
             FAQS
           </Link>
-          <Link
-            to="/shop?sort=newest"
-            className={`transition-all py-1 ${
-              isActive('/shop', 'sort=newest')
-                ? 'text-red-700 font-black border-b-2 border-red-700'
-                : 'text-slate-800 hover:text-red-700'
-            }`}
-          >
-            OFFERS
-          </Link>
+
         </nav>
 
         {/* Right Header Icons */}
@@ -294,15 +285,7 @@ export const Navbar: React.FC = () => {
           >
             FAQs
           </Link>
-          <Link
-            to="/shop?sort=newest"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/shop', 'sort=newest') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            Offers
-          </Link>
+
           {user?.role === 'admin' && (
             <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-red-800 font-black">
               Admin Dashboard

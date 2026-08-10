@@ -395,7 +395,8 @@ export const HomepageEditorPage: React.FC = () => {
                 : defaultSlides;
 
               const updateSlides = (newSlides: any[]) => {
-                setCms({ ...cms, heroSlides: newSlides });
+                const reordered = newSlides.map((s: any, idx: number) => ({ ...s, displayOrder: idx + 1 }));
+                setCms({ ...cms, heroSlides: reordered });
               };
 
               return (

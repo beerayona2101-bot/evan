@@ -7,6 +7,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from './ToastContainer';
 import { AddToCartButton } from './AddToCartButton';
+import { LazyImage } from './LazyImage';
 
 import { formatSareeName } from '../utils/sareeUtils';
 
@@ -40,12 +41,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Ultra Compact Saree Image Container */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-amber-50/30">
         <Link to={`/product/${product._id}`} className="w-full h-full block">
-          <img
+          <LazyImage
             src={product.images[0] || '/images/saree_banarasi_red.png'}
             alt={product.name}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/saree_banarasi_red.png';
-            }}
+            fallbackSrc="/images/saree_banarasi_red.png"
             className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </Link>

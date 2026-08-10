@@ -185,6 +185,18 @@ export const HomePage: React.FC = () => {
       })
     : defaultModernCards;
 
+  // Autoplay 3D Saree Selection Carousel every 2 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const cardsCount = sareeCollectionCards?.length || 8;
+      const nextIndex = (active3DIndexRef.current + 1) % cardsCount;
+      setPrevActiveIndex(active3DIndexRef.current);
+      setActive3DIndex(nextIndex);
+      active3DIndexRef.current = nextIndex;
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [sareeCollectionCards?.length]);
+
   const hero = cms?.heroBanner || {
     enabled: true,
     offerBadge: 'ROYAL SAREE COLLECTION 2026',
@@ -198,9 +210,7 @@ export const HomePage: React.FC = () => {
     desktopImage: '/images/saree_banarasi_red.png',
   };
 
-  const heroImage = (cms?.heroBanner?.desktopImage && cms.heroBanner.desktopImage !== '/images/saree_banarasi_red.png')
-    ? cms.heroBanner.desktopImage
-    : '/images/saree_hero_editorial_right_seated.png';
+  const heroImage = cms?.heroBanner?.desktopImage || '/images/saree_hero_editorial_right_seated.png';
 
   const defaultHeroSlides = [
     {
@@ -214,6 +224,7 @@ export const HomePage: React.FC = () => {
       secondaryButtonText: hero.secondaryButtonText || 'EXPLORE CATALOG',
       secondaryButtonLink: hero.secondaryButtonLink || '/shop?category=Kanchipuram Sarees',
       image: heroImage,
+      displayOrder: 1,
     },
     {
       id: 'fashion',
@@ -226,6 +237,7 @@ export const HomePage: React.FC = () => {
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
       image: '/images/saree_palace_courtyard_trio.jpg',
+      displayOrder: 2,
     },
     {
       id: 'party',
@@ -238,22 +250,25 @@ export const HomePage: React.FC = () => {
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
       image: '/images/saree_palace_courtyard_trio.jpg',
+      displayOrder: 3,
     },
   ];
 
-  const heroSlides = (cms?.heroSlides && cms.heroSlides.length > 0)
+  const rawHeroSlides = (cms?.heroSlides && cms.heroSlides.length > 0)
     ? cms.heroSlides.filter((s: any) => s.status !== 'INACTIVE')
     : defaultHeroSlides;
 
+  const heroSlides = [...rawHeroSlides].sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
   const safeSlideIndex = heroSlides.length > 0 ? (currentHeroSlide % heroSlides.length) : 0;
-  const activeSlide = heroSlides[safeSlideIndex] || defaultHeroSlides[0];
+  const activeSlide = heroSlides[safeSlideIndex] || heroSlides[0] || defaultHeroSlides[0];
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] text-slate-900 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#FFFDF9] text-slate-900 font-sans overflow-x-hidden pt-0 mt-0">
 
       {/* 1. LUXURY SAREE HERO BANNER SECTION - 100% FULL-BLEED EDITORIAL BANNER CAROUSEL (3 SLIDES) */}
       {hero.enabled && (
-        <section className="relative w-full mb-6 group">
+        <section className="relative w-full mb-6 group mt-0 pt-0">
           <div className="relative w-full overflow-hidden bg-[#0b070d] min-h-[440px] sm:min-h-[500px] lg:min-h-[540px] flex items-center">
             
             {/* Full-bleed Background Images Carousel displaying model face & full saree drape */}
@@ -357,6 +372,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={tile1.image || '/images/saree_banarasi_red.png'}
                       alt={tile1.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
@@ -374,6 +391,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={tile2.image || '/images/saree_kanchipuram_gold.png'}
                       alt={tile2.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
@@ -394,6 +413,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={tile3.image || '/images/saree_banarasi_purple.png'}
                       alt={tile3.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow z-10">
@@ -421,6 +442,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={tile4.image || '/images/saree_paithani_green.png'}
                       alt={tile4.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
@@ -438,6 +461,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={tile5.image || '/images/saree_organza_floral.png'}
                       alt={tile5.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
@@ -523,6 +548,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={card.image || '/images/saree_banarasi_red.png'}
                       alt={card.title}
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-top filter contrast-105 group-hover:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />

@@ -2,11 +2,19 @@ import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IAddress {
+  fullName?: string;
+  phone?: string;
+  houseNo?: string;
   street: string;
+  area?: string;
   city: string;
+  district?: string;
   state: string;
   postalCode: string;
   country: string;
+  addressType?: string;
+  latitude?: number;
+  longitude?: number;
   isDefault?: boolean;
 }
 
@@ -44,11 +52,19 @@ export interface IUser extends Document {
 }
 
 const AddressSchema = new Schema<IAddress>({
+  fullName: { type: String, default: '' },
+  phone: { type: String, default: '' },
+  houseNo: { type: String, default: '' },
   street: { type: String, required: true },
+  area: { type: String, default: '' },
   city: { type: String, required: true },
+  district: { type: String, default: '' },
   state: { type: String, required: true },
   postalCode: { type: String, required: true },
   country: { type: String, required: true, default: 'India' },
+  addressType: { type: String, default: 'Home' },
+  latitude: { type: Number },
+  longitude: { type: Number },
   isDefault: { type: Boolean, default: false },
 });
 

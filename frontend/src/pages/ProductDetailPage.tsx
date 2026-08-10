@@ -249,6 +249,8 @@ export const ProductDetailPage: React.FC = () => {
               <img
                 src={selectedImage || activeGalleryImages[0]}
                 alt={product.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-contain group-hover:scale-105 transition-all duration-500 cursor-zoom-in rounded-xl"
               />
               <span className="absolute top-3 left-3 bg-red-800 text-amber-300 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shadow border border-amber-300">
@@ -274,7 +276,7 @@ export const ProductDetailPage: React.FC = () => {
                       selectedImage === img ? 'border-red-800 shadow-md scale-105 bg-white' : 'border-amber-200 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain rounded-lg" />
+                    <img src={img} alt={`Gallery ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-contain rounded-lg" />
                   </button>
                 ))}
               </div>
