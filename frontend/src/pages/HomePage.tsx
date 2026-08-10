@@ -14,7 +14,14 @@ import { formatSareeName } from '../utils/sareeUtils';
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [cms, setCms] = useState<any>(null);
+  const [cms, setCms] = useState<any>(() => {
+    try {
+      const cached = localStorage.getItem('evan_homepage_cms');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
@@ -41,7 +48,14 @@ export const HomePage: React.FC = () => {
   const fetchCMS = () => {
     api
       .get('/homepage')
-      .then((res) => setCms(res.data))
+      .then((res) => {
+        if (res.data) {
+          setCms(res.data);
+          try {
+            localStorage.setItem('evan_homepage_cms', JSON.stringify(res.data));
+          } catch {}
+        }
+      })
       .catch(() => {});
   };
 
@@ -75,7 +89,12 @@ export const HomePage: React.FC = () => {
     if (!socket) return;
 
     socket.on('homepageCMSUpdated', (updatedCms: any) => {
-      setCms(updatedCms);
+      if (updatedCms) {
+        setCms(updatedCms);
+        try {
+          localStorage.setItem('evan_homepage_cms', JSON.stringify(updatedCms));
+        } catch {}
+      }
     });
 
     socket.on('productCreated', fetchProducts);

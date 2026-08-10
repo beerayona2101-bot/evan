@@ -146,7 +146,14 @@ export const HomepageEditorPage: React.FC = () => {
     setLoading(true);
     api
       .get('/homepage')
-      .then((res) => setCms(res.data))
+      .then((res) => {
+        if (res.data) {
+          setCms(res.data);
+          try {
+            localStorage.setItem('evan_homepage_cms', JSON.stringify(res.data));
+          } catch {}
+        }
+      })
       .catch((err) => showToast(err?.response?.data?.message || 'Error loading Homepage CMS', 'error'))
       .finally(() => setLoading(false));
   };
@@ -159,7 +166,12 @@ export const HomepageEditorPage: React.FC = () => {
   useEffect(() => {
     if (!socket) return;
     const handleUpdate = (updatedCms: any) => {
-      setCms(updatedCms);
+      if (updatedCms) {
+        setCms(updatedCms);
+        try {
+          localStorage.setItem('evan_homepage_cms', JSON.stringify(updatedCms));
+        } catch {}
+      }
       showToast('Live Update: Homepage CMS synchronized with database', 'info');
     };
     socket.on('homepageCMSUpdated', handleUpdate);
@@ -172,7 +184,12 @@ export const HomepageEditorPage: React.FC = () => {
     setSaving(true);
     try {
       const res = await api.put('/homepage', cms);
-      setCms(res.data);
+      if (res.data) {
+        setCms(res.data);
+        try {
+          localStorage.setItem('evan_homepage_cms', JSON.stringify(res.data));
+        } catch {}
+      }
       showToast('Successfully published Homepage CMS updates live to all customers!', 'success');
     } catch (err: any) {
       showToast(err?.response?.data?.message || 'Error publishing Homepage CMS', 'error');

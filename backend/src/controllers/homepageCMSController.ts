@@ -280,22 +280,8 @@ export const getHomepageCMS = async (req: Request, res: Response): Promise<void>
     if (!cms) {
       cms = await HomepageCMS.create(getDefaultCMSData());
       console.log('[CMS] Initialized default Homepage CMS document in MongoDB Atlas');
-    } else {
-      const defaultData = getDefaultCMSData();
-      let updated = false;
-      if (!cms.featuredCategories || cms.featuredCategories.length < 4 || (cms.featuredCategories[0] && cms.featuredCategories[0].name.includes('Kanchipuram Silk Sarees'))) {
-        cms.featuredCategories = defaultData.featuredCategories;
-        updated = true;
-      }
-      if (!cms.featuredCollections || cms.featuredCollections.length < 5) {
-        cms.featuredCollections = defaultData.featuredCollections;
-        updated = true;
-      }
-      if (updated) {
-        await cms.save().catch(() => {});
-      }
     }
-    FALLBACK_CMS_DATA = cms;
+    FALLBACK_CMS_DATA = cms.toObject ? cms.toObject() : cms;
     res.json(cms);
   } catch (error) {
     res.json(FALLBACK_CMS_DATA);
@@ -305,24 +291,26 @@ export const getHomepageCMS = async (req: Request, res: Response): Promise<void>
 // PUT /api/homepage (Full Update)
 export const updateHomepageCMS = async (req: Request, res: Response): Promise<void> => {
   try {
+    const updateData = {
+      ...req.body,
+      updatedBy: (req as any).user?.name || 'Admin',
+      updatedAt: new Date(),
+    };
+
     if (mongoose.connection.readyState !== 1) {
-      FALLBACK_CMS_DATA = { ...FALLBACK_CMS_DATA, ...req.body, updatedAt: new Date(), _id: 'fallback-cms-id' };
+      FALLBACK_CMS_DATA = { ...FALLBACK_CMS_DATA, ...updateData, _id: 'fallback-cms-id' };
       emitRealtimeEvent('homepageCMSUpdated', FALLBACK_CMS_DATA);
       res.json(FALLBACK_CMS_DATA);
       return;
     }
 
-    let cms = await HomepageCMS.findOne();
-    if (!cms) {
-      cms = new HomepageCMS(getDefaultCMSData());
-    }
+    const saved = await HomepageCMS.findOneAndUpdate({}, updateData, {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    });
 
-    Object.assign(cms, req.body);
-    cms.updatedBy = (req as any).user?.name || 'Admin';
-    cms.updatedAt = new Date();
-
-    const saved = await cms.save();
-
+    FALLBACK_CMS_DATA = saved.toObject ? saved.toObject() : saved;
     await createAuditLog(req, 'UPDATE_HOMEPAGE_CMS', 'Updated Homepage CMS settings', String(saved._id));
     emitRealtimeEvent('homepageCMSUpdated', saved);
 
@@ -346,17 +334,17 @@ export const updateHomepageSection = async (req: Request, res: Response): Promis
       return;
     }
 
-    let cms = await HomepageCMS.findOne();
-    if (!cms) {
-      cms = new HomepageCMS(getDefaultCMSData());
-    }
+    const saved = await HomepageCMS.findOneAndUpdate(
+      {},
+      {
+        [sectionKey]: req.body,
+        updatedBy: (req as any).user?.name || 'Admin',
+        updatedAt: new Date(),
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
-    (cms as any)[sectionKey] = req.body;
-    cms.updatedBy = (req as any).user?.name || 'Admin';
-    cms.updatedAt = new Date();
-
-    const saved = await cms.save();
-
+    FALLBACK_CMS_DATA = saved.toObject ? saved.toObject() : saved;
     await createAuditLog(req, 'UPDATE_HOMEPAGE_SECTION', `Updated homepage section '${sectionKey}'`, String(saved._id));
     emitRealtimeEvent('homepageCMSUpdated', saved);
 
