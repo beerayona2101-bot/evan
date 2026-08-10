@@ -54,6 +54,7 @@ export const formatSareeName = (
 
   // 2. Clean out ALL branding occurrences
   let clean = raw
+    .replace(/Kanchanika/gi, '')
     .replace(/EVAN\s+COLLECTIONS/gi, '')
     .replace(/by\s+/gi, '')
     .replace(/Vol\.?\s*\d+/gi, '')
@@ -94,5 +95,5 @@ export const formatSareeName = (
     clean = `${clean} ${volStr}`;
   }
 
-  return `${clean} by EVAN COLLECTIONS`;
+  return `${clean} by Kanchanika`;
 };

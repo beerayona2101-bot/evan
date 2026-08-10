@@ -8,7 +8,7 @@ import { User } from '../models/User';
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const runHealthCheck = async () => {
-  console.log('--- EVAN COLLECTIONS 14-PHASE HEALTH CHECK ---');
+  console.log('--- KANCHANIKA 14-PHASE HEALTH CHECK ---');
   
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {

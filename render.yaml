@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: evan-luxury-collections
+    name: kanchanika-luxury-collections
     env: node
     plan: free
     buildCommand: npm install && npm run build

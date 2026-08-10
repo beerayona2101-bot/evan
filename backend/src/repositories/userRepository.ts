@@ -6,8 +6,8 @@ export const createFallbackUser = (data: Partial<IUser>): IUser => {
   const defaultId = data._id || new mongoose.Types.ObjectId();
   const userObj: any = {
     _id: defaultId,
-    name: data.name || 'EVAN User',
-    firstName: data.firstName || (data.name ? data.name.split(' ')[0] : 'EVAN'),
+    name: data.name || 'Kanchanika User',
+    firstName: data.firstName || (data.name ? data.name.split(' ')[0] : 'Kanchanika'),
     lastName: data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : 'User'),
     email: (data.email || '').toLowerCase().trim(),
     password: data.password || '',
@@ -53,8 +53,8 @@ const FALLBACK_USERS_STORE: Map<string, IUser> = new Map();
 
 const adminFallback = createFallbackUser({
   _id: new mongoose.Types.ObjectId('65f0a0000000000000000001'),
-  name: 'EVAN COLLECTIONS Admin',
-  email: 'admin@evan.com',
+  name: 'Kanchanika Admin',
+  email: 'admin@kanchanika.com',
   password: 'adminpassword123',
   role: 'admin',
   phone: '+91 9490644434',
@@ -73,7 +73,7 @@ const customerFallback = createFallbackUser({
   isVerified: true,
 });
 
-FALLBACK_USERS_STORE.set('admin@evan.com', adminFallback);
+FALLBACK_USERS_STORE.set('admin@kanchanika.com', adminFallback);
 FALLBACK_USERS_STORE.set('ananya@example.com', customerFallback);
 
 export class UserRepository {

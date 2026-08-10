@@ -50,10 +50,14 @@ export const ResetPasswordPage: React.FC = () => {
     <div className="min-h-screen bg-[#FFFDF9] flex items-center justify-center p-6 text-slate-900">
       <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-amber-200 shadow-xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-full bg-red-800 text-amber-300 flex items-center justify-center text-xl font-black mx-auto border border-amber-300 shadow">
-            E
+          <div className="flex justify-center pb-1">
+            <img
+              src="/kanchanika_attire_logo.svg"
+              alt="Kanchanika Logo"
+              className="w-14 h-14 object-contain drop-shadow"
+            />
           </div>
-          <span className="font-serif-luxury text-2xl font-extrabold tracking-wider text-slate-900 block">EVAN COLLECTIONS</span>
+          <span className="font-serif-luxury text-2xl font-extrabold tracking-wider text-slate-900 block">KANCHANIKA</span>
           <h2 className="font-serif-luxury text-base font-bold text-amber-900 uppercase tracking-widest">RESET YOUR PASSWORD</h2>
           <p className="text-xs text-slate-500 font-medium">Enter your new secure password below.</p>
         </div>

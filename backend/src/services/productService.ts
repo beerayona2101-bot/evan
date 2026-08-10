@@ -77,7 +77,7 @@ export class ProductService {
 
   async createProduct(data: any) {
     const slug = data.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    const sku = `EVAN-SAREE-${Math.floor(100000 + Math.random() * 900000)}`;
+    const sku = `KANCHANIKA-SAREE-${Math.floor(100000 + Math.random() * 900000)}`;
 
     return await this.productRepo.create({
       name: data.name,

@@ -33,7 +33,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-2.5 px-4 sm:px-8 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-1.5 px-4 sm:px-8 shadow-sm">
       {/* EVAN COLLECTIONS Seamless Header */}
       <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
         {/* Mobile menu button */}
@@ -44,19 +44,19 @@ export const Navbar: React.FC = () => {
           {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
 
-        {/* Brand Logo: EVAN COLLECTIONS */}
-        <Link to="/" className="flex items-center space-x-2">
+        {/* Brand Logo: Kanchanika */}
+        <Link to="/" className="flex items-center space-x-2.5">
           <img
-            src="/favicon.png"
-            alt="EVAN COLLECTIONS Logo"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm border border-amber-300/80 hover:scale-105 transition-transform"
+            src="/kanchanika_attire_logo.svg"
+            alt="Kanchanika Logo"
+            className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm hover:scale-105 transition-transform"
           />
           <div className="flex flex-col leading-none">
-            <span className="font-street text-lg sm:text-xl font-black tracking-wider text-slate-900 hover:text-red-700 transition-colors">
-              EVAN
+            <span className="font-street text-base sm:text-lg font-black tracking-wider text-slate-900 hover:text-red-700 transition-colors">
+              KANCHANIKA
             </span>
-            <span className="text-[7px] uppercase tracking-[0.2em] font-extrabold text-amber-700">
-              COLLECTIONS
+            <span className="text-[6.5px] uppercase tracking-[0.2em] font-extrabold text-amber-700">
+              LUXURY ATELIER
             </span>
           </div>
         </Link>

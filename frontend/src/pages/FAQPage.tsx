@@ -13,13 +13,13 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'f1',
     category: 'General',
-    question: 'Are all sarees at EVAN COLLECTIONS 100% Pure Silk Mark Certified?',
+    question: 'Are all sarees at Kanchanika 100% Pure Silk Mark Certified?',
     answer: 'Yes! Every silk saree in our collection comes with an official Silk Mark Organisation of India authentication certificate guarantees 100% pure mulberry silk and authentic handloom zari weaving.',
   },
   {
     id: 'f2',
     category: 'General',
-    question: 'Do EVAN sarees include unstitched blouse pieces?',
+    question: 'Do Kanchanika sarees include unstitched blouse pieces?',
     answer: 'Yes, all our drapes include an unstitched contrast or matching blouse fabric piece (0.8m - 1.0m) attached to the saree drape.',
   },
   {
@@ -43,7 +43,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'f6',
     category: 'Payments',
-    question: 'Is online payment safe and encrypted on EVAN COLLECTIONS?',
+    question: 'Is online payment safe and encrypted on Kanchanika?',
     answer: 'Absolutely. All transactions pass through 256-bit SSL encrypted payment gateways integrated via Razorpay with instant 3D Secure OTP authentication.',
   },
   {
@@ -61,7 +61,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'f9',
     category: 'Returns',
-    question: 'What is EVAN’s return and exchange policy?',
+    question: 'What is Kanchanika’s return and exchange policy?',
     answer: 'We offer a 7-day hassle-free return and exchange policy from the date of package delivery. The saree must remain unstitched with original Silk Mark tags intact.',
   },
   {

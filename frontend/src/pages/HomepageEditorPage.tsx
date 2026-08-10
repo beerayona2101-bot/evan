@@ -1167,7 +1167,7 @@ export const HomepageEditorPage: React.FC = () => {
                   <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">Headline</label>
                   <input
                     type="text"
-                    value={cms.newsletter?.title || 'JOIN EVAN ROYAL SAREE CLUB'}
+                    value={cms.newsletter?.title || 'JOIN KANCHANIKA ROYAL SAREE CLUB'}
                     onChange={(e) => setCms({ ...cms, newsletter: { ...cms.newsletter, title: e.target.value } })}
                     className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                   />
@@ -1198,7 +1198,7 @@ export const HomepageEditorPage: React.FC = () => {
                     <label className="block text-slate-700 font-bold uppercase text-[9px] mb-1">Brand Logo Text</label>
                     <input
                       type="text"
-                      value={cms.footer?.logo || 'EVAN COLLECTIONS'}
+                      value={cms.footer?.logo || 'KANCHANIKA'}
                       onChange={(e) => setCms({ ...cms, footer: { ...cms.footer, logo: e.target.value } })}
                       className="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                     />

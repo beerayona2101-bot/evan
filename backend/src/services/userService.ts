@@ -25,7 +25,7 @@ export class UserService {
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 Hours
 
-    const fullName = name || `${firstName || ''} ${lastName || ''}`.trim() || 'EVAN Customer';
+    const fullName = name || `${firstName || ''} ${lastName || ''}`.trim() || 'Kanchanika Customer';
 
     const user = await this.userRepo.create({
       name: fullName,
@@ -36,23 +36,15 @@ export class UserService {
       phone: phone || '',
       role: 'customer',
       status: 'active',
-      isVerified: true, // Default active for immediate dev access
+      isVerified: false,
       verificationToken,
       verificationExpiry,
     });
 
-    // Send Welcome Email & Verification Email
-    sendWelcomeEmail(cleanEmail, fullName).catch((err) => console.error('[Nodemailer] Welcome email error:', err));
-    sendEmailVerificationEmail(cleanEmail, fullName, verificationToken).catch((err) => console.error('[Nodemailer] Verification email error:', err));
+    // Dispatch Verification Email
+    await sendEmailVerificationEmail(cleanEmail, user.name, verificationToken);
 
-    return {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isVerified: user.isVerified,
-      token: generateToken(user._id.toString(), user.role),
-    };
+    return user;
   }
 
   async loginUser(email: string, password: string, reqIp?: string, userAgent?: string) {

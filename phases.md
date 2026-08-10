@@ -1,5 +1,5 @@
 
-# EVAN COLLECTIONS – Project Development Phases
+# Kanchanika – Project Development Phases
 
 **Version:** 1.0
 
@@ -7,7 +7,7 @@
 
 # Overview
 
-This document defines the complete project lifecycle for developing the EVAN COLLECTIONS luxury saree e-commerce platform, from idea to production and long-term maintenance.
+This document defines the complete project lifecycle for developing the Kanchanika luxury saree e-commerce platform, from idea to production and long-term maintenance.
 
 ---
 

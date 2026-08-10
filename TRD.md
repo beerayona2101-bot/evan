@@ -1,8 +1,8 @@
 
-# EVAN COLLECTIONS – Technical Requirements Document (TRD)
+# Kanchanika – Technical Requirements Document (TRD)
 
 **Version:** 1.1 (Updated)  
-**Project:** EVAN COLLECTIONS – Luxury Saree E-Commerce Platform
+**Project:** Kanchanika – Luxury Saree E-Commerce Platform
 
 ---
 

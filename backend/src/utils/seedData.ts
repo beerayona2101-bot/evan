@@ -63,11 +63,11 @@ export const seedDatabase = async (): Promise<void> => {
     // Seed Admin & Customer Users if none exist
     const userCount = await User.countDocuments();
     if (userCount === 0) {
-      console.log('[Seed] Seeding initial EVAN COLLECTIONS users...');
+      console.log('[Seed] Seeding initial Kanchanika users...');
       await User.create([
         {
-          name: 'EVAN COLLECTIONS Admin',
-          email: 'admin@evan.com',
+          name: 'Kanchanika Admin',
+          email: 'admin@kanchanika.com',
           password: 'adminpassword123',
           role: 'admin',
           phone: '+91 9490644434',
@@ -104,7 +104,7 @@ export const seedDatabase = async (): Promise<void> => {
           isActive: true,
         },
         {
-          code: 'EVAN1000',
+          code: 'KANCHANIKA1000',
           discountType: 'fixed',
           discountAmount: 1000,
           minPurchase: 7999,
@@ -182,7 +182,7 @@ export const seedDatabase = async (): Promise<void> => {
       for (let p = 1; p <= 25; p++) {
         const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
         const descriptor = LUXURY_DESCRIPTORS[(p - 1) % LUXURY_DESCRIPTORS.length];
-        const title = `${descriptor} ${cleanCatName} Saree by EVAN COLLECTIONS`;
+        const title = `${descriptor} ${cleanCatName} Saree by Kanchanika`;
         const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
         const discountPrice = Math.round(basePrice * 0.84);
         const mrp = Math.round(basePrice * 1.28);
@@ -197,11 +197,11 @@ export const seedDatabase = async (): Promise<void> => {
         productsToCreate.push({
           name: title,
           slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-          brand: 'EVAN COLLECTIONS',
+          brand: 'Kanchanika',
           categoryRef: catId,
           description: `Exquisite ${catName.toLowerCase()} handwoven by master artisans in India. Features rich zari brocade, unstitched contrast blouse piece, and lustrous silk drape.`,
           shortDescription: `Handcrafted ${catName.toLowerCase()} with pure zari border and rich woven pallu.`,
-          detailedDescription: `EVAN COLLECTIONS presents this heirloom-quality saree, meticulously crafted using traditional handloom weaving techniques. Comes with 5.5 meters of pure drape fabric and a matching 0.8 meter unstitched blouse piece.`,
+          detailedDescription: `Kanchanika presents this heirloom-quality saree, meticulously crafted using traditional handloom weaving techniques. Comes with 5.5 meters of pure drape fabric and a matching 0.8 meter unstitched blouse piece.`,
           price: discountPrice,
           discountPrice,
           mrp,
@@ -216,14 +216,14 @@ export const seedDatabase = async (): Promise<void> => {
           weight: `${520 + (globalIdCounter % 280)} Grams`,
           countryOfOrigin: 'India',
           washCare: 'Dry Clean Only. Store wrapped in soft cotton fabric.',
-          sku: `EVAN-SKU-${1000 + globalIdCounter}`,
+          sku: `KAN-SKU-${1000 + globalIdCounter}`,
           stock: 12 + (globalIdCounter % 38),
           images: gallery,
           hoverImage,
           galleryImages: gallery,
           rating: Number((4.6 + (globalIdCounter % 5) * 0.1).toFixed(1)),
           numReviews: 12 + (globalIdCounter * 4) % 90,
-          tags: [catName.toLowerCase(), 'saree', 'silk saree', 'bridal saree', 'banarasi', 'kanchipuram', 'evan collections'],
+          tags: [catName.toLowerCase(), 'saree', 'silk saree', 'bridal saree', 'banarasi', 'kanchipuram', 'kanchanika'],
           isFeatured: globalIdCounter <= 25,
           trending: globalIdCounter % 3 === 0,
           bestSeller: globalIdCounter % 4 === 0,

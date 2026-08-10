@@ -1,7 +1,7 @@
 {
-  "name": "evan-mern-ecommerce",
+  "name": "kanchanika-luxury-saree-ecommerce",
   "version": "1.0.0",
-  "description": "EVAN - Premium Men's Fashion E-Commerce MERN Stack Application",
+  "description": "Kanchanika - Premium Luxury Saree E-Commerce MERN Stack Application",
   "main": "backend/dist/server.js",
   "scripts": {
     "dev": "npx concurrently \"npm run server\" \"npm run client\"",
@@ -14,13 +14,13 @@
   "keywords": [
     "mern",
     "ecommerce",
-    "fashion",
-    "t-shirts",
+    "luxury sarees",
+    "silk mark",
     "react",
     "express",
     "mongodb"
   ],
-  "author": "EVAN",
+  "author": "Kanchanika",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"

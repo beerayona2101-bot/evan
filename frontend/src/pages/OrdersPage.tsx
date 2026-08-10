@@ -61,7 +61,7 @@ export const OrdersPage: React.FC = () => {
           <div className="bg-white p-12 rounded-3xl text-center space-y-4 border border-slate-200 shadow-sm">
             <Package className="w-12 h-12 text-slate-400 mx-auto" />
             <h2 className="text-xl font-bold text-slate-900">No Orders Found</h2>
-            <p className="text-xs text-slate-500">You haven't placed any orders yet with EVAN.</p>
+            <p className="text-xs text-slate-500">You haven't placed any orders yet with Kanchanika.</p>
           </div>
         ) : (
           <div className="space-y-6">

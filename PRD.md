@@ -1,8 +1,8 @@
 
-# EVAN COLLECTIONS – Product Requirements Document (PRD)
+# Kanchanika – Product Requirements Document (PRD)
 
 **Version:** 1.1 (Updated)  
-**Project:** EVAN COLLECTIONS – Luxury Saree E-Commerce Platform  
+**Project:** Kanchanika – Luxury Saree E-Commerce Platform  
 **Prepared For:** Product Owners, UI/UX Designers, Developers, QA, DevOps
 
 ---

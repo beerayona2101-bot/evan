@@ -34,8 +34,12 @@ export const VerifyEmailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFFDF9] flex items-center justify-center p-6 text-slate-900">
       <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-amber-200 shadow-xl text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-red-900 text-amber-300 flex items-center justify-center text-2xl font-black mx-auto border-2 border-amber-300 shadow">
-          E
+        <div className="flex justify-center pb-1">
+          <img
+            src="/kanchanika_attire_logo.svg"
+            alt="Kanchanika Logo"
+            className="w-16 h-16 object-contain drop-shadow"
+          />
         </div>
 
         {loading ? (
@@ -55,7 +59,7 @@ export const VerifyEmailPage: React.FC = () => {
               to="/login"
               className="inline-block px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow border border-amber-300"
             >
-              SIGN IN TO EVAN
+              SIGN IN TO KANCHANIKA
             </Link>
           </div>
         ) : (

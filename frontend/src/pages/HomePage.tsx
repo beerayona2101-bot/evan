@@ -296,7 +296,7 @@ export const HomePage: React.FC = () => {
                 <img
                   key={slide.id || idx}
                   src={slide.image}
-                  alt={`EVAN COLLECTIONS Saree - ${slide.title}`}
+                  alt={`Kanchanika Saree - ${slide.title}`}
                   className={`absolute inset-0 w-full h-full object-cover object-[75%_center] sm:object-right filter brightness-[0.95] contrast-[1.05] transition-opacity duration-700 ease-in-out ${
                     idx === safeSlideIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
                   }`}

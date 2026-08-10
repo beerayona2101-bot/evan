@@ -1,7 +1,7 @@
 {
-  "name": "evan-backend",
+  "name": "kanchanika-backend",
   "version": "1.0.0",
-  "description": "EVAN MERN Backend API - Express & Mongoose Layered Architecture",
+  "description": "Kanchanika MERN Backend API - Express & Mongoose Layered Architecture",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

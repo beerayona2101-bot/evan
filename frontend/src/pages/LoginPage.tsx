@@ -51,10 +51,14 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-[#FFFDF9] text-slate-900 flex items-center justify-center py-16 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-amber-200 shadow-xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-full bg-red-800 flex items-center justify-center text-amber-300 font-black text-xl mx-auto shadow border border-amber-300">
-            E
+          <div className="flex justify-center pb-1">
+            <img
+              src="/kanchanika_attire_logo.svg"
+              alt="Kanchanika Logo"
+              className="w-14 h-14 object-contain drop-shadow"
+            />
           </div>
-          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">EVAN COLLECTIONS</span>
+          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">KANCHANIKA</span>
           <h2 className="font-serif-luxury text-base font-bold text-amber-900 uppercase tracking-widest">WELCOME BACK</h2>
           <p className="text-xs text-slate-500 font-medium">Sign in to access your orders, wishlist, and VIP concierge privileges.</p>
         </div>
@@ -73,7 +77,7 @@ export const LoginPage: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@evan.com or ananya@example.com"
+              placeholder="admin@kanchanika.com or ananya@example.com"
               className="w-full p-3.5 bg-amber-50/40 border border-amber-200 rounded-xl text-slate-900 focus:border-red-800 focus:outline-none"
             />
           </div>
@@ -118,12 +122,12 @@ export const LoginPage: React.FC = () => {
             disabled={loading}
             className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300"
           >
-            {loading ? 'SIGNING IN...' : 'SIGN IN TO EVAN'}
+            {loading ? 'SIGNING IN...' : 'SIGN IN TO KANCHANIKA'}
           </button>
         </form>
 
         <div className="text-center text-xs text-slate-500 pt-2 border-t border-amber-200">
-          Don't have an EVAN account?{' '}
+          Don't have a Kanchanika account?{' '}
           <Link to="/register" className="text-red-800 font-extrabold hover:underline">
             Register Here
           </Link>

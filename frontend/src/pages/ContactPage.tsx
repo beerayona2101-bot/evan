@@ -30,7 +30,7 @@ export const ContactPage: React.FC = () => {
       setSubmitted(true);
 
       // 2. Format WhatsApp Alert Message for Admin Helpline 9490644434
-      const waText = `*NEW SAREE INQUIRY - EVAN COLLECTIONS*\n\n` +
+      const waText = `*NEW SAREE INQUIRY - KANCHANIKA*\n\n` +
         `👤 *Customer Name:* ${formData.name}\n` +
         `✉️ *Email Address:* ${formData.email}\n` +
         `📞 *Phone Number:* ${formData.phone}\n` +
@@ -56,7 +56,7 @@ export const ContactPage: React.FC = () => {
             <Sparkles className="w-4 h-4 text-red-700" /> SILK STYLIST CONCIERGE
           </span>
           <h1 className="font-street text-5xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none uppercase">
-            CONTACT EVAN COLLECTIONS
+            CONTACT KANCHANIKA
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">
             Have a query regarding bridal sarees, silk mark verification, or custom blouse tailoring? Our luxury saree concierge is at your service.
@@ -172,7 +172,7 @@ export const ContactPage: React.FC = () => {
               </span>
               <div className="w-full h-64 rounded-2xl overflow-hidden border border-amber-200 shadow-inner">
                 <iframe
-                  title="EVAN COLLECTIONS Atelier Location"
+                  title="Kanchanika Atelier Location"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.9798544976774!2d77.60945831482205!3d12.973121990854898!2m3!1f0!2f0!3f0!2m3!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae167e42f61a11%3A0xf6d8d6ff84e8f731!2sMG%20Road%2C%20Bengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
                   width="100%"
                   height="100%"

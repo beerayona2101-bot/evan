@@ -35,7 +35,7 @@ export const OrderSuccessPage: React.FC = () => {
             ORDER PLACED!
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-            Thank you for shopping with EVAN COLLECTIONS. Your heirloom saree order has been confirmed.
+            Thank you for shopping with Kanchanika. Your heirloom saree order has been confirmed.
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export const OrderSuccessPage: React.FC = () => {
         <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs text-left space-y-2 font-medium">
           <div className="flex justify-between border-b border-amber-200 pb-2">
             <span className="text-slate-500">Order Reference ID:</span>
-            <span className="font-mono font-black text-red-800 text-sm">{id || 'EVAN-984210'}</span>
+            <span className="font-mono font-black text-red-800 text-sm">{id || 'KAN-984210'}</span>
           </div>
 
           {orderData?.paymentResult?.id && (

@@ -53,7 +53,7 @@ const AppContent: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-[#09090B] selection:bg-amber-400 selection:text-black">
       <GlobalNavigationController />
       {!isAdminRoute && <Navbar />}
-      <main className={`flex-grow ${!isAdminRoute ? 'pt-[57px]' : ''}`}>
+      <main className={`flex-grow ${!isAdminRoute ? 'pt-[46px]' : ''}`}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />

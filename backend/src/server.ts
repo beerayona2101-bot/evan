@@ -45,7 +45,7 @@ connectDB().then(() => {
 });
 
 app.get('/api/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'OK', message: 'EVAN COLLECTIONS Luxury Saree API is running' });
+  res.status(200).json({ status: 'OK', message: 'Kanchanika Luxury Saree API is running' });
 });
 
 app.use('/api/auth', authRoutes);
@@ -89,15 +89,15 @@ const startServer = (port: number) => {
   initSocket(server);
 
   server.listen(port, () => {
-    console.log(`[EVAN Server & Socket.IO] Running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${port}`);
+    console.log(`[Kanchanika Server & Socket.IO] Running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${port}`);
   });
 
   server.on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
-      console.warn(`[EVAN Server] Port ${port} is in use, trying port ${port + 1}...`);
+      console.warn(`[Kanchanika Server] Port ${port} is in use, trying port ${port + 1}...`);
       startServer(port + 1);
     } else {
-      console.error('[EVAN Server] Startup Error:', err);
+      console.error('[Kanchanika Server] Startup Error:', err);
     }
   });
 };

@@ -54,16 +54,16 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
         {/* Company Bio & Contact Info */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-3">
             <img
-              src="/favicon.png"
-              alt="EVAN COLLECTIONS Logo"
-              className="w-10 h-10 rounded-full object-cover shadow border border-amber-400"
+              src="/kanchanika_attire_logo.svg"
+              alt="Kanchanika Logo"
+              className="w-10 h-10 object-contain drop-shadow-md"
             />
-            <span className="font-street text-3xl font-black text-white">EVAN COLLECTIONS</span>
+            <span className="font-street text-3xl font-black text-white">KANCHANIKA</span>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed font-medium max-w-sm">
-            EVAN COLLECTIONS is India's premier luxury saree destination celebrating royal Banarasi brocades, heirloom Kanchipuram silks, delicate floral organzas, and handcrafted linen sarees.
+            Kanchanika is India's premier luxury saree destination celebrating royal Banarasi brocades, heirloom Kanchipuram silks, delicate floral organzas, and handcrafted linen sarees.
           </p>
 
           {/* Luxury Contact Information Block */}
@@ -88,7 +88,7 @@ export const Footer: React.FC = () => {
               <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <div>
                 <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Email Concierge</span>
-                <span className="text-slate-300">concierge@evan.com</span>
+                <span className="text-slate-300">concierge@kanchanika.com</span>
               </div>
             </div>
 
