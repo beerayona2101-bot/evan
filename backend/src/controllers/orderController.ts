@@ -133,6 +133,23 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
           ).catch(() => null);
 
           if (updatedProd) {
+            // Deduct variant color stock if item has color specified
+            if (updatedProd.variants && updatedProd.variants.length > 0 && item.color) {
+              let variantChanged = false;
+              for (const v of updatedProd.variants) {
+                if (v.colorName.toLowerCase() === String(item.color).toLowerCase()) {
+                  v.stock = Math.max(0, v.stock - qty);
+                  if (v.stock === 0) {
+                    v.status = 'inactive';
+                  }
+                  variantChanged = true;
+                }
+              }
+              if (variantChanged) {
+                await updatedProd.save().catch(() => null);
+              }
+            }
+
             emitRealtimeEvent('productUpdated', updatedProd);
             emitRealtimeEvent('inventoryUpdated', { productId: updatedProd._id, stock: updatedProd.stock });
           }

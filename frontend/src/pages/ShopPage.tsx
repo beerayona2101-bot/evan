@@ -7,26 +7,17 @@ import { api } from '../services/api';
 
 const SAREE_CATEGORIES = [
   'All',
-  'Silk Sarees',
-  'Kanchipuram Sarees',
-  'Banarasi Sarees',
-  'Organza Sarees',
-  'Paithani Sarees',
-  'Cotton Sarees',
-  'Linen Sarees',
-  'Georgette Sarees',
-  'Chiffon Sarees',
-  'Tussar Silk',
   'Handloom Sarees',
   'Bandhani Sarees',
-  'Mysore Silk Sarees',
   'Designer Sarees',
   'Printed Sarees',
   'Crepe Sarees',
-  'Wedding Sarees',
-  'Bridal Sarees',
-  'Party Wear Sarees',
-  'Festival Collection',
+  'Georgette Sarees',
+  'Chiffon Sarees',
+  'Embroidery Sarees',
+  'Zari Brocade Sarees',
+  'Katan Silk Weave',
+  'Tissue Silk Weave',
 ];
 
 const SAREE_FABRICS = [
@@ -39,6 +30,7 @@ const SAREE_FABRICS = [
   'Paithani Silk Zari',
   'Pure Mulberry Silk',
   'Organic Mulmul Cotton',
+  'Chanderi Silk',
 ];
 
 const SAREE_OCCASIONS = [
@@ -47,6 +39,7 @@ const SAREE_OCCASIONS = [
   'Festival & Festive',
   'Party & Evening',
   'Office & Professional',
+  'Daily & Casual Wear',
 ];
 
 import { useSocket } from '../context/SocketContext';

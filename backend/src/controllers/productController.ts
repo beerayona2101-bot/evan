@@ -75,31 +75,79 @@ export const getFeaturedProducts = async (req: Request, res: Response): Promise<
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
+    if (req.body.variants && Array.isArray(req.body.variants)) {
+      req.body.variants = req.body.variants.map((v: any, idx: number) => ({
+        ...v,
+        sku: v.sku && String(v.sku).trim() ? String(v.sku) : `SKU-${Date.now()}-${idx}`,
+        price: v.price && Number(v.price) > 0 ? Number(v.price) : (req.body.price ? Number(req.body.price) : 4999),
+        stock: v.stock !== undefined ? Number(v.stock) : 10,
+        status: v.status || (v.stock > 0 ? 'active' : 'inactive'),
+        images: Array.isArray(v.images) ? v.images.filter(Boolean) : [],
+      }));
+    }
     const product = await productService.createProduct(req.body);
     emitRealtimeEvent('productCreated', product);
     res.status(201).json(product);
   } catch (error) {
+    console.error('createProduct error:', error);
     res.status(400).json({ message: (error as Error).message });
   }
 };
 
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
+    const idOrSlug = req.params.id;
     if (mongoose.connection.readyState !== 1) {
-      const mockProduct = { _id: req.params.id, ...req.body };
+      const mockProduct = { _id: idOrSlug, ...req.body };
       emitRealtimeEvent('productUpdated', mockProduct);
       res.json(mockProduct);
       return;
     }
-    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    const isObjectId = mongoose.Types.ObjectId.isValid(idOrSlug);
+
+    // Sanitize variant fields before Mongoose save
+    if (req.body.variants && Array.isArray(req.body.variants)) {
+      req.body.variants = req.body.variants.map((v: any, idx: number) => ({
+        ...v,
+        sku: v.sku && String(v.sku).trim() ? String(v.sku) : `SKU-${Date.now()}-${idx}`,
+        price: v.price && Number(v.price) > 0 ? Number(v.price) : (req.body.price ? Number(req.body.price) : 4999),
+        stock: v.stock !== undefined ? Number(v.stock) : 10,
+        status: v.status || (v.stock > 0 ? 'active' : 'inactive'),
+        images: Array.isArray(v.images) ? v.images.filter(Boolean) : [],
+      }));
+    }
+
+    let updated = await Product.findOneAndUpdate(
+      { $or: [{ _id: isObjectId ? idOrSlug : null }, { slug: idOrSlug }, { sku: idOrSlug }] },
+      req.body,
+      { new: true, runValidators: false }
+    );
+
+    if (!updated && isObjectId) {
+      updated = await Product.findByIdAndUpdate(idOrSlug, req.body, { new: true, runValidators: false });
+    }
+
     if (!updated) {
-      res.status(404).json({ message: 'Product not found' });
+      // If product was from static/fallback catalog or not yet in MongoDB, create/upsert it!
+      const slug = idOrSlug.includes('-') ? idOrSlug : (req.body.name ? req.body.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') : `saree-${Date.now()}`);
+      const newProduct = await Product.create({
+        ...req.body,
+        _id: isObjectId ? idOrSlug : undefined,
+        slug: req.body.slug || slug,
+        sku: req.body.sku || `EVAN-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
+      });
+      emitRealtimeEvent('productUpdated', newProduct);
+      emitRealtimeEvent('inventoryUpdated', { productId: newProduct._id, stock: newProduct.stock });
+      res.json(newProduct);
       return;
     }
+
     emitRealtimeEvent('productUpdated', updated);
     emitRealtimeEvent('inventoryUpdated', { productId: updated._id, stock: updated.stock });
     res.json(updated);
   } catch (error) {
+    console.error('updateProduct error:', error);
     res.status(400).json({ message: (error as Error).message });
   }
 };

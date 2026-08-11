@@ -6,6 +6,10 @@ export interface AddToCartPayload {
   color: string;
   quantity: number;
   price: number;
+  variantId?: string;
+  variantImage?: string;
+  sku?: string;
+  hexColor?: string;
 }
 
 export const cartApi = {

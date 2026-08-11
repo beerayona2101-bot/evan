@@ -27,7 +27,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterLowStockOnly, setFilterLowStockOnly] = useState(false);
+  const [stockFilterMode, setStockFilterMode] = useState<'all' | 'low' | 'out'>('all');
   const [stockEdits, setStockEdits] = useState<Record<string, number>>({});
   const [savingMap, setSavingMap] = useState<Record<string, boolean>>({});
 
@@ -74,8 +74,9 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
 
   // Filtered products list for detailed view or global search
   const displayedProducts = products.filter((p) => {
-    const isLowStock = (p.stock || 0) <= 5;
-    if (filterLowStockOnly && !isLowStock) return false;
+    const stockVal = p.stock || 0;
+    if (stockFilterMode === 'low' && stockVal > 5) return false;
+    if (stockFilterMode === 'out' && stockVal !== 0) return false;
 
     const matchesSearch =
       searchQuery.trim() === '' ||
@@ -117,7 +118,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
         {/* Card 1: TOTAL WAREHOUSE STOCK */}
         <div
           onClick={() => {
-            setFilterLowStockOnly(false);
+            setStockFilterMode('all');
             setSelectedCategory(null);
             setSearchQuery('');
           }}
@@ -133,7 +134,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
         {/* Card 2: LOW STOCK MODELS */}
         <div
           onClick={() => {
-            setFilterLowStockOnly(true);
+            setStockFilterMode('low');
             setSelectedCategory(null);
             setSearchQuery('');
           }}
@@ -152,7 +153,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
         {/* Card 3: OUT OF STOCK SAREES */}
         <div
           onClick={() => {
-            setFilterLowStockOnly(true);
+            setStockFilterMode('out');
             setSelectedCategory(null);
             setSearchQuery('');
           }}
@@ -173,7 +174,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
       {lowStockCount > 0 && (
         <div
           onClick={() => {
-            setFilterLowStockOnly(true);
+            setStockFilterMode('low');
             setSelectedCategory(null);
             setSearchQuery('');
           }}
@@ -211,11 +212,11 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
           />
         </div>
 
-        {selectedCategory || filterLowStockOnly ? (
+        {selectedCategory || stockFilterMode !== 'all' ? (
           <button
             onClick={() => {
               setSelectedCategory(null);
-              setFilterLowStockOnly(false);
+              setStockFilterMode('all');
               setSearchQuery('');
             }}
             className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-black uppercase tracking-wider rounded-xl border border-amber-300 flex items-center gap-1.5 shadow"
@@ -230,7 +231,7 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
       </div>
 
       {/* VIEW 1: CATEGORY CARDS OVERVIEW (When no category selected, no low-stock filter, and no active search) */}
-      {!selectedCategory && !filterLowStockOnly && searchQuery.trim() === '' && (
+      {!selectedCategory && stockFilterMode === 'all' && searchQuery.trim() === '' && (
         <div className="space-y-4">
           <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest border-b border-amber-100 pb-2">
             SAREE WAREHOUSE CATEGORIES ({categoryList.length} CATEGORIES)
@@ -296,14 +297,18 @@ export const StockWarehouseInventoryAdjuster: React.FC<StockWarehouseInventoryAd
         </div>
       )}
 
-      {/* VIEW 2: CATEGORY ITEMS / SEARCH RESULTS / LOW STOCK FILTER GRID WITH MANUAL STOCK EDITING */}
-      {(selectedCategory || filterLowStockOnly || searchQuery.trim() !== '') && (
+      {/* VIEW 2: CATEGORY ITEMS / SEARCH RESULTS / LOW STOCK & OUT OF STOCK FILTER GRID WITH MANUAL STOCK EDITING */}
+      {(selectedCategory || stockFilterMode !== 'all' || searchQuery.trim() !== '') && (
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-amber-100 pb-2">
             <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-2">
-              {filterLowStockOnly ? (
+              {stockFilterMode === 'out' ? (
                 <span className="text-red-800 font-black flex items-center gap-1">
-                  <AlertTriangle className="w-4 h-4 text-red-700" /> ⚠️ LOW STOCK & OUT OF STOCK SAREES (≤ 5 UNITS REMAINING)
+                  <AlertTriangle className="w-4 h-4 text-red-700" /> ⚠️ OUT OF STOCK SAREES (0 UNITS REMAINING)
+                </span>
+              ) : stockFilterMode === 'low' ? (
+                <span className="text-amber-900 font-black flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4 text-amber-700" /> ⚠️ LOW STOCK SAREES (≤ 5 UNITS REMAINING)
                 </span>
               ) : selectedCategory ? (
                 `CATEGORY: ${selectedCategory.toUpperCase()}`

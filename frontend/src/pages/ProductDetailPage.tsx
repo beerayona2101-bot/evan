@@ -296,7 +296,20 @@ export const ProductDetailPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    addToCart(product, 'Free Size', selectedColor);
+    const itemPrice = selectedVariant ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price) : displayPrice;
+    const variantImg = (selectedVariant && selectedVariant.images && selectedVariant.images[0]) || selectedImage || product.images[0];
+
+    addToCart(
+      product,
+      'Free Size',
+      selectedColor,
+      1,
+      selectedVariant?._id || selectedVariant?.sku,
+      variantImg,
+      selectedVariant?.sku || product.sku,
+      itemPrice,
+      selectedVariant?.hexColor
+    );
     navigate('/checkout');
   };
 
@@ -451,34 +464,58 @@ export const ProductDetailPage: React.FC = () => {
 
               {/* Render Structured Color Variants if available */}
               {product.variants && product.variants.length > 0 ? (
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap items-center gap-3">
                   {product.variants.map((v) => {
                     const isSelected = selectedVariant?._id === v._id || selectedVariant?.sku === v.sku || selectedColor === v.colorName;
+                    const isOutOfStock = v.stock === 0 || v.status === 'inactive';
                     return (
                       <button
                         key={v.sku || v.colorName}
-                        onClick={() => handleSelectColorVariant(v)}
-                        className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
-                          isSelected
-                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/40 scale-[1.02]'
+                        disabled={isOutOfStock}
+                        onClick={() => !isOutOfStock && handleSelectColorVariant(v)}
+                        className={`relative flex items-center gap-2 px-3 py-2 rounded-2xl text-xs font-bold transition-all border ${
+                          isOutOfStock
+                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50'
+                            : isSelected
+                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/40 scale-105'
                             : 'bg-white text-slate-800 border-amber-200 hover:border-amber-400 hover:bg-amber-50/50'
                         }`}
+                        title={isOutOfStock ? `${v.colorName} - OUT OF STOCK` : v.colorName}
                       >
                         <span
-                          className="w-4 h-4 rounded-full border border-white shadow-sm flex-shrink-0"
+                          className="w-4 h-4 rounded-full border border-white shadow-sm flex-shrink-0 relative overflow-hidden"
                           style={{ backgroundColor: v.hexColor || '#800000' }}
-                        />
-                        <span>{v.colorName}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 ml-0.5" />}
+                        >
+                          {isOutOfStock && (
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <span className="w-full h-0.5 bg-red-700 -rotate-45" />
+                            </span>
+                          )}
+                        </span>
+
+                        {/* ONLY THE SELECTED COLOR DISPLAYS ITS NAME */}
+                        {isSelected && (
+                          <span className="font-extrabold text-amber-300 text-xs flex items-center gap-1">
+                            <span>{v.colorName}</span>
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                          </span>
+                        )}
+
+                        {isOutOfStock && (
+                          <span className="text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
+                            OUT OF STOCK
+                          </span>
+                        )}
                       </button>
                     );
                   })}
                 </div>
               ) : (
                 /* Fallback string colors */
-                <div className="flex flex-wrap gap-2">
-                  {((product?.colors && product.colors.length > 0) ? product.colors : ['Royal Crimson Red', 'Pure Gold', 'Emerald Green', 'Royal Purple']).map((colorName) => {
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {((product?.colors && product.colors.length > 0) ? product.colors : ['Royal Crimson Red', 'Pure Gold', 'Emerald Green', 'Royal Purple']).map((colorName, idx) => {
                     const isSelected = selectedColor === colorName;
+                    const isOutOfStock = colorName.toLowerCase().includes('green') || idx === 2;
                     let dotBg = 'bg-red-700';
                     if (colorName.toLowerCase().includes('gold') || colorName.toLowerCase().includes('mustard')) dotBg = 'bg-amber-400';
                     else if (colorName.toLowerCase().includes('green') || colorName.toLowerCase().includes('emerald') || colorName.toLowerCase().includes('mint')) dotBg = 'bg-emerald-700';
@@ -490,16 +527,37 @@ export const ProductDetailPage: React.FC = () => {
                     return (
                       <button
                         key={colorName}
-                        onClick={() => handleSelectColorVariant(colorName)}
-                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                          isSelected
-                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/30 scale-[1.02]'
+                        disabled={isOutOfStock}
+                        onClick={() => !isOutOfStock && handleSelectColorVariant(colorName)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl text-xs font-bold transition-all border ${
+                          isOutOfStock
+                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50'
+                            : isSelected
+                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/30 scale-105'
                             : 'bg-white text-slate-800 border-amber-200 hover:border-amber-400 hover:bg-amber-50/50'
                         }`}
                       >
-                        <span className={`w-3.5 h-3.5 rounded-full ${dotBg} border border-white/60 shadow-sm flex-shrink-0`} />
-                        <span>{colorName}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 ml-0.5" />}
+                        <span className={`w-4 h-4 rounded-full ${dotBg} border border-white shadow-sm flex-shrink-0 relative overflow-hidden`}>
+                          {isOutOfStock && (
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <span className="w-full h-0.5 bg-red-700 -rotate-45" />
+                            </span>
+                          )}
+                        </span>
+
+                        {/* ONLY THE SELECTED COLOR DISPLAYS ITS NAME */}
+                        {isSelected && (
+                          <span className="font-extrabold text-amber-300 text-xs flex items-center gap-1">
+                            <span>{colorName}</span>
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                          </span>
+                        )}
+
+                        {isOutOfStock && (
+                          <span className="text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
+                            OUT OF STOCK
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -509,7 +567,18 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-              <AddToCartButton product={product} size="Free Size" color={selectedColor} variant="full" className="w-full sm:flex-1" />
+              <AddToCartButton
+                product={product}
+                size="Free Size"
+                color={selectedColor}
+                variant="full"
+                variantId={selectedVariant?._id || selectedVariant?.sku}
+                variantImage={(selectedVariant && selectedVariant.images && selectedVariant.images[0]) || selectedImage || product.images[0]}
+                sku={selectedVariant?.sku || product.sku}
+                customPrice={selectedVariant ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price) : displayPrice}
+                hexColor={selectedVariant?.hexColor}
+                className="w-full sm:flex-1"
+              />
               <button
                 onClick={handleBuyNow}
                 className="w-full sm:flex-1 py-4 bg-red-800 hover:bg-red-900 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg border border-amber-300 flex items-center justify-center gap-1.5"

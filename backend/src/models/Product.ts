@@ -76,9 +76,9 @@ export interface IProduct extends Document {
 const variantSchema: Schema = new Schema({
   colorName: { type: String, required: true, trim: true },
   hexColor: { type: String, required: true, default: '#800000' },
-  sku: { type: String, required: true },
+  sku: { type: String, default: '' },
   barcode: { type: String, default: '' },
-  price: { type: Number, required: true },
+  price: { type: Number, default: 0 },
   mrp: { type: Number, default: 0 },
   discountPrice: { type: Number, default: 0 },
   discountPercentage: { type: Number, default: 0 },

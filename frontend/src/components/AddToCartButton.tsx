@@ -12,6 +12,11 @@ interface AddToCartButtonProps {
   color?: string;
   className?: string;
   variant?: 'compact' | 'full';
+  variantId?: string;
+  variantImage?: string;
+  sku?: string;
+  customPrice?: number;
+  hexColor?: string;
 }
 
 export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
@@ -20,8 +25,13 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   color,
   className = '',
   variant = 'compact',
+  variantId,
+  variantImage,
+  sku,
+  customPrice,
+  hexColor,
 }) => {
-  const { getItemQuantityInCart, updateCartItemQuantityByProductId } = useCart();
+  const { addToCart, getItemQuantityInCart, updateCartItemQuantityByProductId } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -59,7 +69,17 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
     if (!checkAuth()) return;
-    updateCartItemQuantityByProductId(product, 1, size, effectiveColor);
+    addToCart(
+      product,
+      size,
+      effectiveColor,
+      1,
+      variantId,
+      variantImage,
+      sku,
+      customPrice,
+      hexColor
+    );
   };
 
   // State 2: Item is in Cart -> Transform into Interactive Quantity Controller (- quantity +) with Light Gold Active Color

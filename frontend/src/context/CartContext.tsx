@@ -7,7 +7,17 @@ import { showToast } from '../components/ToastContainer';
 interface CartContextType {
   cartItems: CartItem[];
   savedForLaterItems: CartItem[];
-  addToCart: (product: Product, size: string, color: string, quantity?: number) => Promise<void>;
+  addToCart: (
+    product: Product,
+    size: string,
+    color: string,
+    quantity?: number,
+    variantId?: string,
+    variantImage?: string,
+    sku?: string,
+    customPrice?: number,
+    hexColor?: string
+  ) => Promise<void>;
   removeFromCart: (indexOrId: number | string) => Promise<void>;
   updateQuantity: (index: number, quantity: number) => Promise<void>;
   saveForLater: (indexOrId: number | string) => Promise<void>;
@@ -130,20 +140,37 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [cartItems, savedForLaterItems, user]);
 
-  const addToCart = async (product: Product, size: string, color: string, quantity: number = 1) => {
+  const addToCart = async (
+    product: Product,
+    size: string,
+    color: string,
+    quantity: number = 1,
+    variantId?: string,
+    variantImage?: string,
+    sku?: string,
+    customPrice?: number,
+    hexColor?: string
+  ) => {
     if (!product || !product._id) return;
-    const itemPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
+    const itemPrice = customPrice !== undefined && customPrice > 0
+      ? customPrice
+      : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price);
 
     setCartItems((prev) => {
       const validPrev = prev.filter((item) => item && item.product && item.product._id);
-      const existingIdx = validPrev.findIndex(
-        (item) => item.product._id === product._id && item.size === size && item.color === color
-      );
+      const existingIdx = validPrev.findIndex((item) => {
+        const isSameProd = item.product._id === product._id;
+        const isSameColor = (item.color || '').toLowerCase() === (color || '').toLowerCase();
+        const isSameVariant = variantId ? item.variantId === variantId : true;
+        return isSameProd && isSameColor && isSameVariant;
+      });
 
       if (existingIdx > -1) {
         const updated = [...validPrev];
         const maxStock = product.stock !== undefined ? product.stock : 99;
         updated[existingIdx].quantity = Math.min(updated[existingIdx].quantity + quantity, maxStock);
+        if (variantImage) updated[existingIdx].variantImage = variantImage;
+        if (hexColor) updated[existingIdx].hexColor = hexColor;
         return updated;
       }
 
@@ -155,11 +182,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           color,
           quantity,
           price: itemPrice,
+          variantId,
+          variantImage: variantImage || product.images?.[0],
+          sku: sku || product.sku,
+          hexColor,
         },
       ];
     });
 
-    showToast(`Added ${product.name ? product.name.slice(0, 30) : 'Item'}... to Bag`, 'success');
+    showToast(`Added ${product.name ? product.name.slice(0, 25) : 'Saree'} (${color}) to Bag`, 'success');
 
     if (user) {
       try {
@@ -169,6 +200,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           color,
           quantity,
           price: itemPrice,
+          variantId,
+          variantImage: variantImage || product.images?.[0],
+          sku: sku || product.sku,
+          hexColor,
         });
         if (res && res.items) {
           setCartItems(res.items.filter((i: any) => i && i.product && i.product._id));
