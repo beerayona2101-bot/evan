@@ -2,13 +2,94 @@ import mongoose from 'mongoose';
 import { Product, IProduct } from '../models/Product';
 
 const UNSPLASH_SAREE_IMAGES = [
+  '/images/saree_paithani_green.png',
   '/images/saree_banarasi_red.png',
   '/images/saree_kanchipuram_gold.png',
-  '/images/saree_organza_floral.png',
-  '/images/saree_linen_beige.png',
-  '/images/saree_paithani_green.png',
   '/images/saree_banarasi_purple.png',
+  '/images/saree_linen_beige.png',
+  '/images/saree_organza_floral.png',
 ];
+
+export const SAREE_ANGLE_GALLERY_MAP: Record<string, string[]> = {
+  '/images/saree_paithani_green.png': [
+    '/images/saree_paithani_green.png',
+    '/images/saree_paithani_green_side.png',
+    '/images/saree_paithani_green_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_banarasi_red.png': [
+    '/images/saree_banarasi_red.png',
+    '/images/saree_banarasi_red_side.png',
+    '/images/saree_banarasi_red_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_kanchipuram_gold.png': [
+    '/images/saree_kanchipuram_gold.png',
+    '/images/saree_kanchipuram_gold_side.png',
+    '/images/saree_kanchipuram_gold_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_banarasi_purple.png': [
+    '/images/saree_banarasi_purple.png',
+    '/images/saree_banarasi_purple_side.png',
+    '/images/saree_banarasi_purple_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_linen_beige.png': [
+    '/images/saree_linen_beige.png',
+    '/images/saree_linen_beige_side.png',
+    '/images/saree_linen_beige_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_organza_floral.png': [
+    '/images/saree_organza_floral.png',
+    '/images/saree_organza_floral_side.png',
+    '/images/saree_organza_floral_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_chanderi_pastel.png': [
+    '/images/saree_chanderi_pastel.png',
+    '/images/saree_organza_floral_side.png',
+    '/images/saree_organza_floral_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_bandhani_royal_maroon.png': [
+    '/images/saree_bandhani_royal_maroon.png',
+    '/images/saree_banarasi_red_side.png',
+    '/images/saree_banarasi_red_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_kanchipuram_crimson.png': [
+    '/images/saree_kanchipuram_crimson.png',
+    '/images/saree_kanchipuram_gold_side.png',
+    '/images/saree_kanchipuram_gold_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_organza_pink.png': [
+    '/images/saree_organza_pink.png',
+    '/images/saree_organza_floral_side.png',
+    '/images/saree_organza_floral_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+  '/images/saree_bridal_trousseau.png': [
+    '/images/saree_bridal_trousseau.png',
+    '/images/saree_banarasi_red_side.png',
+    '/images/saree_banarasi_red_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ],
+};
+
+export const getMultiAngleGalleryForImage = (mainImg: string): string[] => {
+  if (mainImg && SAREE_ANGLE_GALLERY_MAP[mainImg]) {
+    return SAREE_ANGLE_GALLERY_MAP[mainImg];
+  }
+  return [
+    mainImg,
+    '/images/saree_paithani_green_side.png',
+    '/images/saree_paithani_green_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ];
+};
 
 const SAREE_CATEGORIES_20 = [
   'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Organza Sarees', 'Paithani Sarees',
@@ -112,7 +193,7 @@ const generate500Sarees = (): any[] => {
 
       const mainImage = UNSPLASH_SAREE_IMAGES[mainImgIdx];
       const hoverImage = UNSPLASH_SAREE_IMAGES[hoverImgIdx];
-      const gallery = [mainImage, hoverImage, UNSPLASH_SAREE_IMAGES[galImgIdx1], UNSPLASH_SAREE_IMAGES[galImgIdx2]];
+      const gallery = getMultiAngleGalleryForImage(mainImage);
 
       list.push({
         _id: `prod-saree-${String(globalIdCounter).padStart(3, '0')}`,

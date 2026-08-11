@@ -153,10 +153,88 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  // Determine current active gallery images based on variant selection
-  const activeGalleryImages: string[] = (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0)
+  // SAREE MULTI-ANGLE GALLERY MAPPING (Front View, Side View, Pallu Close-Up, Back View)
+  const SAREE_ANGLE_MAP: Record<string, string[]> = {
+    '/images/saree_paithani_green.png': [
+      '/images/saree_paithani_green.png',
+      '/images/saree_paithani_green_side.png',
+      '/images/saree_paithani_green_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_banarasi_red.png': [
+      '/images/saree_banarasi_red.png',
+      '/images/saree_banarasi_red_side.png',
+      '/images/saree_banarasi_red_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_kanchipuram_gold.png': [
+      '/images/saree_kanchipuram_gold.png',
+      '/images/saree_kanchipuram_gold_side.png',
+      '/images/saree_kanchipuram_gold_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_banarasi_purple.png': [
+      '/images/saree_banarasi_purple.png',
+      '/images/saree_banarasi_purple_side.png',
+      '/images/saree_banarasi_purple_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_linen_beige.png': [
+      '/images/saree_linen_beige.png',
+      '/images/saree_linen_beige_side.png',
+      '/images/saree_linen_beige_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_organza_floral.png': [
+      '/images/saree_organza_floral.png',
+      '/images/saree_organza_floral_side.png',
+      '/images/saree_organza_floral_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_chanderi_pastel.png': [
+      '/images/saree_chanderi_pastel.png',
+      '/images/saree_organza_floral_side.png',
+      '/images/saree_organza_floral_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_bandhani_royal_maroon.png': [
+      '/images/saree_bandhani_royal_maroon.png',
+      '/images/saree_banarasi_red_side.png',
+      '/images/saree_banarasi_red_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_kanchipuram_crimson.png': [
+      '/images/saree_kanchipuram_crimson.png',
+      '/images/saree_kanchipuram_gold_side.png',
+      '/images/saree_kanchipuram_gold_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_organza_pink.png': [
+      '/images/saree_organza_pink.png',
+      '/images/saree_organza_floral_side.png',
+      '/images/saree_organza_floral_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+    '/images/saree_bridal_trousseau.png': [
+      '/images/saree_bridal_trousseau.png',
+      '/images/saree_banarasi_red_side.png',
+      '/images/saree_banarasi_red_pallu.png',
+      '/images/saree_paithani_green_back.png',
+    ],
+  };
+
+  const currentMainImg = selectedImage || (selectedVariant && selectedVariant.images && selectedVariant.images[0]) || (product && product.images && product.images[0]) || '/images/saree_paithani_green.png';
+
+  const rawGallery: string[] = (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0)
     ? selectedVariant.images
-    : (product && product.images && product.images.length > 0 ? product.images : ['/images/saree_banarasi_red.png']);
+    : (product && product.images && product.images.length > 0 ? product.images : [currentMainImg]);
+
+  const activeGalleryImages: string[] = SAREE_ANGLE_MAP[currentMainImg] || (SAREE_ANGLE_MAP[rawGallery[0]] ? SAREE_ANGLE_MAP[rawGallery[0]] : [
+    currentMainImg,
+    '/images/saree_paithani_green_side.png',
+    '/images/saree_paithani_green_pallu.png',
+    '/images/saree_paithani_green_back.png',
+  ]);
 
   // Listen to ArrowLeft / ArrowRight gallery navigation events (placed unconditionally BEFORE early returns)
   useEffect(() => {
@@ -243,44 +321,57 @@ export const ProductDetailPage: React.FC = () => {
         {/* Main Product Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start bg-white p-4 sm:p-6 rounded-3xl border border-amber-200 shadow-xl">
 
-          {/* Left Saree Gallery Container with Dynamic Per-Color Gallery */}
-          <div className="lg:col-span-6 flex flex-col justify-between space-y-3">
-            <div className="relative aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] max-h-[45vh] sm:max-h-[55vh] lg:max-h-[440px] w-full rounded-2xl overflow-hidden bg-amber-50/30 border border-amber-200/90 shadow-md group mx-auto flex items-center justify-center p-2">
+          {/* Left Saree Gallery Container with Vertical Thumbnails & Zero Empty Space */}
+          <div className="lg:col-span-6 flex flex-col-reverse sm:flex-row gap-3 lg:gap-4 items-start">
+            
+            {/* Left Vertical Thumbnails Strip (i1, i2, i3, i4...) */}
+            {activeGalleryImages && activeGalleryImages.length > 0 && (
+              <div className="flex sm:flex-col gap-2.5 overflow-x-auto sm:overflow-y-auto max-h-none sm:max-h-[500px] w-full sm:w-auto py-1 custom-scrollbar flex-shrink-0">
+                {activeGalleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(img)}
+                    aria-label={`View saree image ${idx + 1}`}
+                    className={`w-14 h-16 sm:w-16 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-amber-50/40 p-0.5 shadow-sm ${
+                      (selectedImage || activeGalleryImages[0]) === img
+                        ? 'border-red-800 ring-2 ring-red-800/20 shadow-md scale-105 bg-white'
+                        : 'border-amber-200/80 opacity-70 hover:opacity-100 hover:border-amber-400'
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Gallery ${idx + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover object-top rounded-lg"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Main Preview Card - Full Fit Cover without Empty Margins */}
+            <div className="relative flex-1 aspect-[3/4] sm:aspect-[3/4] lg:aspect-[3/4] max-h-[500px] sm:max-h-[520px] w-full rounded-2xl overflow-hidden bg-amber-50/20 border border-amber-200 shadow-md group">
               <img
                 src={selectedImage || activeGalleryImages[0]}
                 alt={product.name}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-full object-contain group-hover:scale-105 transition-all duration-500 cursor-zoom-in rounded-xl"
+                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
               />
-              <span className="absolute top-3 left-3 bg-red-800 text-amber-300 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shadow border border-amber-300">
+
+              <span className="absolute top-3 left-3 bg-red-800 text-amber-300 text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow border border-amber-300">
                 PURE SILK MARK
               </span>
 
               {/* Variant Badge overlay */}
               {selectedVariant && (
-                <span className="absolute bottom-3 right-3 bg-slate-950/80 backdrop-blur text-amber-300 text-[9px] font-black uppercase px-2.5 py-1 rounded-full border border-amber-400/40">
-                  {selectedVariant.colorName} Gallery ({activeGalleryImages.length} Images)
+                <span className="absolute bottom-3 right-3 bg-slate-950/85 backdrop-blur text-amber-300 text-[9px] font-black uppercase px-2.5 py-1 rounded-full border border-amber-400/40 shadow-lg">
+                  {selectedVariant.colorName} ({activeGalleryImages.length} Shots)
                 </span>
               )}
             </div>
 
-            {/* Dynamic Thumbnails Strip */}
-            {activeGalleryImages && activeGalleryImages.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto py-1 custom-scrollbar">
-                {activeGalleryImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(img)}
-                    className={`w-14 h-16 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-amber-50/30 p-1 ${
-                      selectedImage === img ? 'border-red-800 shadow-md scale-105 bg-white' : 'border-amber-200 opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt={`Gallery ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-contain rounded-lg" />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Right Product Details & Buy Actions */}
