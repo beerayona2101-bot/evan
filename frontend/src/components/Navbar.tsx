@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon } from 'lucide-react';
+import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -27,7 +27,7 @@ export const Navbar: React.FC = () => {
       return location.pathname === '/';
     }
     if (path === '/shop') {
-      return (location.pathname === '/shop' || location.pathname.startsWith('/product/')) && !location.search.includes('sort=newest');
+      return (location.pathname === '/shop' || location.pathname.startsWith('/product/')) && !location.search.includes('offers=true') && !location.search.includes('sort=newest');
     }
     return location.pathname.startsWith(path);
   };
@@ -94,6 +94,20 @@ export const Navbar: React.FC = () => {
             COLLECTIONS
           </Link>
           <Link
+            to="/shop?offers=true"
+            className={`transition-all py-1 flex items-center gap-1 text-red-800 ${
+              isActive('/shop', 'offers=true')
+                ? 'text-red-700 font-black border-b-2 border-red-700'
+                : 'text-amber-950 hover:text-red-700 font-black'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+            <span>OFFERS</span>
+            <span className="bg-red-800 text-amber-300 text-[8px] font-black uppercase px-1.5 py-0.2 rounded-full border border-amber-300 shadow-sm ml-0.5">
+              SALE
+            </span>
+          </Link>
+          <Link
             to="/contact"
             className={`transition-all py-1 ${
               isActive('/contact')
@@ -113,7 +127,6 @@ export const Navbar: React.FC = () => {
           >
             FAQS
           </Link>
-
         </nav>
 
         {/* Right Header Icons */}
@@ -266,6 +279,20 @@ export const Navbar: React.FC = () => {
             }`}
           >
             Collections
+          </Link>
+          <Link
+            to="/shop?offers=true"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`block py-2 flex items-center justify-between ${
+              isActive('/shop', 'offers=true') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600" /> OFFERS & PROMO CODES
+            </span>
+            <span className="bg-red-800 text-amber-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-300">
+              UP TO 34% OFF
+            </span>
           </Link>
           <Link
             to="/contact"

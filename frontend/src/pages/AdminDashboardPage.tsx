@@ -134,6 +134,7 @@ export const AdminDashboardPage: React.FC = () => {
     barcode: `890100${Math.floor(100000 + Math.random() * 900000)}`,
     image: '/images/saree_kanchipuram_gold.png',
     videoUrl: '',
+    galleryImages: ['', '', '', ''],
   });
 
   // Category Form State
@@ -498,12 +499,14 @@ export const AdminDashboardPage: React.FC = () => {
       barcode: `890100${Math.floor(100000 + Math.random() * 900000)}`,
       image: '/images/saree_kanchipuram_gold.png',
       videoUrl: '',
+      galleryImages: ['', '', '', ''],
     });
     setShowProductModal(true);
   };
 
   const handleOpenEditModal = (prod: Product) => {
     setEditingProduct(prod);
+    const prodImgs = prod.images || (prod as any).galleryImages || [];
     setFormData({
       name: prod.name,
       shortDescription: 'Pure Silk Mark Certified Handcrafted Saree',
@@ -523,8 +526,14 @@ export const AdminDashboardPage: React.FC = () => {
       stock: String(prod.stock),
       sku: prod.sku || `EVAN-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
       barcode: `890100${Math.floor(100000 + Math.random() * 900000)}`,
-      image: prod.images[0] || '/images/saree_kanchipuram_gold.png',
+      image: prodImgs[0] || '/images/saree_kanchipuram_gold.png',
       videoUrl: '',
+      galleryImages: [
+        prodImgs[1] || '',
+        prodImgs[2] || '',
+        prodImgs[3] || '',
+        prodImgs[4] || '',
+      ],
     });
     setShowProductModal(true);
   };
@@ -566,6 +575,11 @@ export const AdminDashboardPage: React.FC = () => {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     const formattedName = formatSareeName(formData.name, formData.category);
+    const compiledImages = [
+      formData.image,
+      ...formData.galleryImages.filter((img) => Boolean(img && img.trim())),
+    ];
+
     const payload = {
       name: formattedName,
       description: formData.description,
@@ -578,7 +592,8 @@ export const AdminDashboardPage: React.FC = () => {
       borderType: formData.borderType,
       stock: Number(formData.stock),
       sku: formData.sku,
-      images: [formData.image],
+      images: compiledImages,
+      galleryImages: compiledImages,
     };
 
     try {
@@ -2728,11 +2743,88 @@ export const AdminDashboardPage: React.FC = () => {
                           }}
                         />
                         <div className="text-[10px] text-slate-700">
-                          <span className="font-black text-red-800 uppercase block">✓ IMAGE PREVIEW READY</span>
+                          <span className="font-black text-red-800 uppercase block">✓ MAIN IMAGE PREVIEW READY</span>
                           <span className="truncate block max-w-xs font-mono text-[9px] text-slate-500">{formData.image.slice(0, 60)}...</span>
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Related Multi-Angle Saree Images Section */}
+                <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-300 space-y-3">
+                  <div className="flex items-center justify-between border-b border-amber-200 pb-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-red-800">MULTIPLE ANGLE SAREE SHOTS</span>
+                      <h4 className="text-xs font-black text-slate-900 uppercase">RELATED SHOTS (SIDE VIEW, PALLU CLOSE-UP, REAR BACK VIEW, DETAIL)</h4>
+                    </div>
+                    <span className="text-[9px] font-bold text-amber-900 bg-amber-200 px-2 py-0.5 rounded-full">USER DETAIL VIEW SYNC</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { label: 'Shot #2: Standing Side Profile View', idx: 0, placeholder: '/images/saree_paithani_green_side.png' },
+                      { label: 'Shot #3: Pallu & Zari Embroidery Detail', idx: 1, placeholder: '/images/saree_paithani_green_pallu.png' },
+                      { label: 'Shot #4: Rear Back View & Blouse Accent', idx: 2, placeholder: '/images/saree_paithani_green_back.png' },
+                      { label: 'Shot #5: Pleats & Fabric Weave Detail', idx: 3, placeholder: '/images/saree_paithani_green.png' },
+                    ].map((shot) => (
+                      <div key={shot.idx} className="space-y-1 bg-white p-2.5 rounded-xl border border-amber-200 shadow-sm">
+                        <label className="block text-[9px] font-black uppercase text-amber-900">{shot.label}</label>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={formData.galleryImages[shot.idx] || ''}
+                            onChange={(e) => {
+                              const updated = [...formData.galleryImages];
+                              updated[shot.idx] = e.target.value;
+                              setFormData({ ...formData, galleryImages: updated });
+                            }}
+                            className="flex-1 p-2 bg-amber-50/40 border border-amber-200 rounded-lg text-[10px] font-medium"
+                            placeholder={shot.placeholder}
+                          />
+                          <label className="p-2 bg-slate-900 hover:bg-slate-800 text-amber-300 rounded-lg cursor-pointer flex items-center justify-center border border-amber-300 transition-all flex-shrink-0" title="Upload Local Image">
+                            <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  showToast(`Optimizing & uploading angle shot "${file.name}"...`, 'info');
+                                  try {
+                                    const compressedBase64 = await compressImage(file, 1200, 1200, 0.82);
+                                    const uploadRes = await api.post('/upload', { image: compressedBase64, folder: 'evan_products_angles' });
+                                    const finalUrl = uploadRes.data?.imageUrl || uploadRes.data?.url || compressedBase64;
+                                    const updated = [...formData.galleryImages];
+                                    updated[shot.idx] = finalUrl;
+                                    setFormData({ ...formData, galleryImages: updated });
+                                    showToast(`Angle shot #${shot.idx + 2} uploaded successfully!`, 'success');
+                                  } catch {
+                                    const compressedBase64 = await compressImage(file, 1000, 1000, 0.78);
+                                    const updated = [...formData.galleryImages];
+                                    updated[shot.idx] = compressedBase64;
+                                    setFormData({ ...formData, galleryImages: updated });
+                                    showToast('Angle shot loaded locally!', 'info');
+                                  }
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                        {formData.galleryImages[shot.idx] && (
+                          <div className="flex items-center gap-2 pt-1">
+                            <img
+                              src={formData.galleryImages[shot.idx]}
+                              alt={`Angle ${shot.idx + 2}`}
+                              className="w-8 h-10 object-cover rounded border border-amber-300"
+                              onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                            />
+                            <span className="text-[8px] font-mono text-slate-500 truncate max-w-[120px]">{formData.galleryImages[shot.idx].slice(0, 30)}...</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 

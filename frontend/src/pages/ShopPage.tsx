@@ -185,7 +185,7 @@ export const ShopPage: React.FC = () => {
                 <Sparkles className="w-3 h-3 text-red-700" /> KANCHANIKA SAREE CATALOG
               </span>
               <h1 className="font-street text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none uppercase mt-0.5">
-                {selectedCategory !== 'All' ? selectedCategory : 'LUXURY INDIAN SAREES'}
+                {searchParams.get('offers') === 'true' ? '🔥 FESTIVE OFFERS & SPECIAL DISCOUNTS' : (selectedCategory !== 'All' ? selectedCategory : 'LUXURY INDIAN SAREES')}
               </h1>
             </div>
             <span className="bg-amber-100 text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border border-amber-300 shadow-sm whitespace-nowrap hidden sm:inline-block">
@@ -241,6 +241,41 @@ export const ShopPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Active Offers & Promo Code Banner when offers=true */}
+        {searchParams.get('offers') === 'true' && (
+          <div className="bg-gradient-to-r from-red-950 via-red-900 to-amber-950 text-amber-300 p-3.5 sm:p-4 rounded-2xl border border-amber-300 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-400/20 border border-amber-300/40 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-amber-300 animate-spin" />
+              </div>
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-amber-400 block">EXCLUSIVE ATELIER PROMO CODES</span>
+                <h3 className="font-serif-luxury text-base sm:text-lg font-bold text-white leading-tight">
+                  Save up to 34% OFF on Authentic Handloom Silk Sarees
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase">
+              <div className="bg-slate-950/70 border border-amber-400/40 px-3 py-1.5 rounded-xl shadow-sm">
+                <span className="text-slate-400 mr-1 font-sans">CODE:</span>
+                <span className="text-amber-300 font-mono text-xs">ROYAL10</span>
+                <span className="text-slate-300 ml-1">(10% OFF)</span>
+              </div>
+              <div className="bg-slate-950/70 border border-amber-400/40 px-3 py-1.5 rounded-xl shadow-sm">
+                <span className="text-slate-400 mr-1 font-sans">CODE:</span>
+                <span className="text-amber-300 font-mono text-xs">BRIDAL20</span>
+                <span className="text-slate-300 ml-1">(20% OFF)</span>
+              </div>
+              <div className="bg-slate-950/70 border border-amber-400/40 px-3 py-1.5 rounded-xl shadow-sm">
+                <span className="text-slate-400 mr-1 font-sans">CODE:</span>
+                <span className="text-amber-300 font-mono text-xs">KANCHANIKA1000</span>
+                <span className="text-slate-300 ml-1">(₹1000 OFF)</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 100% Window Height Locked Split Layout */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch sm:overflow-hidden min-h-0">

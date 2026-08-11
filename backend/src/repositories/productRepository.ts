@@ -178,10 +178,10 @@ const generate500Sarees = (): any[] => {
     const catFabric = FABRICS_MAP[catName] || 'Pure Handloom Silk';
     const catTitles = CATEGORY_TITLES_MAP[catName] || LUXURY_SAREE_TITLES_25;
 
-    for (let p = 1; p <= 25; p++) {
+    for (let p = 1; p <= 4; p++) {
       const baseTitle = catTitles[(p - 1) % catTitles.length];
       const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
-      const name = `${baseTitle} ${cleanCatName} Saree Vol.${p} by EVAN COLLECTIONS`;
+      const name = `${baseTitle} ${cleanCatName} Saree by EVAN COLLECTIONS`;
       const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
       const discountPrice = Math.round(basePrice * 0.84);
       const mrp = Math.round(basePrice * 1.28);

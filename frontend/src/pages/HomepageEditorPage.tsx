@@ -134,7 +134,7 @@ export const HomepageEditorPage: React.FC = () => {
   const [cms, setCms] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('lookbook');
+  const [activeSection, setActiveSection] = useState<string>('announcement');
   const [showLivePreview, setShowLivePreview] = useState(false);
   const { socket } = useSocket();
 

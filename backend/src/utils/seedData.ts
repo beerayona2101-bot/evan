@@ -178,8 +178,8 @@ export const seedDatabase = async (): Promise<void> => {
       const catId = categoryMap[catName];
       const catFabric = FABRICS_MAP[catName] || 'Pure Handloom Silk';
 
-      // Generate 25 unique sarees per category = 500 total products!
-      for (let p = 1; p <= 25; p++) {
+      // Generate 4 unique curated sarees per category = 80 total products!
+      for (let p = 1; p <= 4; p++) {
         const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
         const descriptor = LUXURY_DESCRIPTORS[(p - 1) % LUXURY_DESCRIPTORS.length];
         const title = `${descriptor} ${cleanCatName} Saree by Kanchanika`;
