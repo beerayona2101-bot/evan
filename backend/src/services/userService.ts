@@ -44,7 +44,14 @@ export class UserService {
     // Dispatch Verification Email
     await sendEmailVerificationEmail(cleanEmail, user.name, verificationToken);
 
-    return user;
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id.toString(), user.role),
+      isVerified: user.isVerified,
+    };
   }
 
   async loginUser(email: string, password: string, reqIp?: string, userAgent?: string) {

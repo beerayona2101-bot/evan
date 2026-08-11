@@ -36,6 +36,9 @@ export const createTransporter = () => {
 
 // Generic Send Email Function
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
+  if (process.env.NODE_ENV === 'test') {
+    return true;
+  }
   try {
     const transporter = createTransporter();
     const mailUser = process.env.MAIL_USER || process.env.SMTP_USER || 'beerayona2101@gmail.com';

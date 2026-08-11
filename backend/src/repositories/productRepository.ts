@@ -256,7 +256,7 @@ export class ProductRepository {
 
   async findByIdOrSlug(idOrSlug: string): Promise<IProduct | null> {
     if (mongoose.connection.readyState !== 1) {
-      return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || ALL_500_FALLBACK_SAREES[0]) as any;
+      return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || null) as any;
     }
     try {
       const isObjectId = idOrSlug.match(/^[0-9a-fA-F]{24}$/);
@@ -264,9 +264,9 @@ export class ProductRepository {
         $or: [{ _id: isObjectId ? idOrSlug : null }, { slug: idOrSlug }],
       });
       if (prod) return prod;
-      return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || ALL_500_FALLBACK_SAREES[0]) as any;
+      return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || null) as any;
     } catch {
-      return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || ALL_500_FALLBACK_SAREES[0]) as any;
+      return null;
     }
   }
 
