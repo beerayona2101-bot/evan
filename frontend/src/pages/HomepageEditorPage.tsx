@@ -20,13 +20,13 @@ import {
 import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
 import { useSocket } from '../context/SocketContext';
+import { compressImage } from '../utils/imageCompressor';
 
 // Helper Component for Cloudinary Image Uploads & Image URL Management
 interface ImageUploaderControlProps {
   label: string;
-  currentUrl: string;
-  onUrlChange: (url: string) => void;
-  folder?: string;
+  currentUrl?: string;
+  onUrlChange: (newUrl: string) => void;
 }
 
 const ImageUploaderControl: React.FC<ImageUploaderControlProps> = ({
@@ -41,30 +41,26 @@ const ImageUploaderControl: React.FC<ImageUploaderControlProps> = ({
     if (!file) return;
 
     setUploading(true);
-    showToast(`Uploading image "${file.name}"...`, 'info');
+    showToast(`Optimizing & uploading image "${file.name}"...`, 'info');
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      if (typeof reader.result === 'string') {
-        try {
-          const res = await api.post('/upload', { image: reader.result });
-          if (res.data?.imageUrl || res.data?.url) {
-            const uploadedUrl = res.data.imageUrl || res.data.url;
-            onUrlChange(uploadedUrl);
-            showToast('Successfully uploaded image!', 'success');
-          } else {
-            onUrlChange(reader.result);
-            showToast('Image preview loaded', 'info');
-          }
-        } catch {
-          onUrlChange(reader.result);
-          showToast('Image preview loaded locally', 'info');
-        } finally {
-          setUploading(false);
-        }
+    try {
+      const compressedBase64 = await compressImage(file, 1400, 1400, 0.85);
+      const res = await api.post('/upload', { image: compressedBase64, folder: 'evan_homepage_cms' });
+      if (res.data?.imageUrl || res.data?.url) {
+        const uploadedUrl = res.data.imageUrl || res.data.url;
+        onUrlChange(uploadedUrl);
+        showToast('Successfully uploaded image!', 'success');
+      } else {
+        onUrlChange(compressedBase64);
+        showToast('Image compressed & loaded locally!', 'info');
       }
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      const compressedBase64 = await compressImage(file, 1200, 1200, 0.80);
+      onUrlChange(compressedBase64);
+      showToast('Image preview loaded locally', 'info');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (

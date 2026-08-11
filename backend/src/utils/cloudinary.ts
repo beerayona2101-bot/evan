@@ -34,7 +34,7 @@ export const uploadImageToCloudinary = async (
   try {
     configureCloudinary();
 
-    // If Cloudinary credentials are not configured yet, return fileData as fallback URL/base64
+    // If Cloudinary credentials are not configured or invalid, return fileData as fallback
     if (!isCloudinaryConfigured()) {
       console.log('[Cloudinary] Credentials not configured in .env. Returning base64/URL payload.');
       return { url: fileData, public_id: `local_${Date.now()}` };
@@ -42,8 +42,7 @@ export const uploadImageToCloudinary = async (
 
     const result = await cloudinary.uploader.upload(fileData, {
       folder,
-      resource_type: 'auto',
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      resource_type: 'image',
     });
 
     console.log(`[Cloudinary] Uploaded image successfully: ${result.secure_url}`);

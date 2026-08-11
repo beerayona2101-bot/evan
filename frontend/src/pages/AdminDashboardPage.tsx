@@ -16,6 +16,7 @@ import { userApi } from '../services/userApi';
 import { showToast } from '../components/ToastContainer';
 import { useSocket } from '../context/SocketContext';
 import { formatSareeName } from '../utils/sareeUtils';
+import { compressImage } from '../utils/imageCompressor';
 
 import { HomepageEditorPage } from './HomepageEditorPage';
 import { RevenueDashboardPage } from './RevenueDashboardPage';
@@ -2695,17 +2696,21 @@ export const AdminDashboardPage: React.FC = () => {
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                if (typeof reader.result === 'string') {
-                                  setFormData({ ...formData, image: reader.result });
-                                  showToast(`Local image "${file.name}" loaded successfully!`, 'success');
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              showToast(`Optimizing & uploading image "${file.name}"...`, 'info');
+                              try {
+                                const compressedBase64 = await compressImage(file, 1200, 1200, 0.82);
+                                const uploadRes = await api.post('/upload', { image: compressedBase64, folder: 'evan_products' });
+                                const finalUrl = uploadRes.data?.imageUrl || uploadRes.data?.url || compressedBase64;
+                                setFormData({ ...formData, image: finalUrl });
+                                showToast('Product image uploaded successfully!', 'success');
+                              } catch {
+                                const compressedBase64 = await compressImage(file, 1000, 1000, 0.78);
+                                setFormData({ ...formData, image: compressedBase64 });
+                                showToast('Image compressed & loaded locally!', 'info');
+                              }
                             }
                           }}
                         />
@@ -2823,17 +2828,21 @@ export const AdminDashboardPage: React.FC = () => {
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                if (typeof reader.result === 'string') {
-                                  setCardFormData({ ...cardFormData, image: reader.result });
-                                  showToast(`Local image "${file.name}" loaded for category card!`, 'success');
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              showToast(`Optimizing & uploading category image "${file.name}"...`, 'info');
+                              try {
+                                const compressedBase64 = await compressImage(file, 1200, 1200, 0.82);
+                                const uploadRes = await api.post('/upload', { image: compressedBase64, folder: 'evan_categories' });
+                                const finalUrl = uploadRes.data?.imageUrl || uploadRes.data?.url || compressedBase64;
+                                setCardFormData({ ...cardFormData, image: finalUrl });
+                                showToast('Category image uploaded successfully!', 'success');
+                              } catch {
+                                const compressedBase64 = await compressImage(file, 1000, 1000, 0.78);
+                                setCardFormData({ ...cardFormData, image: compressedBase64 });
+                                showToast('Image compressed & loaded locally!', 'info');
+                              }
                             }
                           }}
                         />
