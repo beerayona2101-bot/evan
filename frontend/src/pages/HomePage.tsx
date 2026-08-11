@@ -76,13 +76,16 @@ export const HomePage: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Autoplay hero saree carousel slides (Traditional, Fashion Wear, Party Collections)
+  // Autoplay hero saree carousel slides dynamically across all active slides
+  const heroSlidesCount = (cms?.heroSlides && cms.heroSlides.length > 0) ? cms.heroSlides.length : 3;
+
   useEffect(() => {
+    if (heroSlidesCount <= 1) return;
     const timer = setInterval(() => {
-      setCurrentHeroSlide((prev) => (prev + 1) % 3);
+      setCurrentHeroSlide((prev) => (prev + 1) % heroSlidesCount);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSlidesCount]);
 
   // Listen to real-time Socket.IO broadcasts
   useEffect(() => {
@@ -255,7 +258,7 @@ export const HomePage: React.FC = () => {
       primaryButtonLink: '/shop?category=Designer Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-      image: '/images/saree_palace_courtyard_trio.jpg',
+      image: '/images/saree_fashion_wear_hero_v3.png',
       displayOrder: 2,
     },
     {
@@ -268,7 +271,7 @@ export const HomePage: React.FC = () => {
       primaryButtonLink: '/shop?category=Organza Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
       secondaryButtonLink: '/shop',
-      image: '/images/saree_palace_courtyard_trio.jpg',
+      image: '/images/saree_party_wear_hero_v3.png',
       displayOrder: 3,
     },
   ];
@@ -353,11 +356,50 @@ export const HomePage: React.FC = () => {
             {/* Bottom Right Floating Collection Badge */}
             <Link
               to={activeSlide.secondaryButtonLink || '/shop'}
-              className="absolute bottom-5 right-5 sm:right-12 z-20 flex items-center gap-2 sm:gap-4 bg-[#09050b]/80 backdrop-blur-md px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-2xl hover:bg-[#09050b] hover:border-amber-400 transition-all group"
+              className="absolute bottom-5 right-5 sm:right-12 z-20 hidden md:flex items-center gap-2 sm:gap-4 bg-[#09050b]/80 backdrop-blur-md px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-2xl hover:bg-[#09050b] hover:border-amber-400 transition-all group"
             >
               <span>View Full Saree Collection</span>
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
             </Link>
+
+            {/* Interactive Left/Right Carousel Arrows & Slide Dots */}
+            {heroSlides.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-red-900 text-amber-300 border border-amber-400/40 backdrop-blur-md transition-all shadow-lg hover:scale-110"
+                  aria-label="Previous Hero Slide"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length)}
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-red-900 text-amber-300 border border-amber-400/40 backdrop-blur-md transition-all shadow-lg hover:scale-110"
+                  aria-label="Next Hero Slide"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                {/* Bottom Slide Navigation Dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-400/30">
+                  {heroSlides.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      type="button"
+                      onClick={() => setCurrentHeroSlide(dotIdx)}
+                      className={`h-2.5 rounded-full transition-all ${
+                        dotIdx === safeSlideIndex
+                          ? 'w-7 bg-amber-400 border border-amber-300 shadow'
+                          : 'w-2.5 bg-white/40 hover:bg-white/70'
+                      }`}
+                      aria-label={`Jump to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
 
           </div>
         </section>
