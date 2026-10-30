@@ -135,7 +135,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
         ...req.body,
         _id: isObjectId ? idOrSlug : undefined,
         slug: req.body.slug || slug,
-        sku: req.body.sku || `EVAN-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
+        sku: req.body.sku || `ANEERA-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
       });
       emitRealtimeEvent('productUpdated', newProduct);
       emitRealtimeEvent('inventoryUpdated', { productId: newProduct._id, stock: newProduct.stock });
@@ -201,7 +201,7 @@ export const addProductVariant = async (req: Request, res: Response): Promise<vo
     const newVariant: IVariant = {
       colorName: req.body.colorName || 'Royal Maroon',
       hexColor: req.body.hexColor || '#800000',
-      sku: req.body.sku || `EVAN-VAR-${Date.now().toString().slice(-4)}`,
+      sku: req.body.sku || `ANEERA-VAR-${Date.now().toString().slice(-4)}`,
       barcode: req.body.barcode || '',
       price: req.body.price || product.price,
       mrp: req.body.mrp || product.mrp,

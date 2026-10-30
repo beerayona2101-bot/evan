@@ -36,9 +36,9 @@ export const VerifyEmailPage: React.FC = () => {
       <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-amber-200 shadow-xl text-center space-y-6">
         <div className="flex justify-center pb-1">
           <img
-            src="/kanchanika_attire_logo.svg"
-            alt="Kanchanika Logo"
-            className="w-16 h-16 object-contain drop-shadow"
+            src="/aneera_silks_logo.jpg"
+            alt="Aneera Silks Logo"
+            className="w-16 h-16 rounded-2xl object-cover shadow-md border border-amber-300"
           />
         </div>
 
@@ -59,7 +59,7 @@ export const VerifyEmailPage: React.FC = () => {
               to="/login"
               className="inline-block px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow border border-amber-300"
             >
-              SIGN IN TO KANCHANIKA
+              SIGN IN TO ANEERA SILKS
             </Link>
           </div>
         ) : (

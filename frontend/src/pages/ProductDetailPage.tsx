@@ -368,8 +368,9 @@ export const ProductDetailPage: React.FC = () => {
               <img
                 src={selectedImage || activeGalleryImages[0]}
                 alt={product.name}
-                loading="lazy"
+                loading="eager"
                 decoding="async"
+                {...({ fetchpriority: 'high' } as any)}
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
               />
 

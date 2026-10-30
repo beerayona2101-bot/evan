@@ -4,6 +4,7 @@ import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon, Sparkles } from 
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { prefetchRoute } from '../utils/prefetch';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -34,7 +35,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-1.5 px-4 sm:px-8 shadow-sm">
-      {/* EVAN COLLECTIONS Seamless Header */}
+      {/* ANEERA SILKS Seamless Header */}
       <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
         {/* Mobile menu button */}
         <button
@@ -44,19 +45,19 @@ export const Navbar: React.FC = () => {
           {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
 
-        {/* Brand Logo: Kanchanika */}
+        {/* Brand Logo: Aneera Silks */}
         <Link to="/" className="flex items-center space-x-2.5">
           <img
-            src="/kanchanika_attire_logo.svg"
-            alt="Kanchanika Logo"
-            className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm hover:scale-105 transition-transform"
+            src="/aneera_silks_logo.jpg"
+            alt="Aneera Silks Logo"
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover shadow-sm border border-amber-400/50 hover:scale-105 transition-transform"
           />
           <div className="flex flex-col leading-none">
             <span className="font-street text-base sm:text-lg font-black tracking-wider text-slate-900 hover:text-red-700 transition-colors">
-              KANCHANIKA
+              ANEERA SILKS
             </span>
             <span className="text-[6.5px] uppercase tracking-[0.2em] font-extrabold text-amber-700">
-              LUXURY ATELIER
+              LUXURY SILK ATELIER
             </span>
           </div>
         </Link>
@@ -65,6 +66,8 @@ export const Navbar: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-6 text-[11px] font-black tracking-widest uppercase">
           <Link
             to="/"
+            onMouseEnter={() => prefetchRoute('home')}
+            onTouchStart={() => prefetchRoute('home')}
             className={`transition-all py-1 ${
               isActive('/')
                 ? 'text-red-700 font-black border-b-2 border-red-700'
@@ -75,6 +78,8 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             to="/about"
+            onMouseEnter={() => prefetchRoute('about')}
+            onTouchStart={() => prefetchRoute('about')}
             className={`transition-all py-1 ${
               isActive('/about')
                 ? 'text-red-700 font-black border-b-2 border-red-700'
@@ -85,6 +90,8 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             to="/shop"
+            onMouseEnter={() => prefetchRoute('shop')}
+            onTouchStart={() => prefetchRoute('shop')}
             className={`transition-all py-1 ${
               isActive('/shop')
                 ? 'text-red-700 font-black border-b-2 border-red-700'
@@ -95,6 +102,8 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             to="/contact"
+            onMouseEnter={() => prefetchRoute('contact')}
+            onTouchStart={() => prefetchRoute('contact')}
             className={`transition-all py-1 ${
               isActive('/contact')
                 ? 'text-red-700 font-black border-b-2 border-red-700'
@@ -121,6 +130,8 @@ export const Navbar: React.FC = () => {
           {user && (
             <Link
               to="/wishlist"
+              onMouseEnter={() => prefetchRoute('wishlist')}
+              onTouchStart={() => prefetchRoute('wishlist')}
               className={`p-1.5 transition-colors relative ${
                 isActive('/wishlist') ? 'text-red-700 font-black' : 'hover:text-red-700'
               }`}
@@ -139,6 +150,8 @@ export const Navbar: React.FC = () => {
           {user && (
             <Link
               to="/cart"
+              onMouseEnter={() => prefetchRoute('cart')}
+              onTouchStart={() => prefetchRoute('cart')}
               className={`p-1.5 transition-colors relative ${
                 isActive('/cart') ? 'text-red-700 font-black' : 'hover:text-red-700'
               }`}
@@ -176,6 +189,8 @@ export const Navbar: React.FC = () => {
             ) : (
               <Link
                 to="/login"
+                onMouseEnter={() => prefetchRoute('login')}
+                onTouchStart={() => prefetchRoute('login')}
                 className={`p-2 transition-colors flex items-center gap-1 font-extrabold text-xs ${
                   isActive('/login') || isActive('/register') ? 'text-red-700' : 'hover:text-red-700'
                 }`}

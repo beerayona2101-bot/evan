@@ -1,5 +1,7 @@
 import { Product } from '../models/Product';
 import { Category } from '../models/Category';
+import { Fabric } from '../models/Fabric';
+import { Occasion } from '../models/Occasion';
 import { User } from '../models/User';
 import { Coupon } from '../models/Coupon';
 
@@ -35,27 +37,33 @@ const getUniqueSareeImage = (index: number, variant: string = 'main'): string =>
 };
 
 const SAREE_CATEGORIES_20 = [
-  'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Cotton Sarees', 'Linen Sarees',
-  'Organza Sarees', 'Georgette Sarees', 'Chiffon Sarees', 'Crepe Sarees', 'Tussar Silk',
-  'Handloom Sarees', 'Designer Sarees', 'Wedding Sarees', 'Bridal Sarees', 'Party Wear Sarees',
-  'Casual Sarees', 'Printed Sarees', 'Festival Collection', 'Office Wear', 'Daily Wear'
+  'Kanchipuram Sarees',
+  'Banarasi Sarees',
+  'Paithani Sarees',
+  'Chanderi Sarees',
+  'Bandhani Sarees',
+  'Patola Sarees',
+  'Maheshwari Sarees',
+  'Kalamkari Sarees',
+  'Pochampally Sarees',
+  'Handcrafted Heritage Sarees',
+  'Designer Artisan Sarees',
+  'Royal Zari Brocade Sarees',
 ];
 
 const FABRICS_MAP: Record<string, string> = {
-  'Silk Sarees': 'Pure Mulberry Silk',
   'Kanchipuram Sarees': 'Pure Kanchipuram Silk',
   'Banarasi Sarees': 'Royal Banarasi Brocade Silk',
-  'Cotton Sarees': 'Mulmul Soft Organic Cotton',
-  'Linen Sarees': 'Pure Handloom Linen',
-  'Organza Sarees': 'Delicate Floral Organza',
-  'Georgette Sarees': 'Faux Silk Georgette',
-  'Chiffon Sarees': 'Pure Chiffon Zari',
-  'Tussar Silk': 'Pure Tussar Silk',
-  'Handloom Sarees': 'Artisanal Handloom Weave',
-  'Designer Sarees': 'High-Fashion Designer Silk',
-  'Wedding Sarees': 'Heavy Zari Wedding Brocade',
-  'Bridal Sarees': 'Royal Bridal Trousseau Silk',
-  'Party Wear Sarees': 'Shimmer Party Wear Silk',
+  'Paithani Sarees': 'Pure Handloom Silk',
+  'Chanderi Sarees': 'Pure Chiffon Zari',
+  'Bandhani Sarees': 'Pure Mulberry Silk',
+  'Patola Sarees': 'Pure Handloom Silk',
+  'Maheshwari Sarees': 'Pure Handloom Linen',
+  'Kalamkari Sarees': 'Organic Mulmul Cotton',
+  'Pochampally Sarees': 'Pure Handloom Silk',
+  'Handcrafted Heritage Sarees': 'Pure Tussar Silk',
+  'Designer Artisan Sarees': 'Delicate Floral Organza',
+  'Royal Zari Brocade Sarees': 'Royal Banarasi Brocade Silk',
 };
 
 export const seedDatabase = async (): Promise<void> => {
@@ -63,11 +71,11 @@ export const seedDatabase = async (): Promise<void> => {
     // Seed Admin & Customer Users if none exist
     const userCount = await User.countDocuments();
     if (userCount === 0) {
-      console.log('[Seed] Seeding initial Kanchanika users...');
+      console.log('[Seed] Seeding initial Aneera Silks users...');
       await User.create([
         {
-          name: 'Kanchanika Admin',
-          email: 'admin@kanchanika.com',
+          name: 'Aneera Silks Admin',
+          email: 'admin@aneerasilks.com',
           password: 'adminpassword123',
           role: 'admin',
           phone: '+91 9490644434',
@@ -104,7 +112,7 @@ export const seedDatabase = async (): Promise<void> => {
           isActive: true,
         },
         {
-          code: 'KANCHANIKA1000',
+          code: 'ANEERA1000',
           discountType: 'fixed',
           discountAmount: 1000,
           minPurchase: 7999,
@@ -112,6 +120,61 @@ export const seedDatabase = async (): Promise<void> => {
           isActive: true,
         },
       ]);
+    }
+
+    // Seed Pure Fabrics if none exist
+    const fabricCount = await Fabric.countDocuments();
+    if (fabricCount === 0) {
+      console.log('[Seed] Seeding 10 master Pure Fabrics...');
+      const INITIAL_FABRICS = [
+        'Pure Kanchipuram Silk',
+        'Pure Handloom Silk',
+        'Royal Banarasi Brocade Silk',
+        'Pure Tussar Silk',
+        'Pure Mulberry Silk',
+        'Pure Handloom Linen',
+        'Organic Mulmul Cotton',
+        'Delicate Floral Organza',
+        'Pure Chiffon Zari',
+        'Faux Silk Georgette',
+      ];
+      await Fabric.create(
+        INITIAL_FABRICS.map((name, i) => ({
+          name,
+          slug: name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+          description: `Exquisite handcrafted ${name.toLowerCase()} featuring traditional zari and pure thread weave.`,
+          image: getUniqueSareeImage(i + 1, 'fabric'),
+          status: 'ACTIVE',
+          featured: i < 6,
+          displayOrder: i + 1,
+          productCount: 4,
+          createdBy: 'Admin',
+        }))
+      );
+    }
+
+    // Seed Occasions if none exist
+    const occasionCount = await Occasion.countDocuments();
+    if (occasionCount === 0) {
+      console.log('[Seed] Seeding master Occasions...');
+      const INITIAL_OCCASIONS = [
+        'Bridal & Wedding',
+        'Festival & Evening',
+        'Party Wear',
+        'Office Wear',
+        'Daily Wear',
+      ];
+      await Occasion.create(
+        INITIAL_OCCASIONS.map((name, i) => ({
+          name,
+          slug: name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+          description: `Exclusive ${name.toLowerCase()} saree collection curated for special moments.`,
+          image: getUniqueSareeImage(i + 1, 'occasion'),
+          status: 'ACTIVE',
+          displayOrder: i + 1,
+          productCount: 4,
+        }))
+      );
     }
 
     // Seed 20 Core Saree Categories with Unique Images
@@ -127,7 +190,7 @@ export const seedDatabase = async (): Promise<void> => {
         isLive: true,
         featured: i < 6,
         displayOrder: i + 1,
-        seoTitle: `${name} | EVAN COLLECTIONS`,
+        seoTitle: `${name} | Aneera Silks`,
         seoDescription: `Handcrafted ${name.toLowerCase()} featuring pure zari borders and authentic artisan craftsmanship.`,
         createdBy: 'Master Admin',
       }))
@@ -182,7 +245,7 @@ export const seedDatabase = async (): Promise<void> => {
       for (let p = 1; p <= 4; p++) {
         const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
         const descriptor = LUXURY_DESCRIPTORS[(p - 1) % LUXURY_DESCRIPTORS.length];
-        const title = `${descriptor} ${cleanCatName} Saree by Kanchanika`;
+        const title = `${descriptor} ${cleanCatName} Saree by Aneera Silks`;
         const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
         const discountPrice = Math.round(basePrice * 0.84);
         const mrp = Math.round(basePrice * 1.28);
@@ -197,11 +260,11 @@ export const seedDatabase = async (): Promise<void> => {
         productsToCreate.push({
           name: title,
           slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-          brand: 'Kanchanika',
+          brand: 'Aneera Silks',
           categoryRef: catId,
           description: `Exquisite ${catName.toLowerCase()} handwoven by master artisans in India. Features rich zari brocade, unstitched contrast blouse piece, and lustrous silk drape.`,
           shortDescription: `Handcrafted ${catName.toLowerCase()} with pure zari border and rich woven pallu.`,
-          detailedDescription: `Kanchanika presents this heirloom-quality saree, meticulously crafted using traditional handloom weaving techniques. Comes with 5.5 meters of pure drape fabric and a matching 0.8 meter unstitched blouse piece.`,
+          detailedDescription: `Aneera Silks presents this heirloom-quality saree, meticulously crafted using traditional handloom weaving techniques. Comes with 5.5 meters of pure drape fabric and a matching 0.8 meter unstitched blouse piece.`,
           price: discountPrice,
           discountPrice,
           mrp,
@@ -216,14 +279,14 @@ export const seedDatabase = async (): Promise<void> => {
           weight: `${520 + (globalIdCounter % 280)} Grams`,
           countryOfOrigin: 'India',
           washCare: 'Dry Clean Only. Store wrapped in soft cotton fabric.',
-          sku: `KAN-SKU-${1000 + globalIdCounter}`,
+          sku: `ANEERA-SKU-${1000 + globalIdCounter}`,
           stock: 12 + (globalIdCounter % 38),
           images: gallery,
           hoverImage,
           galleryImages: gallery,
           rating: Number((4.6 + (globalIdCounter % 5) * 0.1).toFixed(1)),
           numReviews: 12 + (globalIdCounter * 4) % 90,
-          tags: [catName.toLowerCase(), 'saree', 'silk saree', 'bridal saree', 'banarasi', 'kanchipuram', 'kanchanika'],
+          tags: [catName.toLowerCase(), 'saree', 'silk saree', 'bridal saree', 'banarasi', 'kanchipuram', 'aneera silks', 'aneera'],
           isFeatured: globalIdCounter <= 25,
           trending: globalIdCounter % 3 === 0,
           bestSeller: globalIdCounter % 4 === 0,

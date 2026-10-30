@@ -88,7 +88,7 @@ describe('Product Catalog & Service', () => {
 
     const created = await productService.createProduct(newProductData);
     expect(created.slug).toBe('chanderi-zari-silk-saree');
-    expect(created.sku).toMatch(/^KANCHANIKA-SAREE-\d{6}$/);
+    expect(created.sku).toMatch(/^ANEERA-SAREE-\d{6}$/);
     expect(created.price).toBe(12500);
   });
 });

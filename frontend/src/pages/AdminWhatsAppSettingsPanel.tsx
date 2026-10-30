@@ -5,7 +5,7 @@ import { showToast } from '../components/ToastContainer';
 
 export const AdminWhatsAppSettingsPanel: React.FC = () => {
   const [whatsappNumber, setWhatsappNumber] = useState('919490644434');
-  const [whatsappGreeting, setWhatsappGreeting] = useState('Hello EVAN Collections, I would like to know more about your sarees.');
+  const [whatsappGreeting, setWhatsappGreeting] = useState('Hello Aneera Silks, I would like to know more about your sarees.');
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
   const [whatsappPosition, setWhatsappPosition] = useState<'bottom-left' | 'bottom-right'>('bottom-left');
   const [whatsappColor, setWhatsappColor] = useState('#25D366');
@@ -18,7 +18,7 @@ export const AdminWhatsAppSettingsPanel: React.FC = () => {
       .then((res: any) => {
         if (res.data) {
           setWhatsappNumber(res.data.whatsappNumber || '919490644434');
-          setWhatsappGreeting(res.data.whatsappGreeting || 'Hello EVAN Collections, I would like to know more about your sarees.');
+          setWhatsappGreeting(res.data.whatsappGreeting || 'Hello Aneera Silks, I would like to know more about your sarees.');
           setWhatsappEnabled(res.data.whatsappEnabled !== undefined ? res.data.whatsappEnabled : true);
           setWhatsappPosition(res.data.whatsappPosition || 'bottom-left');
           setWhatsappColor(res.data.whatsappColor || '#25D366');
@@ -96,7 +96,7 @@ export const AdminWhatsAppSettingsPanel: React.FC = () => {
               required
               value={whatsappGreeting}
               onChange={(e) => setWhatsappGreeting(e.target.value)}
-              placeholder="Hello EVAN Collections..."
+              placeholder="Hello Aneera Silks..."
               className="w-full p-3.5 bg-white border border-amber-300 rounded-xl font-medium text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-800"
             />
           </div>

@@ -490,7 +490,7 @@ export const CheckoutPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
           <div>
-            <span className="text-[10px] font-black tracking-[0.2em] text-red-700 uppercase block">EVAN COLLECTIONS CONCIERGE</span>
+            <span className="text-[10px] font-black tracking-[0.2em] text-red-700 uppercase block">ANEERA SILKS CONCIERGE</span>
             <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900">CHECKOUT & DELIVERY</h1>
           </div>
 

@@ -13,7 +13,7 @@ interface AIRecommendationsProps {
 const AI_RECOMMENDED_ITEMS = [
   {
     id: 'prod-saree-001',
-    name: 'Royal Crimson Banarasi Silk Saree by EVAN COLLECTIONS',
+    name: 'Royal Crimson Banarasi Silk Saree by Aneera Silks',
     price: 9999,
     matchScore: 98,
     reason: 'Perfect Color & Border Contrast',
@@ -22,7 +22,7 @@ const AI_RECOMMENDED_ITEMS = [
   },
   {
     id: 'prod-saree-002',
-    name: 'Mustard Gold Kanchipuram Silk Saree by EVAN COLLECTIONS',
+    name: 'Mustard Gold Kanchipuram Silk Saree by Aneera Silks',
     price: 14999,
     matchScore: 95,
     reason: 'Recommended Heirloom Weave',
@@ -31,7 +31,7 @@ const AI_RECOMMENDED_ITEMS = [
   },
   {
     id: 'prod-saree-003',
-    name: 'Pastel Floral Organza Designer Saree by EVAN COLLECTIONS',
+    name: 'Pastel Floral Organza Designer Saree by Aneera Silks',
     price: 6999,
     matchScore: 94,
     reason: 'Matching Party Wear Drape',

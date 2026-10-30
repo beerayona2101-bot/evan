@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { setupIdlePrefetch } from '../utils/prefetch';
 
 const scrollPositions = new Map<string, number>();
 
@@ -17,6 +18,11 @@ export const GlobalNavigationController: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Initialize idle prefetching once on mount
+  useEffect(() => {
+    setupIdlePrefetch();
+  }, []);
+
   // Save and Restore Scroll Positions
   useEffect(() => {
     const currentKey = location.key || `${location.pathname}${location.search}`;
@@ -24,13 +30,11 @@ export const GlobalNavigationController: React.FC = () => {
     if (isPopStateRef.current) {
       // Browser back/forward navigation - restore saved scroll position
       const savedY = scrollPositions.get(currentKey) || 0;
-      setTimeout(() => {
-        window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
-      }, 50);
+      window.scrollTo(0, savedY);
       isPopStateRef.current = false;
     } else {
-      // New navigation - scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // New navigation - instant crisp relocation to top
+      window.scrollTo(0, 0);
     }
 
     // Save scroll position on scroll

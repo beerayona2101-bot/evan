@@ -5,6 +5,9 @@ let mongoServer: MongoMemoryServer;
 
 jest.setTimeout(60000);
 
+process.env.MONGOMS_MD5_CHECK = 'false';
+process.env.MONGOMS_DISABLE_POSTINSTALL = '1';
+
 beforeAll(async () => {
   process.env.JWT_SECRET = 'test_secret_key_123456789_kanchanika';
   process.env.NODE_ENV = 'test';
@@ -14,6 +17,7 @@ beforeAll(async () => {
       checkMD5: false,
     },
   });
+
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
 }, 60000);

@@ -56,14 +56,14 @@ export const Footer: React.FC = () => {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center space-x-3">
             <img
-              src="/kanchanika_attire_logo.svg"
-              alt="Kanchanika Logo"
-              className="w-10 h-10 object-contain drop-shadow-md"
+              src="/aneera_silks_logo.jpg"
+              alt="Aneera Silks Logo"
+              className="w-10 h-10 rounded-xl object-cover shadow-md border border-amber-400/50"
             />
-            <span className="font-street text-3xl font-black text-white">KANCHANIKA</span>
+            <span className="font-street text-3xl font-black text-white">ANEERA SILKS</span>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed font-medium max-w-sm">
-            Kanchanika is India's premier luxury saree destination celebrating royal Banarasi brocades, heirloom Kanchipuram silks, delicate floral organzas, and handcrafted linen sarees.
+            Aneera Silks is India's premier luxury saree destination celebrating royal Banarasi brocades, heirloom Kanchipuram silks, delicate floral organzas, and handcrafted linen sarees.
           </p>
 
           {/* Luxury Contact Information Block */}
@@ -88,7 +88,7 @@ export const Footer: React.FC = () => {
               <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <div>
                 <span className="font-bold text-amber-300 block text-[10px] uppercase tracking-wider">Email Concierge</span>
-                <span className="text-slate-300">concierge@kanchanika.com</span>
+                <span className="text-slate-300">concierge@aneerasilks.com</span>
               </div>
             </div>
 
@@ -140,7 +140,7 @@ export const Footer: React.FC = () => {
 
       {/* Copyright */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-        <p>© 2026 EVAN COLLECTIONS. All Rights Reserved. Pure Handloom Craftsmanship.</p>
+        <p>© 2026 Aneera Silks. All Rights Reserved. Pure Handloom Craftsmanship.</p>
         <div className="flex items-center space-x-1 mt-4 sm:mt-0">
           <span>Crafted with</span>
           <Heart className="w-3.5 h-3.5 text-red-500 fill-current" />

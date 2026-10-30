@@ -86,7 +86,7 @@ export const RevenueDashboardPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `KANCHANIKA_${reportType}_Report_${Date.now()}.${format}`);
+      link.setAttribute('download', `ANEERA_SILKS_${reportType}_Report_${Date.now()}.${format}`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -104,7 +104,7 @@ export const RevenueDashboardPage: React.FC = () => {
         <div className="text-center space-y-4">
           <div className="w-12 h-12 rounded-full border-4 border-amber-400 border-t-red-800 animate-spin mx-auto"></div>
           <p className="text-xs font-black text-amber-900 uppercase tracking-widest font-street">
-            COMPUTING FINANCIAL AGGREGATIONS FROM MONGODB ATLAS...
+            COMPUTING FINANCIAL AGGREGATIONS...
           </p>
         </div>
       </div>

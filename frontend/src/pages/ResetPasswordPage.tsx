@@ -52,12 +52,12 @@ export const ResetPasswordPage: React.FC = () => {
         <div className="text-center space-y-2">
           <div className="flex justify-center pb-1">
             <img
-              src="/kanchanika_attire_logo.svg"
-              alt="Kanchanika Logo"
-              className="w-14 h-14 object-contain drop-shadow"
+              src="/aneera_silks_logo.jpg"
+              alt="Aneera Silks Logo"
+              className="w-14 h-14 rounded-2xl object-cover shadow-md border border-amber-300"
             />
           </div>
-          <span className="font-serif-luxury text-2xl font-extrabold tracking-wider text-slate-900 block">KANCHANIKA</span>
+          <span className="font-serif-luxury text-2xl font-extrabold tracking-wider text-slate-900 block">ANEERA SILKS</span>
           <h2 className="font-serif-luxury text-base font-bold text-amber-900 uppercase tracking-widest">RESET YOUR PASSWORD</h2>
           <p className="text-xs text-slate-500 font-medium">Enter your new secure password below.</p>
         </div>

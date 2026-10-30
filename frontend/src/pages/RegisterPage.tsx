@@ -35,7 +35,7 @@ export const RegisterPage: React.FC = () => {
 
     try {
       await register(fullName, email, password, phone);
-      showToast(`Welcome to Kanchanika, ${firstName}! A verification email has been dispatched.`, 'success');
+      showToast(`Welcome to Aneera Silks, ${firstName}! A verification email has been dispatched.`, 'success');
       navigate('/shop');
     } catch (err: any) {
       // Handled in context
@@ -48,14 +48,14 @@ export const RegisterPage: React.FC = () => {
         <div className="text-center space-y-2">
           <div className="flex justify-center pb-1">
             <img
-              src="/kanchanika_attire_logo.svg"
-              alt="Kanchanika Logo"
-              className="w-14 h-14 object-contain drop-shadow"
+              src="/aneera_silks_logo.jpg"
+              alt="Aneera Silks Logo"
+              className="w-16 h-16 rounded-2xl object-cover shadow-md border border-amber-300"
             />
           </div>
-          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">KANCHANIKA</span>
+          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">ANEERA SILKS</span>
           <h2 className="font-serif-luxury text-base font-bold text-amber-900 uppercase tracking-widest">CREATE AN ACCOUNT</h2>
-          <p className="text-xs text-slate-500 font-medium">Join Kanchanika to unlock luxury handloom previews, order tracking, and VIP perks.</p>
+          <p className="text-xs text-slate-500 font-medium">Join Aneera Silks to unlock luxury handloom previews, order tracking, and VIP perks.</p>
         </div>
 
         {(error || localError) && (
@@ -167,7 +167,7 @@ export const RegisterPage: React.FC = () => {
             disabled={loading}
             className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300"
           >
-            {loading ? 'CREATING ACCOUNT...' : 'REGISTER KANCHANIKA ACCOUNT'}
+            {loading ? 'CREATING ACCOUNT...' : 'REGISTER ANEERA SILKS ACCOUNT'}
           </button>
         </form>
 

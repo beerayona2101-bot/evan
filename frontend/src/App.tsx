@@ -33,13 +33,13 @@ const AccountPage = lazy(() => import('./pages/AccountPage').then(m => ({ defaul
 
 // Luxury Gold Atelier Fallback Loader
 const PageLoader: React.FC = () => (
-  <div className="min-h-[70vh] bg-[#09090B] flex flex-col items-center justify-center space-y-4">
-    <div className="relative w-14 h-14">
-      <div className="absolute inset-0 rounded-full border-2 border-amber-500/20 animate-ping"></div>
-      <div className="w-14 h-14 rounded-full border-2 border-t-amber-400 border-r-amber-500 border-b-amber-600 border-l-transparent animate-spin"></div>
+  <div className="min-h-[70vh] bg-[#FFFDF9] flex flex-col items-center justify-center space-y-4">
+    <div className="relative w-12 h-12">
+      <div className="absolute inset-0 rounded-full border-2 border-amber-400/20 animate-ping"></div>
+      <div className="w-12 h-12 rounded-full border-2 border-t-red-800 border-r-amber-500 border-b-red-900 border-l-transparent animate-spin"></div>
     </div>
-    <span className="text-amber-400 text-xs font-black tracking-[0.25em] uppercase font-street animate-pulse">
-      EVAN COLLECTIONS
+    <span className="text-red-900 text-xs font-black tracking-[0.25em] uppercase font-street animate-pulse">
+      ANEERA SILKS
     </span>
   </div>
 );
@@ -50,7 +50,7 @@ const AppContent: React.FC = () => {
   const hideFooter = isAdminRoute || location.pathname.startsWith('/shop');
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#09090B] selection:bg-amber-400 selection:text-black">
+    <div className="flex flex-col min-h-screen bg-[#FFFDF9] selection:bg-amber-300 selection:text-red-950">
       <GlobalNavigationController />
       {!isAdminRoute && <Navbar />}
       <main className={`flex-grow ${!isAdminRoute ? 'pt-[46px]' : ''}`}>

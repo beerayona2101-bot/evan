@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import {
   Plus, Edit2, Trash2, Shield, Package, ShoppingBag, Users, DollarSign, Sparkles, Check, X, Menu, Search,
   LayoutDashboard, Tag, ArrowLeft, Bot, Image as ImageIcon, BarChart3, MessageSquare, AlertTriangle,
-  FileText, Download, Star, CheckCircle, Clock, Truck, Copy, Archive, Printer, Lock, UserCheck, ExternalLink, RotateCcw, RefreshCw, Eye
+  FileText, Download, Star, CheckCircle, Clock, Truck, Copy, Archive, Printer, Lock, UserCheck, ExternalLink, RotateCcw, RefreshCw, Eye, ChevronDown
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Product, ProductVariant, Order, Category } from '../types';
+import { Product, ProductVariant, Order, Category, Fabric, Occasion, Collection } from '../types';
 import { api } from '../services/api';
 import { productApi } from '../services/productApi';
 import { orderApi } from '../services/orderApi';
 import { categoryApi } from '../services/categoryApi';
+import { fabricApi } from '../services/fabricApi';
+import { occasionApi } from '../services/occasionApi';
+import { collectionApi } from '../services/collectionApi';
 import { couponApi } from '../services/couponApi';
 import { reviewApi } from '../services/reviewApi';
 import { userApi } from '../services/userApi';
@@ -46,6 +49,9 @@ export const AdminDashboardPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [fabrics, setFabrics] = useState<Fabric[]>([]);
+  const [occasions, setOccasions] = useState<Occasion[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [coupons, setCoupons] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
@@ -124,6 +130,11 @@ export const AdminDashboardPage: React.FC = () => {
     category: 'Kanchipuram Sarees',
     collection: 'Bridal Heirloom Collection',
     fabric: 'Pure Kanchipuram Silk',
+    primaryFabricId: '',
+    secondaryFabricIds: [] as string[],
+    categoryIds: [] as string[],
+    occasionIds: [] as string[],
+    collectionId: '',
     weight: '0.85 kg',
     gstRate: '5%',
     blousePiece: 'Includes Unstitched Blouse (0.8m)',
@@ -270,7 +281,8 @@ export const AdminDashboardPage: React.FC = () => {
   // Coupon Form State
   const [couponData, setCouponData] = useState({ code: '', discountType: 'percentage', discountAmount: '15', minPurchase: '2000' });
 
-  // Database Category Management State
+  // Database Category, Fabric, Occasion Master Management State
+  const [catMasterSubTab, setCatMasterSubTab] = useState<'CATEGORIES' | 'FABRICS' | 'OCCASIONS'>('CATEGORIES');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryStatusFilter, setCategoryStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE' | 'ARCHIVED'>('ALL');
   const [categorySortBy, setCategorySortBy] = useState<'displayOrder' | 'name' | 'newest' | 'products'>('displayOrder');
@@ -279,6 +291,27 @@ export const AdminDashboardPage: React.FC = () => {
     open: false,
     category: null,
     productCount: 0,
+  });
+
+  // Fabric Modal State
+  const [showFabricModal, setShowFabricModal] = useState(false);
+  const [editingFabric, setEditingFabric] = useState<Fabric | null>(null);
+  const [fabricForm, setFabricForm] = useState({
+    name: '',
+    description: '',
+    image: '/images/saree_kanchipuram_gold.png',
+    status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE' | 'ARCHIVED',
+    featured: false,
+  });
+
+  // Occasion Modal State
+  const [showOccasionModal, setShowOccasionModal] = useState(false);
+  const [editingOccasion, setEditingOccasion] = useState<Occasion | null>(null);
+  const [occasionForm, setOccasionForm] = useState({
+    name: '',
+    description: '',
+    image: '/images/saree_banarasi_red.png',
+    status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE' | 'ARCHIVED',
   });
 
   const [dbCatForm, setDbCatForm] = useState({
@@ -418,6 +451,120 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  // Fabric Handlers
+  const handleOpenAddFabricModal = () => {
+    setEditingFabric(null);
+    setFabricForm({
+      name: '',
+      description: '',
+      image: '/images/saree_kanchipuram_gold.png',
+      status: 'ACTIVE',
+      featured: false,
+    });
+    setShowFabricModal(true);
+  };
+
+  const handleOpenEditFabricModal = (fab: Fabric) => {
+    setEditingFabric(fab);
+    setFabricForm({
+      name: fab.name || '',
+      description: fab.description || '',
+      image: fab.image || '/images/saree_kanchipuram_gold.png',
+      status: fab.status || 'ACTIVE',
+      featured: fab.featured || false,
+    });
+    setShowFabricModal(true);
+  };
+
+  const handleSaveFabric = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fabricForm.name.trim()) {
+      showToast('Please enter fabric name', 'error');
+      return;
+    }
+    try {
+      if (editingFabric) {
+        const updated = await fabricApi.updateFabric(editingFabric._id, fabricForm);
+        setFabrics((prev) => prev.map((f) => (f._id === updated._id ? updated : f)));
+        showToast(`Fabric "${updated.name}" updated!`, 'success');
+      } else {
+        const created = await fabricApi.createFabric(fabricForm);
+        setFabrics((prev) => [created, ...prev]);
+        showToast(`Fabric "${created.name}" created!`, 'success');
+      }
+      setShowFabricModal(false);
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Error saving fabric', 'error');
+    }
+  };
+
+  const handleDeleteFabric = async (fab: Fabric) => {
+    if (!window.confirm(`Archive fabric "${fab.name}"?`)) return;
+    try {
+      await fabricApi.deleteFabric(fab._id);
+      setFabrics((prev) => prev.filter((f) => f._id !== fab._id));
+      showToast(`Fabric "${fab.name}" archived!`, 'info');
+    } catch {
+      showToast('Error deleting fabric', 'error');
+    }
+  };
+
+  // Occasion Handlers
+  const handleOpenAddOccasionModal = () => {
+    setEditingOccasion(null);
+    setOccasionForm({
+      name: '',
+      description: '',
+      image: '/images/saree_banarasi_red.png',
+      status: 'ACTIVE',
+    });
+    setShowOccasionModal(true);
+  };
+
+  const handleOpenEditOccasionModal = (occ: Occasion) => {
+    setEditingOccasion(occ);
+    setOccasionForm({
+      name: occ.name || '',
+      description: occ.description || '',
+      image: occ.image || '/images/saree_banarasi_red.png',
+      status: occ.status || 'ACTIVE',
+    });
+    setShowOccasionModal(true);
+  };
+
+  const handleSaveOccasion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!occasionForm.name.trim()) {
+      showToast('Please enter occasion name', 'error');
+      return;
+    }
+    try {
+      if (editingOccasion) {
+        const updated = await occasionApi.updateOccasion(editingOccasion._id, occasionForm);
+        setOccasions((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
+        showToast(`Occasion "${updated.name}" updated!`, 'success');
+      } else {
+        const created = await occasionApi.createOccasion(occasionForm);
+        setOccasions((prev) => [created, ...prev]);
+        showToast(`Occasion "${created.name}" created!`, 'success');
+      }
+      setShowOccasionModal(false);
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Error saving occasion', 'error');
+    }
+  };
+
+  const handleDeleteOccasion = async (occ: Occasion) => {
+    if (!window.confirm(`Archive occasion "${occ.name}"?`)) return;
+    try {
+      await occasionApi.deleteOccasion(occ._id);
+      setOccasions((prev) => prev.filter((o) => o._id !== occ._id));
+      showToast(`Occasion "${occ.name}" archived!`, 'info');
+    } catch {
+      showToast('Error deleting occasion', 'error');
+    }
+  };
+
   // AI Generator State
   const [aiInputs, setAiInputs] = useState({
     category: 'Banarasi Sarees',
@@ -431,14 +578,19 @@ export const AdminDashboardPage: React.FC = () => {
   const [adminSearch, setAdminSearch] = useState('');
   // Order Status Filter inside Customer Orders Pipeline
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('ALL');
+  const [isMobileStatusOpen, setIsMobileStatusOpen] = useState(false);
+  const [isMobilePeriodOpen, setIsMobilePeriodOpen] = useState(false);
 
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [prodRes, orderRes, catRes, coupRes, userRes, inqRes] = await Promise.all([
+      const [prodRes, orderRes, catRes, fabRes, occRes, colRes, coupRes, userRes, inqRes] = await Promise.all([
         productApi.getProducts().catch(() => []),
         orderApi.getAllOrders().catch(() => []),
         categoryApi.getCategories().catch(() => []),
+        fabricApi.getFabrics().catch(() => []),
+        occasionApi.getOccasions().catch(() => []),
+        collectionApi.getCollections().catch(() => []),
         couponApi.getCoupons().catch(() => []),
         userApi.getAllUsers().catch(() => []),
         api.get('/inquiries').then((r) => r.data).catch(() => []),
@@ -446,6 +598,9 @@ export const AdminDashboardPage: React.FC = () => {
       setProducts(prodRes);
       setOrders(orderRes);
       setCategories(catRes);
+      setFabrics(fabRes);
+      setOccasions(occRes);
+      setCollections(colRes);
       setCoupons(coupRes);
       setCustomers(userRes);
       setInquiries(inqRes || []);
@@ -514,6 +669,9 @@ export const AdminDashboardPage: React.FC = () => {
     socket.on('productUpdated', handleProductUpdated);
     socket.on('inventoryUpdated', handleInventoryUpdated);
     socket.on('productDeleted', fetchAdminData);
+    socket.on('categoryCreated', fetchAdminData);
+    socket.on('categoryUpdated', fetchAdminData);
+    socket.on('categoryDeleted', fetchAdminData);
 
     return () => {
       socket.off('orderCreated', handleNewOrder);
@@ -523,6 +681,9 @@ export const AdminDashboardPage: React.FC = () => {
       socket.off('productUpdated', handleProductUpdated);
       socket.off('inventoryUpdated', handleInventoryUpdated);
       socket.off('productDeleted', fetchAdminData);
+      socket.off('categoryCreated', fetchAdminData);
+      socket.off('categoryUpdated', fetchAdminData);
+      socket.off('categoryDeleted', fetchAdminData);
     };
   }, [socket]);
 
@@ -539,6 +700,11 @@ export const AdminDashboardPage: React.FC = () => {
       category: 'Kanchipuram Sarees',
       collection: 'Bridal Heirloom Collection',
       fabric: 'Pure Kanchipuram Silk',
+      primaryFabricId: '',
+      secondaryFabricIds: [],
+      categoryIds: [],
+      occasionIds: [],
+      collectionId: '',
       weight: '0.85 kg',
       gstRate: '5%',
       blousePiece: 'Includes Unstitched Blouse (0.8m)',
@@ -606,6 +772,11 @@ export const AdminDashboardPage: React.FC = () => {
       category: prod.category,
       collection: 'Bridal Heirloom Collection',
       fabric: prod.fabric || 'Pure Kanchipuram Silk',
+      primaryFabricId: prod.primaryFabricId ? String(prod.primaryFabricId) : '',
+      secondaryFabricIds: prod.secondaryFabricIds ? prod.secondaryFabricIds.map(String) : [],
+      categoryIds: prod.categoryIds ? prod.categoryIds.map(String) : [],
+      occasionIds: prod.occasionIds ? prod.occasionIds.map(String) : [],
+      collectionId: prod.collectionId ? String(prod.collectionId) : '',
       weight: '0.85 kg',
       gstRate: '5%',
       blousePiece: prod.blousePiece || 'Includes Unstitched Blouse (0.8m)',
@@ -798,9 +969,9 @@ export const AdminDashboardPage: React.FC = () => {
         <body>
           <div class="header">
             <div>
-              <div class="brand">EVAN COLLECTIONS</div>
+              <div class="brand">ANEERA SILKS</div>
               <div>Luxury Handcrafted Silk Atelier</div>
-              <div>GSTIN: 33EVANSERP7891Z5</div>
+              <div>GSTIN: 33ANEERASILK7891Z5</div>
             </div>
             <div style="text-align: right;">
               <h2>TAX INVOICE</h2>
@@ -862,7 +1033,7 @@ export const AdminDashboardPage: React.FC = () => {
           </style>
         </head>
         <body>
-          <div class="h">EVAN COLLECTIONS DISPATCH</div>
+          <div class="h">ANEERA SILKS DISPATCH</div>
           <div class="b">
             <strong>DELIVER TO:</strong><br />
             Name: ${(order as any).user?.name || 'Customer'}<br />
@@ -978,7 +1149,7 @@ export const AdminDashboardPage: React.FC = () => {
     const col = aiInputs.color || 'Royal Crimson Red';
     const occ = aiInputs.occasion || 'Bridal & Wedding';
 
-    const generatedTitle = `EVAN COLLECTIONS ${col} ${cat} Vol.${Math.floor(100 + Math.random() * 900)}`;
+    const generatedTitle = `Aneera Silks ${col} ${cat} Vol.${Math.floor(100 + Math.random() * 900)}`;
     const generatedDesc = `Exquisite ${col.toLowerCase()} handwoven ${cat.toLowerCase()} by master artisans in India. Features rich zari brocade, unstitched contrast blouse piece, and lustrous silk drape. Certified pure silk mark.`;
     const price = 15999 + Math.floor(Math.random() * 9000);
     const discountPrice = Math.round(price * 0.85);
@@ -1045,7 +1216,7 @@ export const AdminDashboardPage: React.FC = () => {
         images: aiGeneratedResult.images || [aiGeneratedResult.image || '/images/saree_banarasi_red.png'],
       });
       setProducts([created, ...products]);
-      showToast('Full AI Saree Product Card Published Live to MongoDB!', 'success');
+      showToast('Full AI Saree Product Card Published Live!', 'success');
       setAiGeneratedResult(null);
     } catch {
       showToast('Failed to publish AI Saree', 'error');
@@ -1108,6 +1279,40 @@ export const AdminDashboardPage: React.FC = () => {
       return (a.displayOrder || 0) - (b.displayOrder || 0);
     });
 
+  const filteredFabrics = fabrics
+    .filter((fab) => {
+      const matchesStatus =
+        categoryStatusFilter === 'ALL' || fab.status === categoryStatusFilter;
+      const matchesSearch =
+        fab.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
+        fab.slug.toLowerCase().includes(categorySearch.toLowerCase()) ||
+        (fab.description && fab.description.toLowerCase().includes(categorySearch.toLowerCase()));
+      return matchesStatus && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (categorySortBy === 'name') return a.name.localeCompare(b.name);
+      if (categorySortBy === 'newest') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      if (categorySortBy === 'products') return (b.productCount || 0) - (a.productCount || 0);
+      return (a.displayOrder || 0) - (b.displayOrder || 0);
+    });
+
+  const filteredOccasions = occasions
+    .filter((occ) => {
+      const matchesStatus =
+        categoryStatusFilter === 'ALL' || occ.status === categoryStatusFilter;
+      const matchesSearch =
+        occ.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
+        occ.slug.toLowerCase().includes(categorySearch.toLowerCase()) ||
+        (occ.description && occ.description.toLowerCase().includes(categorySearch.toLowerCase()));
+      return matchesStatus && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (categorySortBy === 'name') return a.name.localeCompare(b.name);
+      if (categorySortBy === 'newest') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      if (categorySortBy === 'products') return (b.productCount || 0) - (a.productCount || 0);
+      return (a.displayOrder || 0) - (b.displayOrder || 0);
+    });
+
   return (
     <div className="h-screen w-screen bg-[#FFFDF9] text-slate-900 flex flex-col font-sans overflow-hidden relative">
       {/* Mobile Top Navigation Bar */}
@@ -1124,16 +1329,16 @@ export const AdminDashboardPage: React.FC = () => {
           {isAdminSidebarOpen ? <X className="w-5 h-5 text-red-700" /> : <Menu className="w-5 h-5 text-red-700" />}
         </button>
 
-        {/* Center: Kanchanika Logo & Brand Name */}
+        {/* Center: Aneera Silks Logo & Brand Name */}
         <div className="flex items-center space-x-2">
           <img
-            src="/kanchanika_attire_logo.svg"
-            alt="Kanchanika Logo"
-            className="w-7 h-7 object-contain drop-shadow-sm"
+            src="/aneera_silks_logo.jpg"
+            alt="Aneera Silks Logo"
+            className="w-7 h-7 rounded-lg object-cover shadow-xs border border-amber-400/50"
           />
           <div className="flex flex-col leading-none text-center">
             <span className="font-street text-base font-black tracking-wider text-slate-900">
-              KANCHANIKA
+              ANEERA SILKS
             </span>
             <span className="text-[7px] uppercase tracking-[0.2em] font-extrabold text-amber-800">
               ADMIN DASHBOARD
@@ -1176,12 +1381,12 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between pt-2">
             <Link to="/" className="flex items-center space-x-2.5" onClick={() => setIsAdminSidebarOpen(false)}>
               <img
-                src="/kanchanika_attire_logo.svg"
-                alt="Kanchanika Logo"
-                className="w-9 h-9 object-contain drop-shadow-sm"
+                src="/aneera_silks_logo.jpg"
+                alt="Aneera Silks Logo"
+                className="w-9 h-9 rounded-xl object-cover shadow-sm border border-amber-400/50"
               />
               <div className="flex flex-col leading-none">
-                <span className="font-street text-xl font-black tracking-wider text-slate-900">KANCHANIKA</span>
+                <span className="font-street text-xl font-black tracking-wider text-slate-900">ANEERA SILKS</span>
                 <span className="text-[7.5px] uppercase tracking-[0.25em] font-extrabold text-amber-800">ADMIN ATELIER</span>
               </div>
             </Link>
@@ -1195,6 +1400,7 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
 
           <nav className="space-y-1 text-xs font-extrabold uppercase tracking-wider max-h-[75vh] overflow-y-auto no-scrollbar pr-1">
+            {/* 1. Analytics & Reports */}
             <button
               onClick={() => { setActiveTab('analytics'); setIsAdminSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
@@ -1203,62 +1409,7 @@ export const AdminDashboardPage: React.FC = () => {
               <BarChart3 className="w-4 h-4 text-amber-700" /> Analytics & Reports
             </button>
 
-            <button
-              onClick={() => { setActiveTab('products'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'products' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <Package className="w-4 h-4 text-amber-700" /> Saree Inventory
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('orders'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-amber-700" /> Orders ({orders.length})
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('categories'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'categories' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <Tag className="w-4 h-4 text-amber-700" /> Categories & Weaves
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('inquiries'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inquiries' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <MessageSquare className="w-4 h-4 text-amber-700" /> Inquiries & Alerts ({inquiries.length})
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('inventory'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inventory' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <AlertTriangle className="w-4 h-4 text-amber-700" /> Stock & Warehouse
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('customers'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'customers' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <Users className="w-4 h-4 text-amber-700" /> Customer CRM
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('coupons'); setIsAdminSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'coupons' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
-                }`}
-            >
-              <Sparkles className="w-4 h-4 text-amber-700" /> Coupons & Offers
-            </button>
-
+            {/* 2. Earnings & Taxes */}
             <button
               onClick={() => { setActiveTab('financials'); setIsAdminSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'financials' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
@@ -1267,6 +1418,61 @@ export const AdminDashboardPage: React.FC = () => {
               <DollarSign className="w-4 h-4 text-amber-700" /> Earnings & Taxes
             </button>
 
+            {/* 3. Orders */}
+            <button
+              onClick={() => { setActiveTab('orders'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <ShoppingBag className="w-4 h-4 text-amber-700" /> Orders ({orders.length})
+            </button>
+
+            {/* 4. Customer CRM */}
+            <button
+              onClick={() => { setActiveTab('customers'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'customers' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Users className="w-4 h-4 text-amber-700" /> Customer CRM
+            </button>
+
+            {/* 5. Inquiries & Alerts */}
+            <button
+              onClick={() => { setActiveTab('inquiries'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inquiries' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <MessageSquare className="w-4 h-4 text-amber-700" /> Inquiries & Alerts ({inquiries.length})
+            </button>
+
+            {/* 6. Categories & Weaves */}
+            <button
+              onClick={() => { setActiveTab('categories'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'categories' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Tag className="w-4 h-4 text-amber-700" /> Categories & Master Weaves
+            </button>
+
+            {/* 8. Stock & Warehouse */}
+            <button
+              onClick={() => { setActiveTab('inventory'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'inventory' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <AlertTriangle className="w-4 h-4 text-amber-700" /> Stock & Warehouse
+            </button>
+
+            {/* 9. Coupons & Offers */}
+            <button
+              onClick={() => { setActiveTab('coupons'); setIsAdminSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'coupons' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
+                }`}
+            >
+              <Sparkles className="w-4 h-4 text-amber-700" /> Coupons & Offers
+            </button>
+
+            {/* 10. Homepage Editor */}
             <button
               onClick={() => { setActiveTab('homepage-editor'); setIsAdminSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'homepage-editor' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
@@ -1275,6 +1481,7 @@ export const AdminDashboardPage: React.FC = () => {
               <LayoutDashboard className="w-4 h-4 text-amber-700" /> Homepage Editor
             </button>
 
+            {/* 11. Settings & Contact */}
             <button
               onClick={() => { setActiveTab('settings'); setIsAdminSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-amber-100 text-amber-950 shadow-sm border border-amber-300 font-black' : 'text-slate-700 hover:bg-amber-100/60 hover:text-red-900'
@@ -1383,7 +1590,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-amber-100 pb-4">
                   <div>
                     <span className="text-xs font-black uppercase tracking-widest text-amber-800">
-                      EVAN COLLECTIONS
+                      ANEERA SILKS
                     </span>
                     <h3 className="font-street text-3xl font-black text-slate-900 mt-1">
                       SAREE WEAVE CATEGORIES
@@ -1483,7 +1690,6 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              /* VIEW 2: DEDICATED RELOCATED CATEGORY ITEMS PAGE */
               <div className="bg-white rounded-3xl border border-amber-200 shadow-md overflow-hidden space-y-4">
                 <div className="p-6 border-b border-amber-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-amber-50/60">
                   <div className="flex items-center gap-3">
@@ -1499,7 +1705,10 @@ export const AdminDashboardPage: React.FC = () => {
                         RELOCATED CATEGORY INVENTORY PAGE
                       </span>
                       <h3 className="font-street text-2xl font-black text-slate-900 uppercase">
-                        {selectedAdminCategory} ({filteredProducts.length} ITEMS)
+                        {selectedAdminCategory} ({products.filter((p) => {
+                          const target = (selectedAdminCategory || '').toLowerCase();
+                          return (p.category || '').toLowerCase().includes(target) || (p.fabric || '').toLowerCase().includes(target) || ((p as any).occasion || '').toLowerCase().includes(target) || p.name.toLowerCase().includes(target);
+                        }).length} ITEMS)
                       </h3>
                     </div>
                   </div>
@@ -1550,7 +1759,10 @@ export const AdminDashboardPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-amber-100">
-                      {filteredProducts.map((prod) => (
+                      {products.filter((p) => {
+                        const target = (selectedAdminCategory || '').toLowerCase();
+                        return (p.category || '').toLowerCase().includes(target) || (p.fabric || '').toLowerCase().includes(target) || ((p as any).occasion || '').toLowerCase().includes(target) || p.name.toLowerCase().includes(target);
+                      }).map((prod) => (
                         <tr key={prod._id} className="hover:bg-amber-50/60 transition-colors">
                           <td className="p-4 flex items-center gap-3">
                             <img
@@ -1696,8 +1908,211 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Single-Line Interactive Status Filter Buttons Bar */}
-              <div className="p-2 sm:p-2.5 bg-amber-50/60 border-b border-amber-200 flex items-center justify-between gap-1 sm:gap-1.5 w-full overflow-x-auto custom-scrollbar whitespace-nowrap">
+              {/* 📱 Mobile Responsive Filter Bar: 2 Dropdowns side-by-side in the same line */}
+              <div className="p-3 bg-amber-100/50 border-b border-amber-200 block sm:hidden relative">
+                <div className="grid grid-cols-2 gap-2 w-full max-w-full">
+                  {/* Dropdown 1: Order Status Filter */}
+                  <div className="relative min-w-0">
+                    <label className="block text-[9px] font-black text-amber-900 uppercase tracking-wider mb-0.5">
+                      ORDER STATUS:
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileStatusOpen(!isMobileStatusOpen);
+                        setIsMobilePeriodOpen(false);
+                      }}
+                      className="w-full px-2 py-1.5 bg-white border border-amber-300 rounded-xl font-bold text-slate-900 text-[11px] shadow-sm flex items-center justify-between gap-1 uppercase truncate hover:bg-amber-50"
+                    >
+                      <span className="truncate">
+                        {
+                          [
+                            { key: 'ALL', label: 'ALL ORDERS' },
+                            { key: 'Pending', label: 'PENDING' },
+                            { key: 'Confirmed', label: 'CONFIRMED' },
+                            { key: 'Processing', label: 'PROCESSING' },
+                            { key: 'Packed', label: 'PACKED' },
+                            { key: 'Shipped', label: 'SHIPPED' },
+                            { key: 'Out For Delivery', label: 'OUT FOR DELIVERY' },
+                            { key: 'Delivered', label: 'DELIVERED' },
+                            { key: 'Cancelled', label: 'CANCELLED' },
+                          ].find((o) => o.key.toLowerCase() === orderStatusFilter.toLowerCase())?.label || orderStatusFilter
+                        } ({getOrderStatusCount(orderStatusFilter)})
+                      </span>
+                      <ChevronDown className={`w-3.5 h-3.5 text-amber-800 transition-transform flex-shrink-0 ${isMobileStatusOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* Dropdown 2: Time Period Filter */}
+                  <div className="relative min-w-0">
+                    <label className="block text-[9px] font-black text-amber-900 uppercase tracking-wider mb-0.5">
+                      TIME PERIOD:
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobilePeriodOpen(!isMobilePeriodOpen);
+                        setIsMobileStatusOpen(false);
+                      }}
+                      className="w-full px-2 py-1.5 bg-white border border-amber-300 rounded-xl font-bold text-slate-900 text-[11px] shadow-sm flex items-center justify-between gap-1 uppercase truncate hover:bg-amber-50"
+                    >
+                      <span className="truncate">
+                        {
+                          [
+                            { key: 'all', label: 'ALL TIME' },
+                            { key: 'today', label: 'TODAY' },
+                            { key: '7days', label: 'LAST 7 DAYS' },
+                            { key: '30days', label: 'LAST 30 DAYS' },
+                            { key: 'this_month', label: 'THIS MONTH' },
+                            { key: 'last_month', label: 'LAST MONTH' },
+                            { key: 'this_year', label: 'THIS YEAR' },
+                            { key: 'custom', label: 'CUSTOM DATE' },
+                          ].find((p) => p.key === orderPeriodFilter)?.label || 'ALL TIME'
+                        }
+                      </span>
+                      <ChevronDown className={`w-3.5 h-3.5 text-amber-800 transition-transform flex-shrink-0 ${isMobilePeriodOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Popover Menu for Status (Bounded 100% inside container card width) */}
+                {isMobileStatusOpen && (
+                  <div className="mt-2 bg-white border-2 border-amber-400 rounded-2xl shadow-2xl overflow-hidden p-1.5 space-y-1 w-full max-w-full animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="text-[9px] font-black text-amber-800 uppercase px-2 py-1 border-b border-amber-100 flex items-center justify-between bg-amber-50/60">
+                      <span>Select Order Status</span>
+                      <button onClick={() => setIsMobileStatusOpen(false)} className="text-slate-500 font-extrabold hover:text-slate-800 px-1">✕</button>
+                    </div>
+                    <div className="max-h-56 overflow-y-auto space-y-0.5 custom-scrollbar">
+                      {[
+                        { key: 'ALL', label: '📦 ALL ORDERS' },
+                        { key: 'Pending', label: '⏳ PENDING' },
+                        { key: 'Confirmed', label: '✅ CONFIRMED' },
+                        { key: 'Processing', label: '⚙️ PROCESSING' },
+                        { key: 'Packed', label: '📦 PACKED' },
+                        { key: 'Shipped', label: '🚚 SHIPPED' },
+                        { key: 'Out For Delivery', label: '🛵 OUT FOR DELIVERY' },
+                        { key: 'Delivered', label: '🎉 DELIVERED' },
+                        { key: 'Cancelled', label: '❌ CANCELLED' },
+                      ].map((st) => {
+                        const count = getOrderStatusCount(st.key);
+                        const isSelected = orderStatusFilter.toLowerCase() === st.key.toLowerCase();
+                        return (
+                          <button
+                            key={st.key}
+                            type="button"
+                            onClick={() => {
+                              setOrderStatusFilter(st.key);
+                              setIsMobileStatusOpen(false);
+                            }}
+                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-colors ${
+                              isSelected
+                                ? 'bg-red-800 text-amber-300 font-black shadow-sm'
+                                : 'text-slate-800 hover:bg-amber-100'
+                            }`}
+                          >
+                            <span className="truncate">{st.label}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black flex-shrink-0 ${isSelected ? 'bg-amber-300 text-red-950' : 'bg-amber-100 text-slate-900'}`}>
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Popover Menu for Time Period (Bounded 100% inside container card width) */}
+                {isMobilePeriodOpen && (
+                  <div className="mt-2 bg-white border-2 border-amber-400 rounded-2xl shadow-2xl overflow-hidden p-1.5 space-y-1 w-full max-w-full animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="text-[9px] font-black text-amber-800 uppercase px-2 py-1 border-b border-amber-100 flex items-center justify-between bg-amber-50/60">
+                      <span>Select Time Period</span>
+                      <button onClick={() => setIsMobilePeriodOpen(false)} className="text-slate-500 font-extrabold hover:text-slate-800 px-1">✕</button>
+                    </div>
+                    <div className="max-h-56 overflow-y-auto space-y-0.5 custom-scrollbar">
+                      {[
+                        { key: 'all', label: '🗓️ ALL TIME ORDERS' },
+                        { key: 'today', label: '⚡ TODAY' },
+                        { key: '7days', label: '📅 LAST 7 DAYS' },
+                        { key: '30days', label: '📆 LAST 30 DAYS' },
+                        { key: 'this_month', label: '📊 THIS MONTH' },
+                        { key: 'last_month', label: '📜 LAST MONTH' },
+                        { key: 'this_year', label: '🏆 THIS YEAR' },
+                        { key: 'custom', label: '🔍 CHOOSE SPECIFIC DATE (CALENDAR)' },
+                      ].map((p) => {
+                        const isSelected = orderPeriodFilter === p.key;
+                        return (
+                          <button
+                            key={p.key}
+                            type="button"
+                            onClick={() => {
+                              setOrderPeriodFilter(p.key);
+                              if (p.key !== 'custom') setOrderCustomDate('');
+                              setIsMobilePeriodOpen(false);
+                            }}
+                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-colors ${
+                              isSelected
+                                ? 'bg-red-800 text-amber-300 font-black shadow-sm'
+                                : 'text-slate-800 hover:bg-amber-100'
+                            }`}
+                          >
+                            <span className="truncate">{p.label}</span>
+                            {isSelected && <span className="text-amber-300 text-xs font-black">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Calendar Date Picker Input on Mobile if Custom selected */}
+                {(orderPeriodFilter === 'custom' || orderCustomDate) && (
+                  <div className="mt-2.5 flex items-center justify-between gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-400 shadow-sm">
+                    <span className="text-[10px] font-black text-amber-800 uppercase">PICK DATE:</span>
+                    <input
+                      type="date"
+                      value={orderCustomDate}
+                      onChange={(e) => {
+                        setOrderCustomDate(e.target.value);
+                        setOrderPeriodFilter('custom');
+                      }}
+                      className="bg-transparent font-mono text-xs font-bold text-slate-900 focus:outline-none cursor-pointer"
+                    />
+                    {orderCustomDate && (
+                      <button
+                        onClick={() => {
+                          setOrderCustomDate('');
+                          setOrderPeriodFilter('all');
+                        }}
+                        className="px-2 py-0.5 bg-red-100 text-red-800 rounded-md text-[9px] font-black uppercase hover:bg-red-200 border border-red-300"
+                      >
+                        ✕ Clear
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Mobile Filter Summary & Reset */}
+                <div className="flex items-center justify-between gap-2 mt-2.5 pt-2 border-t border-amber-200/60 text-[11px]">
+                  <span className="font-bold text-slate-700">
+                    Showing <strong className="text-red-800 font-black font-mono text-xs">{filteredOrders.length}</strong> of {orders.length} Orders
+                  </span>
+                  {(orderPeriodFilter !== 'all' || orderStatusFilter !== 'ALL' || orderCustomDate) && (
+                    <button
+                      onClick={() => {
+                        setOrderStatusFilter('ALL');
+                        setOrderPeriodFilter('all');
+                        setOrderCustomDate('');
+                      }}
+                      className="px-2 py-0.5 bg-red-800 text-amber-300 rounded-md text-[9.5px] font-black uppercase hover:bg-red-900 border border-amber-300 shadow-sm"
+                    >
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Single-Line Interactive Status Filter Buttons Bar (Desktop Only) */}
+              <div className="hidden sm:flex p-2 sm:p-2.5 bg-amber-50/60 border-b border-amber-200 items-center justify-between gap-1 sm:gap-1.5 w-full overflow-x-auto custom-scrollbar whitespace-nowrap">
                 {[
                   { key: 'ALL', label: 'ALL ORDERS' },
                   { key: 'Pending', label: 'PENDING' },
@@ -1730,8 +2145,8 @@ export const AdminDashboardPage: React.FC = () => {
                 })}
               </div>
 
-              {/* 📅 Date & Time Period Filter Bar (Day, Month, Year, Calendar Date Picker) */}
-              <div className="p-4 bg-amber-100/50 border-b border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              {/* 📅 Date & Time Period Filter Bar (Desktop Only) */}
+              <div className="hidden sm:flex p-4 bg-amber-100/50 border-b border-amber-200 flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1.5 font-black text-amber-900 uppercase tracking-wider text-[11px]">
                     <Clock className="w-4 h-4 text-red-800" />
@@ -1938,30 +2353,99 @@ export const AdminDashboardPage: React.FC = () => {
           );
         })()}
 
-        {/* TAB 4: Categories & Weaves (Database-Driven Enterprise CRUD) */}
+        {/* TAB 4: Categories & Weaves (3 Master Cards System) */}
         {activeTab === 'categories' && (
           <div className="bg-white rounded-3xl border border-amber-200 shadow-md p-6 space-y-6">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-amber-100 pb-4">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">
-                  ENTERPRISE MONGODB SYSTEM
+                  ENTERPRISE CATALOG SYSTEM
                 </span>
                 <h3 className="font-street text-3xl font-black text-slate-900 mt-0.5">
-                  CATEGORIES & WEAVES MANAGEMENT
+                  CATEGORIES & MASTER WEAVES MANAGEMENT
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold">
-                  {filteredDbCategories.length} categories loaded from database • Syncs real-time with WebSockets
+                  Manage Categories, Pure Fabrics, and Occasions (Live updates on User Dashboard)
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <button
-                  onClick={handleOpenAddDbCategoryModal}
-                  className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300 flex items-center gap-1.5 whitespace-nowrap"
-                >
-                  <Plus className="w-4 h-4" /> Add Category
-                </button>
+                {catMasterSubTab === 'CATEGORIES' && (
+                  <button
+                    onClick={handleOpenAddDbCategoryModal}
+                    className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4" /> Add Category
+                  </button>
+                )}
+                {catMasterSubTab === 'FABRICS' && (
+                  <button
+                    onClick={handleOpenAddFabricModal}
+                    className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4" /> Add Pure Fabric
+                  </button>
+                )}
+                {catMasterSubTab === 'OCCASIONS' && (
+                  <button
+                    onClick={handleOpenAddOccasionModal}
+                    className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4" /> Add Occasion
+                  </button>
+                )}
               </div>
+            </div>
+
+            {/* 3 USER-FILTER MASTER CARDS (SUB-TABS) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button
+                onClick={() => setCatMasterSubTab('FABRICS')}
+                className={`p-4 rounded-2xl border transition-all text-left flex items-center justify-between shadow-xs ${
+                  catMasterSubTab === 'FABRICS'
+                    ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300'
+                    : 'bg-amber-50/40 border-amber-200 hover:bg-amber-100/50'
+                }`}
+              >
+                <div>
+                  <span className="text-[10px] font-black uppercase text-amber-800 block">CARD 1</span>
+                  <h4 className="font-street text-xl font-black text-slate-900">BY FABRIC</h4>
+                  <span className="text-xs text-slate-600 font-bold">{fabrics.length} Pure Fabrics</span>
+                </div>
+                <Package className="w-6 h-6 text-red-800" />
+              </button>
+
+              <button
+                onClick={() => setCatMasterSubTab('CATEGORIES')}
+                className={`p-4 rounded-2xl border transition-all text-left flex items-center justify-between shadow-xs ${
+                  catMasterSubTab === 'CATEGORIES'
+                    ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300'
+                    : 'bg-amber-50/40 border-amber-200 hover:bg-amber-100/50'
+                }`}
+              >
+                <div>
+                  <span className="text-[10px] font-black uppercase text-amber-800 block">CARD 2</span>
+                  <h4 className="font-street text-xl font-black text-slate-900">BY CATEGORY</h4>
+                  <span className="text-xs text-slate-600 font-bold">{categories.length} Categories</span>
+                </div>
+                <Tag className="w-6 h-6 text-red-800" />
+              </button>
+
+              <button
+                onClick={() => setCatMasterSubTab('OCCASIONS')}
+                className={`p-4 rounded-2xl border transition-all text-left flex items-center justify-between shadow-xs ${
+                  catMasterSubTab === 'OCCASIONS'
+                    ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300'
+                    : 'bg-amber-50/40 border-amber-200 hover:bg-amber-100/50'
+                }`}
+              >
+                <div>
+                  <span className="text-[10px] font-black uppercase text-amber-800 block">CARD 3</span>
+                  <h4 className="font-street text-xl font-black text-slate-900">BY OCCASION</h4>
+                  <span className="text-xs text-slate-600 font-bold">{occasions.length} Occasions</span>
+                </div>
+                <Sparkles className="w-6 h-6 text-red-800" />
+              </button>
             </div>
 
             {/* Filter & Search Bar */}
@@ -1970,7 +2454,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-700" />
                 <input
                   type="text"
-                  placeholder="Search category name, slug, description..."
+                  placeholder={`Search ${catMasterSubTab.toLowerCase()} name, slug, description...`}
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 bg-white border border-amber-300 rounded-xl text-xs focus:outline-none"
@@ -2002,10 +2486,9 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* MongoDB Category Cards Grid */}
-            {/* Full-Width Database Category Cards (One by One in Rows) */}
+            {/* Master Cards List View */}
             <div className="flex flex-col gap-4 w-full">
-              {filteredDbCategories.map((cat) => (
+              {catMasterSubTab === 'CATEGORIES' && filteredDbCategories.map((cat) => (
                 <div
                   key={cat._id}
                   className={`relative w-full rounded-3xl p-5 sm:p-6 border transition-all duration-300 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-sm hover:shadow-lg ${
@@ -2016,107 +2499,210 @@ export const AdminDashboardPage: React.FC = () => {
                         : 'bg-slate-100/60 border-slate-300'
                   }`}
                 >
-                  {/* Left Section: Name, Order Index, Description & Metadata */}
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3">
                       <h4 className="font-street text-xl sm:text-2xl font-black text-slate-900 uppercase">
                         {cat.name}
                       </h4>
                       <span className="text-[10px] font-bold font-mono text-slate-500 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
-                        Order #{cat.displayOrder || 0}
+                        Category Card
                       </span>
                     </div>
 
                     <p className="text-xs text-slate-600 font-medium max-w-3xl">
-                      {cat.description || 'Authentic handcrafted saree collection.'}
+                      {cat.description || 'Authentic handcrafted saree category.'}
                     </p>
-
-                    <div className="flex flex-wrap items-center gap-4 text-[10px] text-slate-500 font-semibold pt-1">
-                      <span>Created By: <strong className="text-slate-800">{cat.createdBy || 'Admin'}</strong></span>
-                      <span>• Last Updated: <strong className="text-slate-800">{new Date(cat.updatedAt || Date.now()).toLocaleDateString()}</strong></span>
-                    </div>
                   </div>
 
-                  {/* Right Section: Badges Toolbar & Action Buttons */}
-                  <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center gap-3 flex-shrink-0">
-                    
-                    {/* Status & Live & Starred Badges Toolbar */}
-                    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-amber-50/80 rounded-2xl border border-amber-200">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm border ${
-                          cat.status === 'ACTIVE'
-                            ? 'bg-amber-100 text-amber-950 border-amber-300'
-                            : 'bg-red-100 text-red-950 border-red-300'
-                        }`}
-                      >
-                        {cat.status}
-                      </span>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300">
+                      {cat.productCount || 0} SAREES
+                    </span>
 
-                      <button
-                        onClick={() => handleToggleDbCategoryLive(cat)}
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm transition-all border ${
-                          cat.isLive
-                            ? 'bg-red-100 text-red-950 hover:bg-red-200 border-red-300'
-                            : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200 font-bold'
-                        }`}
-                        title="Click to toggle Live/Offline"
-                      >
-                        {cat.isLive ? '● LIVE' : '○ OFFLINE'}
-                      </button>
+                    <button
+                      onClick={() => handleOpenEditDbCategoryModal(cat)}
+                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center gap-1 border border-amber-300 shadow-sm"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-red-800" /> Edit
+                    </button>
 
-                      <button
-                        onClick={() => handleToggleDbCategoryFeatured(cat)}
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase shadow-sm transition-all border ${
-                          cat.featured
-                            ? 'bg-amber-100 text-amber-950 hover:bg-amber-200 border-amber-300 font-black'
-                            : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200 font-bold'
-                        }`}
-                        title="Click to toggle Starred Category"
-                      >
-                        {cat.featured ? '★ STARRED' : '☆ STAR'}
-                      </button>
+                    <button
+                      onClick={() => handleDeleteDbCategory(cat)}
+                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-sm"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </button>
 
-                      <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300">
-                        {cat.productCount || 0} SAREES
+                    <button
+                      onClick={() => {
+                        setSelectedAdminCategory(cat.name);
+                        setActiveTab('products');
+                      }}
+                      className="p-2.5 bg-amber-100/70 hover:bg-amber-200 text-slate-900 rounded-xl border border-amber-300 shadow-sm"
+                      title="View Category Items in Inventory"
+                    >
+                      <ExternalLink className="w-4 h-4 text-red-800" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {catMasterSubTab === 'CATEGORIES' && filteredDbCategories.length === 0 && (
+                <div className="p-12 text-center bg-amber-50/30 rounded-3xl border border-dashed border-amber-300 space-y-3">
+                  <Tag className="w-10 h-10 text-amber-700 mx-auto opacity-60" />
+                  <p className="text-sm font-black text-slate-800 uppercase">No Categories Found</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">No categories match your search or filter criteria.</p>
+                  <button
+                    onClick={handleOpenAddDbCategoryModal}
+                    className="px-4 py-2 bg-red-800 text-amber-300 text-xs font-black uppercase rounded-xl border border-amber-300 shadow-sm"
+                  >
+                    + Add New Category
+                  </button>
+                </div>
+              )}
+
+              {catMasterSubTab === 'FABRICS' && filteredFabrics.length === 0 && (
+                <div className="p-12 text-center bg-amber-50/30 rounded-3xl border border-dashed border-amber-300 space-y-3">
+                  <Package className="w-10 h-10 text-amber-700 mx-auto opacity-60" />
+                  <p className="text-sm font-black text-slate-800 uppercase">No Pure Fabrics Found</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">No fabrics match your search or filter criteria.</p>
+                  <button
+                    onClick={handleOpenAddFabricModal}
+                    className="px-4 py-2 bg-red-800 text-amber-300 text-xs font-black uppercase rounded-xl border border-amber-300 shadow-sm"
+                  >
+                    + Add Pure Fabric
+                  </button>
+                </div>
+              )}
+
+              {catMasterSubTab === 'FABRICS' && filteredFabrics.map((fab) => (
+                <div
+                  key={fab._id}
+                  className={`relative w-full rounded-3xl p-5 sm:p-6 border transition-all duration-300 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-sm hover:shadow-lg ${
+                    fab.status === 'ARCHIVED'
+                      ? 'bg-red-50/40 border-red-200'
+                      : fab.status === 'ACTIVE'
+                        ? 'bg-white border-amber-200/90 hover:border-amber-400'
+                        : 'bg-slate-100/60 border-slate-300'
+                  }`}
+                >
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-street text-xl sm:text-2xl font-black text-slate-900 uppercase">
+                        {fab.name}
+                      </h4>
+                      <span className="text-[10px] font-bold font-mono text-slate-500 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+                        Pure Fabric Card
                       </span>
                     </div>
 
-                    {/* Action Buttons: Edit, Delete, View */}
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                      <button
-                        onClick={() => handleOpenEditDbCategoryModal(cat)}
-                        className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center gap-1 border border-amber-300 transition-all shadow-sm"
-                      >
-                        <Edit2 className="w-3.5 h-3.5 text-red-800" /> Edit
-                      </button>
+                    <p className="text-xs text-slate-600 font-medium max-w-3xl">
+                      {fab.description || 'Authentic pure saree fabric material.'}
+                    </p>
+                  </div>
 
-                      {cat.status === 'ARCHIVED' ? (
-                        <button
-                          onClick={() => handleRestoreDbCategory(cat._id)}
-                          className="px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-extrabold text-xs rounded-xl flex items-center gap-1 transition-all shadow-sm"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" /> Restore
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleDeleteDbCategory(cat)}
-                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center gap-1 transition-all shadow-sm"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" /> Delete
-                        </button>
-                      )}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300">
+                      {fab.productCount || 0} SAREES
+                    </span>
 
-                      <button
-                        onClick={() => {
-                          setSelectedAdminCategory(cat.name);
-                          setActiveTab('products');
-                        }}
-                        className="p-2.5 bg-amber-100/70 hover:bg-amber-200 text-slate-900 rounded-xl transition-all border border-amber-300 shadow-sm"
-                        title="View Category Items in Inventory"
-                      >
-                        <ExternalLink className="w-4 h-4 text-red-800" />
-                      </button>
+                    <button
+                      onClick={() => handleOpenEditFabricModal(fab)}
+                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center gap-1 border border-amber-300 shadow-sm"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-red-800" /> Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteFabric(fab)}
+                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-sm"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedAdminCategory(fab.name);
+                        setActiveTab('products');
+                      }}
+                      className="p-2.5 bg-amber-100/70 hover:bg-amber-200 text-slate-900 rounded-xl border border-amber-300 shadow-sm"
+                      title="View Pure Fabric Items in Inventory"
+                    >
+                      <ExternalLink className="w-4 h-4 text-red-800" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {catMasterSubTab === 'OCCASIONS' && filteredOccasions.length === 0 && (
+                <div className="p-12 text-center bg-amber-50/30 rounded-3xl border border-dashed border-amber-300 space-y-3">
+                  <Sparkles className="w-10 h-10 text-amber-700 mx-auto opacity-60" />
+                  <p className="text-sm font-black text-slate-800 uppercase">No Occasions Found</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">No occasions match your search or filter criteria.</p>
+                  <button
+                    onClick={handleOpenAddOccasionModal}
+                    className="px-4 py-2 bg-red-800 text-amber-300 text-xs font-black uppercase rounded-xl border border-amber-300 shadow-sm"
+                  >
+                    + Add Occasion
+                  </button>
+                </div>
+              )}
+
+              {catMasterSubTab === 'OCCASIONS' && filteredOccasions.map((occ) => (
+                <div
+                  key={occ._id}
+                  className={`relative w-full rounded-3xl p-5 sm:p-6 border transition-all duration-300 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-sm hover:shadow-lg ${
+                    occ.status === 'ARCHIVED'
+                      ? 'bg-red-50/40 border-red-200'
+                      : occ.status === 'ACTIVE'
+                        ? 'bg-white border-amber-200/90 hover:border-amber-400'
+                        : 'bg-slate-100/60 border-slate-300'
+                  }`}
+                >
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-street text-xl sm:text-2xl font-black text-slate-900 uppercase">
+                        {occ.name}
+                      </h4>
+                      <span className="text-[10px] font-bold font-mono text-slate-500 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+                        Occasion Card
+                      </span>
                     </div>
+
+                    <p className="text-xs text-slate-600 font-medium max-w-3xl">
+                      {occ.description || 'Special occasion saree collection.'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm border border-amber-300">
+                      {occ.productCount || 0} SAREES
+                    </span>
+
+                    <button
+                      onClick={() => handleOpenEditOccasionModal(occ)}
+                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-slate-900 font-extrabold text-xs rounded-xl flex items-center gap-1 border border-amber-300 shadow-sm"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-red-800" /> Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteOccasion(occ)}
+                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-sm"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedAdminCategory(occ.name);
+                        setActiveTab('products');
+                      }}
+                      className="p-2.5 bg-amber-100/70 hover:bg-amber-200 text-slate-900 rounded-xl border border-amber-300 shadow-sm"
+                      title="View Occasion Items in Inventory"
+                    >
+                      <ExternalLink className="w-4 h-4 text-red-800" />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -2129,7 +2715,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <div className="flex justify-between items-center border-b border-amber-100 pb-4">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">
-                        MONGODB CATEGORY RECORD
+                        CATEGORY RECORD
                       </span>
                       <h3 className="font-street text-2xl font-black text-slate-900 uppercase">
                         {editingCategory ? 'EDIT CATEGORY' : 'ADD NEW CATEGORY'}
@@ -2225,16 +2811,6 @@ export const AdminDashboardPage: React.FC = () => {
                           />
                           <span>Live Visibility</span>
                         </label>
-
-                        <label className="flex items-center gap-2 cursor-pointer font-bold">
-                          <input
-                            type="checkbox"
-                            checked={dbCatForm.featured}
-                            onChange={(e) => setDbCatForm({ ...dbCatForm, featured: e.target.checked })}
-                            className="w-4 h-4 rounded text-red-800"
-                          />
-                          <span>Featured Badge</span>
-                        </label>
                       </div>
                     </div>
 
@@ -2250,7 +2826,7 @@ export const AdminDashboardPage: React.FC = () => {
                         type="submit"
                         className="px-6 py-3 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-xl shadow-md border border-amber-300"
                       >
-                        SAVE CATEGORY TO MONGODB
+                        SAVE CATEGORY
                       </button>
                     </div>
                   </form>
@@ -2258,7 +2834,187 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             )}
 
-            {/* Product Safety Warning Modal */}
+            {/* Fabric Modal (Create / Edit) */}
+            {showFabricModal && (
+              <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div className="bg-white p-6 sm:p-8 rounded-3xl border border-amber-300 shadow-2xl max-w-xl w-full space-y-6 my-8 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex justify-between items-center border-b border-amber-100 pb-4">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">
+                        PURE FABRIC RECORD
+                      </span>
+                      <h3 className="font-street text-2xl font-black text-slate-900 uppercase">
+                        {editingFabric ? 'EDIT PURE FABRIC' : 'ADD NEW PURE FABRIC'}
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setShowFabricModal(false)}
+                      className="p-2 text-slate-400 hover:text-slate-900 rounded-xl hover:bg-amber-50"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveFabric} className="space-y-4 text-xs font-semibold">
+                    <div>
+                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                        Fabric Material Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={fabricForm.name}
+                        onChange={(e) => setFabricForm({ ...fabricForm, name: e.target.value })}
+                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
+                        placeholder="e.g. Pure Kanchipuram Silk"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                        Fabric Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={fabricForm.description}
+                        onChange={(e) => setFabricForm({ ...fabricForm, description: e.target.value })}
+                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
+                        placeholder="Exquisite handloom fabric weave craftsmanship details..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                          Status
+                        </label>
+                        <select
+                          value={fabricForm.status}
+                          onChange={(e: any) => setFabricForm({ ...fabricForm, status: e.target.value })}
+                          className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold uppercase"
+                        >
+                          <option value="ACTIVE font-bold">Active</option>
+                          <option value="INACTIVE">Inactive</option>
+                          <option value="ARCHIVED">Archived</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col justify-center space-y-2 pt-2">
+                        <label className="flex items-center gap-2 cursor-pointer font-bold">
+                          <input
+                            type="checkbox"
+                            checked={fabricForm.featured}
+                            onChange={(e) => setFabricForm({ ...fabricForm, featured: e.target.checked })}
+                            className="w-4 h-4 rounded text-red-800"
+                          />
+                          <span>Featured Fabric</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowFabricModal(false)}
+                        className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-slate-900 font-black uppercase text-xs rounded-xl"
+                      >
+                        CANCEL
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-xl shadow-md border border-amber-300"
+                      >
+                        SAVE FABRIC
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Occasion Modal (Create / Edit) */}
+            {showOccasionModal && (
+              <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div className="bg-white p-6 sm:p-8 rounded-3xl border border-amber-300 shadow-2xl max-w-xl w-full space-y-6 my-8 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex justify-between items-center border-b border-amber-100 pb-4">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">
+                        OCCASION RECORD
+                      </span>
+                      <h3 className="font-street text-2xl font-black text-slate-900 uppercase">
+                        {editingOccasion ? 'EDIT OCCASION' : 'ADD NEW OCCASION'}
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setShowOccasionModal(false)}
+                      className="p-2 text-slate-400 hover:text-slate-900 rounded-xl hover:bg-amber-50"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveOccasion} className="space-y-4 text-xs font-semibold">
+                    <div>
+                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                        Occasion Title *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={occasionForm.name}
+                        onChange={(e) => setOccasionForm({ ...occasionForm, name: e.target.value })}
+                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
+                        placeholder="e.g. Bridal & Wedding"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                        Occasion Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={occasionForm.description}
+                        onChange={(e) => setOccasionForm({ ...occasionForm, description: e.target.value })}
+                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-medium"
+                        placeholder="Traditional wedding or festive celebration details..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold uppercase text-[10px] mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={occasionForm.status}
+                        onChange={(e: any) => setOccasionForm({ ...occasionForm, status: e.target.value })}
+                        className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold uppercase"
+                      >
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="ARCHIVED">Archived</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowOccasionModal(false)}
+                        className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-slate-900 font-black uppercase text-xs rounded-xl"
+                      >
+                        CANCEL
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-red-800 hover:bg-red-900 text-amber-300 font-black uppercase text-xs tracking-widest rounded-xl shadow-md border border-amber-300"
+                      >
+                        SAVE OCCASION
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
             {categorySafetyWarning.open && categorySafetyWarning.category && (
               <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
                 <div className="bg-white p-6 sm:p-8 rounded-3xl border border-red-300 shadow-2xl max-w-md w-full space-y-4 animate-in fade-in zoom-in-95 duration-200">
@@ -2439,13 +3195,22 @@ export const AdminDashboardPage: React.FC = () => {
                   onChange={(e) => setAiInputs({ ...aiInputs, category: e.target.value })}
                   className="w-full p-3 bg-amber-50/50 border border-amber-300 rounded-xl font-bold"
                 >
-                  <option value="Banarasi Sarees">Banarasi Sarees</option>
-                  <option value="Kanchipuram Sarees">Kanchipuram Sarees</option>
-                  <option value="Organza Sarees">Organza Sarees</option>
-                  <option value="Linen Sarees">Linen Sarees</option>
-                  <option value="Paithani Sarees">Paithani Sarees</option>
-                  <option value="Silk Sarees">Silk Sarees</option>
-                  <option value="Partywear Sarees">Partywear Sarees</option>
+                  {(categories.length > 0 ? categories.map((c) => c.name) : [
+                    'Kanchipuram Sarees',
+                    'Banarasi Sarees',
+                    'Paithani Sarees',
+                    'Chanderi Sarees',
+                    'Bandhani Sarees',
+                    'Patola Sarees',
+                    'Maheshwari Sarees',
+                    'Kalamkari Sarees',
+                    'Pochampally Sarees',
+                    'Handcrafted Heritage Sarees',
+                    'Designer Artisan Sarees',
+                    'Royal Zari Brocade Sarees',
+                  ]).map((cat: string) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
 
@@ -2652,7 +3417,7 @@ export const AdminDashboardPage: React.FC = () => {
                   onClick={handlePublishAiProduct}
                   className="w-full py-4 bg-slate-900 hover:bg-red-800 text-amber-300 font-black uppercase text-xs tracking-wider rounded-2xl shadow-xl border border-amber-300 transition-all flex items-center justify-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" /> ✨ PUBLISH FULL AI SAREE PRODUCT CARD TO MONGODB
+                  <Sparkles className="w-4 h-4 text-amber-400" /> ✨ PUBLISH FULL AI SAREE PRODUCT CARD
                 </button>
               </div>
             )}
@@ -2756,7 +3521,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
                 <div>
                   <span className="text-[9px] font-black uppercase tracking-widest text-amber-400 block">
-                    EVAN COLLECTIONS • SAREE EDITOR ATELIER
+                    ANEERA SILKS • SAREE EDITOR ATELIER
                   </span>
                   <h2 className="font-street text-xl sm:text-2xl font-black tracking-tight text-white uppercase leading-none">
                     {editingProduct ? 'EDIT SAREE PRODUCT' : 'ADD NEW LUXURY SAREE'}
@@ -2803,11 +3568,11 @@ export const AdminDashboardPage: React.FC = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full p-3.5 bg-amber-50/40 border border-amber-300 rounded-xl font-bold text-sm text-slate-900 focus:outline-none focus:border-red-800"
-                      placeholder="e.g. EVAN COLLECTIONS Royal Crimson Banarasi Silk Saree"
+                      placeholder="e.g. Aneera Silks Royal Crimson Banarasi Silk Saree"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-slate-800 font-black uppercase text-[11px] mb-1.5">Saree Category *</label>
                       <select
@@ -2815,39 +3580,62 @@ export const AdminDashboardPage: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         className="w-full p-3.5 bg-amber-50/40 border border-amber-300 rounded-xl font-black text-xs text-slate-900 focus:outline-none focus:border-red-800 cursor-pointer"
                       >
-                        {[
+                        {(categories.length > 0 ? categories.map(c => c.name) : [
                           'Kanchipuram Sarees',
                           'Banarasi Sarees',
-                          'Organza Sarees',
                           'Paithani Sarees',
-                          'Linen Sarees',
-                          'Silk Sarees',
-                          'Cotton Sarees',
-                          'Handloom Sarees',
+                          'Chanderi Sarees',
                           'Bandhani Sarees',
-                          'Designer Sarees',
-                          'Printed Sarees',
-                          'Crepe Sarees',
-                          'Georgette Sarees',
-                          'Chiffon Sarees',
-                          'Tussar Silk Sarees',
-                          'Embroidery Sarees',
-                          'Zari Brocade Sarees',
-                        ].map((cat: string) => (
+                          'Patola Sarees',
+                          'Maheshwari Sarees',
+                          'Kalamkari Sarees',
+                          'Pochampally Sarees',
+                          'Handcrafted Heritage Sarees',
+                          'Designer Artisan Sarees',
+                          'Royal Zari Brocade Sarees',
+                        ]).map((cat: string) => (
                           <option key={cat} value={cat}>{cat}</option>
                         ))}
                       </select>
                     </div>
+
                     <div>
-                      <label className="block text-slate-800 font-black uppercase text-[11px] mb-1.5">Fabric & Weave Material *</label>
+                      <label className="block text-slate-800 font-black uppercase text-[11px] mb-1.5">Pure Fabric *</label>
                       <input
                         type="text"
                         required
+                        list="saree-fabric-list"
                         value={formData.fabric}
                         onChange={(e) => setFormData({ ...formData, fabric: e.target.value })}
                         className="w-full p-3.5 bg-amber-50/40 border border-amber-300 rounded-xl font-bold text-xs text-slate-900 focus:outline-none focus:border-red-800"
-                        placeholder="e.g. Pure Kanchipuram Silk"
+                        placeholder="Select or Type Pure Fabric..."
                       />
+                      <datalist id="saree-fabric-list">
+                        <option value="Pure Kanchipuram Silk" />
+                        <option value="Royal Banarasi Silk" />
+                        <option value="Pure Handloom Linen" />
+                        <option value="Delicate Floral Organza" />
+                        <option value="Pure Tussar Silk" />
+                        <option value="Paithani Silk Zari" />
+                        <option value="Pure Mulberry Silk" />
+                        <option value="Organic Mulmul Cotton" />
+                        <option value="Chanderi Silk" />
+                      </datalist>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-800 font-black uppercase text-[11px] mb-1.5">Occasion *</label>
+                      <select
+                        value={formData.occasion || 'Bridal & Wedding'}
+                        onChange={(e) => setFormData({ ...formData, occasion: e.target.value })}
+                        className="w-full p-3.5 bg-amber-50/40 border border-amber-300 rounded-xl font-black text-xs text-slate-900 focus:outline-none focus:border-red-800 cursor-pointer"
+                      >
+                        <option value="Bridal & Wedding">Bridal & Wedding</option>
+                        <option value="Festival & Festive">Festival & Festive</option>
+                        <option value="Party & Evening">Party & Evening</option>
+                        <option value="Office & Professional">Office & Professional</option>
+                        <option value="Daily & Casual Wear">Daily & Casual Wear</option>
+                      </select>
                     </div>
                   </div>
 

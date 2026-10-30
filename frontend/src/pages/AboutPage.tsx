@@ -11,14 +11,14 @@ export const AboutPage: React.FC = () => {
           {/* Clean Logo Image without borders or circular clipping */}
           <div className="flex justify-center pb-2">
             <img
-              src="/kanchanika_attire_logo.svg"
-              alt="Kanchanika Logo"
-              className="w-64 sm:w-80 md:w-96 h-auto object-contain drop-shadow-md hover:scale-[1.01] transition-transform duration-300"
+              src="/aneera_silks_logo.jpg"
+              alt="Aneera Silks Logo"
+              className="w-44 sm:w-56 md:w-64 h-auto rounded-3xl shadow-2xl border-2 border-amber-300/80 object-cover hover:scale-[1.02] transition-transform duration-300"
             />
           </div>
 
           <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.3em] text-amber-800 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-red-800" /> OUR HERITAGE STORY & ATELIER <Sparkles className="w-4 h-4 text-red-800" />
+            <Sparkles className="w-4 h-4 text-red-800" /> ANEERA SILKS • OUR HERITAGE STORY & ATELIER <Sparkles className="w-4 h-4 text-red-800" />
           </span>
 
           <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-3xl mx-auto">
@@ -34,7 +34,7 @@ export const AboutPage: React.FC = () => {
               CRAFTED BY GENERATIONS OF WEAVING FAMILIES
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-              Every saree in the Kanchanika atelier represents weeks of dedicated handloom craftsmanship by master weavers in Varanasi, Kanchipuram, Paithan, and Chanderi. We partner directly with artisan clusters to preserve authentic zari weaving.
+              Every saree in the Aneera Silks atelier represents weeks of dedicated handloom craftsmanship by master weavers in Varanasi, Kanchipuram, Paithan, and Chanderi. We partner directly with artisan clusters to preserve authentic zari weaving.
             </p>
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
@@ -50,9 +50,9 @@ export const AboutPage: React.FC = () => {
 
           <div className="lg:col-span-6 relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-amber-300">
             <img
-              src="/images/saree_kanchipuram_gold.png"
-              alt="Kanchanika Master Weaver Heritage"
-              className="w-full h-full object-cover object-top"
+              src="/aneera_silks_backdrop.jpg"
+              alt="Aneera Silks Master Weaver Heritage"
+              className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500"
             />
           </div>
         </div>

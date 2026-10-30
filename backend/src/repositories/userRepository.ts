@@ -6,8 +6,8 @@ export const createFallbackUser = (data: Partial<IUser>): IUser => {
   const defaultId = data._id || new mongoose.Types.ObjectId();
   const userObj: any = {
     _id: defaultId,
-    name: data.name || 'Kanchanika User',
-    firstName: data.firstName || (data.name ? data.name.split(' ')[0] : 'Kanchanika'),
+    name: data.name || 'Aneera Silks User',
+    firstName: data.firstName || (data.name ? data.name.split(' ')[0] : 'Aneera'),
     lastName: data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : 'User'),
     email: (data.email || '').toLowerCase().trim(),
     password: data.password || '',
@@ -53,8 +53,8 @@ const FALLBACK_USERS_STORE: Map<string, IUser> = new Map();
 
 const adminFallback = createFallbackUser({
   _id: new mongoose.Types.ObjectId('65f0a0000000000000000001'),
-  name: 'Kanchanika Admin',
-  email: 'admin@kanchanika.com',
+  name: 'Aneera Silks Admin',
+  email: 'admin@aneerasilks.com',
   password: 'adminpassword123',
   role: 'admin',
   phone: '+91 9490644434',
@@ -73,7 +73,9 @@ const customerFallback = createFallbackUser({
   isVerified: true,
 });
 
+FALLBACK_USERS_STORE.set('admin@aneerasilks.com', adminFallback);
 FALLBACK_USERS_STORE.set('admin@kanchanika.com', adminFallback);
+FALLBACK_USERS_STORE.set('admin@evan.com', adminFallback);
 FALLBACK_USERS_STORE.set('ananya@example.com', customerFallback);
 
 export class UserRepository {
@@ -96,7 +98,7 @@ export class UserRepository {
       for (const u of FALLBACK_USERS_STORE.values()) {
         if (u._id.toString() === id.toString()) return u;
       }
-      return FALLBACK_USERS_STORE.get('admin@evan.com') || null;
+      return FALLBACK_USERS_STORE.get('admin@aneerasilks.com') || null;
     }
     try {
       const user = await User.findById(id);
@@ -109,7 +111,7 @@ export class UserRepository {
       for (const u of FALLBACK_USERS_STORE.values()) {
         if (u._id.toString() === id.toString()) return u;
       }
-      return FALLBACK_USERS_STORE.get('admin@evan.com') || null;
+      return FALLBACK_USERS_STORE.get('admin@aneerasilks.com') || null;
     }
   }
 

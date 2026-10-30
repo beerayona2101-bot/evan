@@ -181,7 +181,7 @@ const generate500Sarees = (): any[] => {
     for (let p = 1; p <= 4; p++) {
       const baseTitle = catTitles[(p - 1) % catTitles.length];
       const cleanCatName = catName.endsWith('Sarees') ? catName.replace(/Sarees/g, '').trim() : catName;
-      const name = `${baseTitle} ${cleanCatName} Saree by EVAN COLLECTIONS`;
+      const name = `${baseTitle} ${cleanCatName} Saree by Aneera Silks`;
       const basePrice = 3499 + ((globalIdCounter * 437) % 32000);
       const discountPrice = Math.round(basePrice * 0.84);
       const mrp = Math.round(basePrice * 1.28);
@@ -199,7 +199,7 @@ const generate500Sarees = (): any[] => {
         _id: `prod-saree-${String(globalIdCounter).padStart(3, '0')}`,
         name,
         slug: name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-        brand: 'EVAN COLLECTIONS',
+        brand: 'Aneera Silks',
         description: `Exquisite luxury ${catName.toLowerCase()} handwoven by master artisans. Features rich zari brocade, unstitched contrast blouse piece (0.8m), and lustrous silk drape.`,
         price: discountPrice,
         discountPrice,
@@ -215,7 +215,7 @@ const generate500Sarees = (): any[] => {
           { colorName: 'Emerald Green', hexColor: '#006633', stock: 0, status: 'inactive', sku: `SKU-${1000 + globalIdCounter}-GRN`, price: discountPrice, images: gallery },
           { colorName: 'Peacock Blue', hexColor: '#003366', stock: 10 + (globalIdCounter % 8), status: 'active', sku: `SKU-${1000 + globalIdCounter}-BLU`, price: discountPrice, images: gallery },
         ],
-        sku: `EVAN-SKU-${1000 + globalIdCounter}`,
+        sku: `ANEERA-SKU-${1000 + globalIdCounter}`,
         stock: 12 + (globalIdCounter % 38),
         rating: Number((4.6 + (globalIdCounter % 5) * 0.1).toFixed(1)),
         numReviews: 12 + (globalIdCounter * 4) % 90,
@@ -333,8 +333,8 @@ export class ProductRepository {
       return this.getFallback(query);
     }
     try {
-      const prods = await Product.find(query).sort(sortOptions);
-      if (prods && prods.length > 0) return prods;
+      const prods = await Product.find(query).sort(sortOptions).lean();
+      if (prods && prods.length > 0) return prods as any;
       return this.getFallback(query);
     } catch {
       return this.getFallback(query);
@@ -349,8 +349,8 @@ export class ProductRepository {
       const isObjectId = idOrSlug.match(/^[0-9a-fA-F]{24}$/);
       const prod = await Product.findOne({
         $or: [{ _id: isObjectId ? idOrSlug : null }, { slug: idOrSlug }],
-      });
-      if (prod) return prod;
+      }).lean();
+      if (prod) return prod as any;
       return (ALL_500_FALLBACK_SAREES.find((p) => p._id === idOrSlug || p.slug === idOrSlug) || null) as any;
     } catch {
       return null;
@@ -362,8 +362,8 @@ export class ProductRepository {
       return ALL_500_FALLBACK_SAREES.slice(0, limit) as any;
     }
     try {
-      const prods = await Product.find({ isFeatured: true }).limit(limit);
-      if (prods && prods.length > 0) return prods;
+      const prods = await Product.find({ isFeatured: true }).limit(limit).lean();
+      if (prods && prods.length > 0) return prods as any;
       return ALL_500_FALLBACK_SAREES.slice(0, limit) as any;
     } catch {
       return ALL_500_FALLBACK_SAREES.slice(0, limit) as any;

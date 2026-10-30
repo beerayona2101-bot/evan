@@ -66,8 +66,11 @@ export interface IProduct extends Document {
   comfortLevel?: string;
   threadMaterial?: string;
   colorDetails?: string;
-  transparency?: string;
-  drapeStyle?: string;
+  primaryFabricId?: mongoose.Types.ObjectId | string;
+  secondaryFabricIds?: (mongoose.Types.ObjectId | string)[];
+  categoryIds?: (mongoose.Types.ObjectId | string)[];
+  occasionIds?: (mongoose.Types.ObjectId | string)[];
+  collectionId?: mongoose.Types.ObjectId | string;
   status: 'active' | 'inactive';
   createdAt: Date;
   updatedAt: Date;
@@ -93,7 +96,7 @@ const productSchema: Schema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
-    brand: { type: String, default: 'EVAN COLLECTIONS' },
+    brand: { type: String, default: 'Aneera Silks' },
     description: { type: String, required: true },
     shortDescription: { type: String, default: '' },
     detailedDescription: { type: String, default: '' },
@@ -102,6 +105,11 @@ const productSchema: Schema = new Schema(
     mrp: { type: Number, required: true },
     discountPercentage: { type: Number, default: 0 },
     category: { type: String, required: true, index: true },
+    primaryFabricId: { type: Schema.Types.ObjectId, ref: 'Fabric', default: null, index: true },
+    secondaryFabricIds: [{ type: Schema.Types.ObjectId, ref: 'Fabric' }],
+    categoryIds: [{ type: Schema.Types.ObjectId, ref: 'Category', index: true }],
+    occasionIds: [{ type: Schema.Types.ObjectId, ref: 'Occasion', index: true }],
+    collectionId: { type: Schema.Types.ObjectId, ref: 'Collection', default: null, index: true },
     fit: { type: String, default: 'Saree' },
     sizes: { type: [String], default: ['Free Size'] },
     colors: { type: [String], required: true },
@@ -148,5 +156,8 @@ const productSchema: Schema = new Schema(
 
 productSchema.index({ name: 'text', category: 'text', fabric: 'text', tags: 'text' });
 productSchema.index({ category: 1, isFeatured: 1 });
+productSchema.index({ primaryFabricId: 1, status: 1 });
+productSchema.index({ categoryIds: 1, status: 1 });
+productSchema.index({ occasionIds: 1, status: 1 });
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);

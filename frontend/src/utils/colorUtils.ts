@@ -1,5 +1,5 @@
 /**
- * Color Utilities for EVAN COLLECTIONS
+ * Color Utilities for Aneera Silks
  * Converts HEX color codes into human-readable color names for Saree variants.
  */
 

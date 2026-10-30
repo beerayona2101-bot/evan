@@ -179,7 +179,7 @@ export const deleteAddress = async (req: AuthRequest, res: Response): Promise<vo
 export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      const admin = await userRepo.findByEmail('admin@evan.com');
+      const admin = (await userRepo.findByEmail('admin@aneerasilks.com')) || (await userRepo.findByEmail('admin@evan.com'));
       const customer = await userRepo.findByEmail('ananya@example.com');
       res.json([admin, customer].filter(Boolean));
       return;
@@ -187,7 +187,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
     const users = await User.find({}).select('-password').sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
-    const admin = await userRepo.findByEmail('admin@evan.com');
+    const admin = (await userRepo.findByEmail('admin@aneerasilks.com')) || (await userRepo.findByEmail('admin@evan.com'));
     const customer = await userRepo.findByEmail('ananya@example.com');
     res.json([admin, customer].filter(Boolean));
   }

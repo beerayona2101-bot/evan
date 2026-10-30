@@ -56,6 +56,8 @@ export const formatSareeName = (
   let clean = raw
     .replace(/Kanchanika/gi, '')
     .replace(/EVAN\s+COLLECTIONS/gi, '')
+    .replace(/Aneera\s+Silks/gi, '')
+    .replace(/Aneera/gi, '')
     .replace(/by\s+/gi, '')
     .replace(/Vol\.?\s*\d+/gi, '')
     .trim();
@@ -95,5 +97,5 @@ export const formatSareeName = (
     clean = `${clean} ${volStr}`;
   }
 
-  return `${clean} by Kanchanika`;
+  return `${clean} by Aneera Silks`;
 };

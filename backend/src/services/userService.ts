@@ -25,7 +25,7 @@ export class UserService {
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 Hours
 
-    const fullName = name || `${firstName || ''} ${lastName || ''}`.trim() || 'Kanchanika Customer';
+    const fullName = name || `${firstName || ''} ${lastName || ''}`.trim() || 'Aneera Silks Customer';
 
     const user = await this.userRepo.create({
       name: fullName,
@@ -104,7 +104,7 @@ export class UserService {
     user.verificationExpiry = undefined;
     await user.save();
 
-    return { message: 'Email verified successfully! You can now access all EVAN privileges.' };
+    return { message: 'Email verified successfully! You can now access all Aneera Silks privileges.' };
   }
 
   async forgotPassword(email: string) {

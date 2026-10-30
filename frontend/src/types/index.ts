@@ -73,9 +73,64 @@ export interface Product {
   comfortLevel?: string;
   threadMaterial?: string;
   colorDetails?: string;
-  transparency?: string;
-  drapeStyle?: string;
+  primaryFabricId?: string;
+  secondaryFabricIds?: string[];
+  categoryIds?: string[];
+  occasionIds?: string[];
+  collectionId?: string;
   status?: 'active' | 'inactive';
+}
+
+export interface Fabric {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  banner?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
+  featured: boolean;
+  displayOrder: number;
+  productCount: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Occasion {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
+  displayOrder: number;
+  productCount: number;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Collection {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  coverImage?: string;
+  bannerImage?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
+  featured: boolean;
+  displayOrder: number;
+  productCount: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {

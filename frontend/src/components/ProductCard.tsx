@@ -10,6 +10,8 @@ import { AddToCartButton } from './AddToCartButton';
 import { LazyImage } from './LazyImage';
 
 import { formatSareeName } from '../utils/sareeUtils';
+import { prefetchRoute } from '../utils/prefetch';
+import { prefetchApi } from '../services/api';
 
 interface ProductCardProps {
   product: Product;
@@ -20,6 +22,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handlePrefetch = () => {
+    prefetchRoute('product');
+    if (product._id) {
+      prefetchApi(`/products/${product._id}`);
+      prefetchApi(`/reviews/${product._id}`);
+    }
+  };
 
   const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
   const mrp = product.mrp || Math.round(product.price * 1.25);
@@ -37,7 +47,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="group bg-white rounded-xl border border-amber-200/80 hover:border-amber-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+    <div
+      onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
+      className="group bg-white rounded-xl border border-amber-200/80 hover:border-amber-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
+    >
       {/* Ultra Compact Saree Image Container */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-amber-50/30">
         <Link to={`/product/${product._id}`} className="w-full h-full block">

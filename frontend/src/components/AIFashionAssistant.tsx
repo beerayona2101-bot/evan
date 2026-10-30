@@ -27,21 +27,21 @@ const PRESET_PROMPTS = [
 const SAMPLE_RECOMMENDATIONS = [
   {
     id: 'prod-saree-001',
-    name: 'Royal Crimson Banarasi Silk Saree by EVAN COLLECTIONS',
+    name: 'Royal Crimson Banarasi Silk Saree by Aneera Silks',
     price: 9999,
     image: '/images/saree_banarasi_red.png',
     category: 'Banarasi Silk'
   },
   {
     id: 'prod-saree-002',
-    name: 'Mustard Gold Kanchipuram Silk Saree by EVAN COLLECTIONS',
+    name: 'Mustard Gold Kanchipuram Silk Saree by Aneera Silks',
     price: 14999,
     image: '/images/saree_kanchipuram_gold.png',
     category: 'Kanchipuram Silk'
   },
   {
     id: 'prod-saree-003',
-    name: 'Pastel Floral Organza Designer Saree by EVAN COLLECTIONS',
+    name: 'Pastel Floral Organza Designer Saree by Aneera Silks',
     price: 6999,
     image: '/images/saree_organza_floral.png',
     category: 'Organza Silk'

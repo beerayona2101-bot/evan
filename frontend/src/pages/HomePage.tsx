@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Award, Sparkles, Heart, Star, ShoppingBag, Play, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Award, Sparkles, Heart, Star, ShoppingBag, Play, Quote } from 'lucide-react';
 import { Product } from '../types';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -10,6 +10,8 @@ import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/ToastContainer';
 import { AddToCartButton } from '../components/AddToCartButton';
 import { formatSareeName } from '../utils/sareeUtils';
+import { prefetchRoute } from '../utils/prefetch';
+import { prefetchApi } from '../services/api';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -182,7 +184,7 @@ export const HomePage: React.FC = () => {
   // Modern saree collection cards for 3D selection carousel with direct category navigation links
   const defaultModernCards = [
     { id: 's1', title: 'Modern Lightweight Organza Floral', tag: 'PARTYWEAR ORGANZA', price: '$115.00 USD', rupeePrice: '₹6,999', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees' },
-    { id: 's2', title: 'Fancy Tissue Zari Shimmer Saree', tag: 'MODERN TISSUE', price: '$190.00 USD', rupeePrice: '₹12,499', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Silk Sarees' },
+    { id: 's2', title: 'Fancy Tissue Zari Shimmer Saree', tag: 'MODERN TISSUE', price: '$190.00 USD', rupeePrice: '₹12,499', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Royal Zari Brocade Sarees' },
     { id: 's3', title: 'Royal Crimson Banarasi Partywear', tag: 'TRENDING BANARASI', price: '$160.00 USD', rupeePrice: '₹9,999', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees' },
     { id: 's4', title: 'Glamour Sequenced Purple Georgette', tag: 'PARTYWEAR GEORGETTE', price: '$220.00 USD', rupeePrice: '₹14,999', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Designer Sarees' },
     { id: 's5', title: 'Handwoven Peacock Paithani Silk', tag: 'PAITHANI SILK', price: '$280.00 USD', rupeePrice: '₹17,999', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees' },
@@ -207,15 +209,16 @@ export const HomePage: React.FC = () => {
       })
     : defaultModernCards;
 
-  // Autoplay 3D Saree Selection Carousel every 2 seconds
+  // Autoplay 3D Saree Selection Carousel every 4.5 seconds when tab is active
   useEffect(() => {
     const timer = setInterval(() => {
+      if (document.hidden) return;
       const cardsCount = sareeCollectionCards?.length || 8;
       const nextIndex = (active3DIndexRef.current + 1) % cardsCount;
       setPrevActiveIndex(active3DIndexRef.current);
       setActive3DIndex(nextIndex);
       active3DIndexRef.current = nextIndex;
-    }, 2000);
+    }, 4500);
     return () => clearInterval(timer);
   }, [sareeCollectionCards?.length]);
 
@@ -299,7 +302,8 @@ export const HomePage: React.FC = () => {
                 <img
                   key={slide.id || idx}
                   src={slide.image}
-                  alt={`Kanchanika Saree - ${slide.title}`}
+                  alt={`Aneera Silks Saree - ${slide.title}`}
+                  {...({ fetchpriority: idx === 0 ? 'high' : 'auto' } as any)}
                   className={`absolute inset-0 w-full h-full object-cover object-[75%_center] sm:object-right filter brightness-[0.95] contrast-[1.05] transition-opacity duration-700 ease-in-out ${
                     idx === safeSlideIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
                   }`}
@@ -338,6 +342,8 @@ export const HomePage: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 pt-1">
                   <Link
                     to={activeSlide.primaryButtonLink || '/shop'}
+                    onMouseEnter={() => prefetchRoute('shop')}
+                    onTouchStart={() => prefetchRoute('shop')}
                     className="px-5 py-2.5 sm:px-7 sm:py-3 bg-slate-950/80 hover:bg-slate-900 text-amber-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all border border-amber-400/50 flex items-center gap-1.5 sm:gap-2"
                   >
                     <span>{activeSlide.primaryButtonText || 'SEE MORE'}</span>
@@ -345,6 +351,8 @@ export const HomePage: React.FC = () => {
                   </Link>
                   <Link
                     to={activeSlide.secondaryButtonLink || '/shop'}
+                    onMouseEnter={() => prefetchRoute('shop')}
+                    onTouchStart={() => prefetchRoute('shop')}
                     className="px-5 py-2.5 sm:px-7 sm:py-3 bg-black/30 hover:bg-black/50 text-slate-200 font-bold text-[10px] sm:text-xs uppercase tracking-widest rounded-xl border border-amber-400/40 transition-all shadow-sm"
                   >
                     {activeSlide.secondaryButtonText || 'EXPLORE CATALOG'}
@@ -356,50 +364,13 @@ export const HomePage: React.FC = () => {
             {/* Bottom Right Floating Collection Badge */}
             <Link
               to={activeSlide.secondaryButtonLink || '/shop'}
+              onMouseEnter={() => prefetchRoute('shop')}
+              onTouchStart={() => prefetchRoute('shop')}
               className="absolute bottom-5 right-5 sm:right-12 z-20 hidden md:flex items-center gap-2 sm:gap-4 bg-[#09050b]/80 backdrop-blur-md px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-2xl hover:bg-[#09050b] hover:border-amber-400 transition-all group"
             >
               <span>View Full Saree Collection</span>
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
             </Link>
-
-            {/* Interactive Left/Right Carousel Arrows & Slide Dots */}
-            {heroSlides.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-red-900 text-amber-300 border border-amber-400/40 backdrop-blur-md transition-all shadow-lg hover:scale-110"
-                  aria-label="Previous Hero Slide"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length)}
-                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-red-900 text-amber-300 border border-amber-400/40 backdrop-blur-md transition-all shadow-lg hover:scale-110"
-                  aria-label="Next Hero Slide"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-
-                {/* Bottom Slide Navigation Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-400/30">
-                  {heroSlides.map((_, dotIdx) => (
-                    <button
-                      key={dotIdx}
-                      type="button"
-                      onClick={() => setCurrentHeroSlide(dotIdx)}
-                      className={`h-2.5 rounded-full transition-all ${
-                        dotIdx === safeSlideIndex
-                          ? 'w-7 bg-amber-400 border border-amber-300 shadow'
-                          : 'w-2.5 bg-white/40 hover:bg-white/70'
-                      }`}
-                      aria-label={`Jump to slide ${dotIdx + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
 
           </div>
         </section>
@@ -418,7 +389,7 @@ export const HomePage: React.FC = () => {
             const cols = cms?.featuredCollections || [];
             const tile1 = cols[0] || { name: 'Banarasi Zari Brocade Collection', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees', buttonText: 'Explore' };
             const tile2 = cols[1] || { name: 'Kanchipuram Temple Border', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees', buttonText: 'Explore' };
-            const tile3 = cols[2] || { name: 'LUXURY SILK SAREES', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Silk Sarees', buttonText: 'SHOP SILK COLLECTION', description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.' };
+            const tile3 = cols[2] || { name: 'LUXURY SILK SAREES', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Royal Zari Brocade Sarees', buttonText: 'SHOP SILK COLLECTION', description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.' };
             const tile4 = cols[3] || { name: 'Paithani Peacock Pallu', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees', buttonText: 'Explore' };
             const tile5 = cols[4] || { name: 'Scalloped Floral Organza', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees', buttonText: 'Explore' };
 
@@ -468,7 +439,7 @@ export const HomePage: React.FC = () => {
                 {/* Tile 3 (Featured Large Center Tile) */}
                 <div className="md:col-span-4 h-full min-h-[320px] md:min-h-full">
                   <Link
-                    to={tile3.buttonLink || '/shop?category=Silk Sarees'}
+                    to={tile3.buttonLink || '/shop?category=Royal Zari Brocade Sarees'}
                     className="relative h-full rounded-2xl overflow-hidden group border border-amber-200 bg-slate-900 block"
                   >
                     <img
@@ -749,14 +720,14 @@ export const HomePage: React.FC = () => {
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
-                  <p className="text-xs text-slate-700 italic font-medium leading-relaxed font-serif-luxury">"{test.review}"</p>
+                  <p className="text-xs text-slate-700 italic font-medium leading-relaxed font-serif-luxury">"{test.review || test.quoteText || ''}"</p>
                   <div className="flex items-center gap-3 pt-2">
                     <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-300 font-black text-sm flex items-center justify-center border border-amber-300">
-                      {test.customerName.charAt(0)}
+                      {(test.customerName || test.clientName || 'R').charAt(0)}
                     </div>
                     <div>
-                      <h5 className="text-xs font-bold text-slate-900">{test.customerName}</h5>
-                      <span className="text-[10px] text-amber-800 font-extrabold uppercase">{test.location}</span>
+                      <h5 className="text-xs font-bold text-slate-900">{test.customerName || test.clientName || 'Royal Client'}</h5>
+                      <span className="text-[10px] text-amber-800 font-extrabold uppercase">{test.location || test.cityState || ''}</span>
                     </div>
                   </div>
                 </div>

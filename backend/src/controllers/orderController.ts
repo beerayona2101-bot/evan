@@ -74,17 +74,40 @@ const FALLBACK_ORDERS: any[] = [
 
 export const addOrderItems = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { orderItems, shippingAddress, paymentMethod, itemsPrice, taxPrice, shippingPrice, totalPrice } = req.body;
-
-    if (!orderItems || orderItems.length === 0) {
+    const rawItems = req.body.orderItems || req.body.items;
+    if (!rawItems || rawItems.length === 0) {
       res.status(400).json({ message: 'No order items provided' });
       return;
     }
+    const orderItems = rawItems.map((it: any) => ({
+      name: it.name,
+      qty: it.qty || it.quantity || 1,
+      image: it.image || '/images/saree_banarasi_red.png',
+      price: it.price || 4999,
+      product: mongoose.Types.ObjectId.isValid(it.product || it.productId)
+        ? (it.product || it.productId)
+        : new mongoose.Types.ObjectId('65f0a0000000000000000001'),
+      size: it.size || 'Free Size',
+      color: it.color || it.selectedColor || 'Royal Crimson Red',
+    }));
+    const rawAddr = req.body.shippingAddress || {};
+    const shippingAddress = {
+      street: rawAddr.street || rawAddr.address || 'Atelier Lane',
+      city: rawAddr.city || 'Bengaluru',
+      state: rawAddr.state || 'Karnataka',
+      postalCode: rawAddr.postalCode || rawAddr.zipCode || '560001',
+      country: rawAddr.country || 'India',
+    };
+    const paymentMethod = req.body.paymentMethod || 'Razorpay / Card';
+    const itemsPrice = req.body.itemsPrice || req.body.subtotal || 0;
+    const taxPrice = req.body.taxPrice || req.body.gstAmount || 0;
+    const shippingPrice = req.body.shippingPrice || req.body.shippingFee || 0;
+    const totalPrice = req.body.totalPrice || req.body.totalAmount || (itemsPrice + taxPrice + shippingPrice);
 
     if (mongoose.connection.readyState !== 1) {
       const newOrd = {
         _id: `ord-${Date.now()}`,
-        user: req.user || { name: 'EVAN Customer', email: 'customer@evan.com' },
+        user: req.user || { name: 'Aneera Silks Customer', email: 'customer@aneerasilks.com' },
         orderItems,
         shippingAddress,
         paymentMethod: paymentMethod || 'Razorpay / Card',
@@ -160,7 +183,7 @@ export const addOrderItems = async (req: AuthRequest, res: Response): Promise<vo
     emitRealtimeEvent('orderCreated', createdOrder);
 
     // Send Nodemailer HTML Order Confirmation & Payment Receipts asynchronously
-    const customerEmail = req.user?.email || req.body.email || 'customer@evancollections.com';
+    const customerEmail = req.user?.email || req.body.email || 'customer@aneerasilks.com';
     sendOrderConfirmationEmail(createdOrder, customerEmail).catch(() => {});
     sendPaymentSuccessEmail(createdOrder, customerEmail).catch(() => {});
 
@@ -359,7 +382,7 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
     emitRealtimeEvent('orderUpdated', updatedOrder);
 
     // Trigger status-specific emails asynchronously
-    const customerEmail = (updatedOrder.user as any)?.email || req.body.email || 'customer@evancollections.com';
+    const customerEmail = (updatedOrder.user as any)?.email || req.body.email || 'customer@aneerasilks.com';
     if (normalizedStatus === 'Shipped') {
       sendOrderShippedEmail(updatedOrder, customerEmail).catch(() => {});
     } else if (normalizedStatus === 'Out For Delivery') {
@@ -435,7 +458,7 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
       match.cancelReason = req.body.reason || req.body.cancelReason || 'Cancelled by customer';
       emitRealtimeEvent('orderUpdated', match);
 
-      const customerEmail = req.user?.email || 'customer@evancollections.com';
+      const customerEmail = req.user?.email || 'customer@aneerasilks.com';
       sendOrderCancelledEmail(match, customerEmail).catch(() => {});
 
       res.json(match);
@@ -460,7 +483,7 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
       const updatedOrder = await order.save();
       emitRealtimeEvent('orderUpdated', updatedOrder);
 
-      const customerEmail = req.user?.email || 'customer@evancollections.com';
+      const customerEmail = req.user?.email || 'customer@aneerasilks.com';
       sendOrderCancelledEmail(updatedOrder, customerEmail).catch(() => {});
 
       res.json(updatedOrder);

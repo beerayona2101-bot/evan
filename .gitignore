@@ -5,6 +5,8 @@ backend/node_modules/
 backend/dist/
 frontend/.vite/
 .vite/
+.mongo-binaries/
+backend/.mongo-binaries/
 
 # Environment & Secret files
 .env

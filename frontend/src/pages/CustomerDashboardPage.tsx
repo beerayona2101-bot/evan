@@ -39,7 +39,7 @@ export const CustomerDashboardPage: React.FC = () => {
             totalPrice: 14999,
             orderItems: [
               {
-                name: 'EVAN COLLECTIONS Royal Crimson Banarasi Silk Saree',
+                name: 'Aneera Silks Royal Crimson Banarasi Silk Saree',
                 quantity: 1,
                 price: 14999,
                 image: '/images/saree_banarasi_red.png',
@@ -92,7 +92,7 @@ export const CustomerDashboardPage: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 text-center shadow-sm">
-              <span className="text-[10px] font-black text-amber-900 block uppercase">KANCHANIKA WALLET</span>
+              <span className="text-[10px] font-black text-amber-900 block uppercase">ANEERA SILKS WALLET</span>
               <span className="font-street text-2xl font-black text-amber-950">₹2,500</span>
             </div>
             <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 text-center shadow-sm">
@@ -131,7 +131,7 @@ export const CustomerDashboardPage: React.FC = () => {
                 activeTab === 'wallet' ? 'bg-amber-100 text-amber-950 border border-amber-300 shadow-sm' : 'text-slate-700 hover:bg-amber-50/80'
               }`}
             >
-              <Wallet className="w-4 h-4 text-amber-700" /> KANCHANIKA Wallet & Coupons
+              <Wallet className="w-4 h-4 text-amber-700" /> ANEERA SILKS Wallet & Coupons
             </button>
 
             <button

@@ -7,10 +7,18 @@ import { emitRealtimeEvent } from '../config/socket';
 import { uploadImageToCloudinary } from '../utils/cloudinary';
 
 const SAREE_CATEGORIES_20 = [
-  'Silk Sarees', 'Kanchipuram Sarees', 'Banarasi Sarees', 'Cotton Sarees', 'Linen Sarees',
-  'Organza Sarees', 'Georgette Sarees', 'Chiffon Sarees', 'Crepe Sarees', 'Tussar Silk',
-  'Handloom Sarees', 'Designer Sarees', 'Wedding Sarees', 'Bridal Sarees', 'Party Wear Sarees',
-  'Casual Sarees', 'Printed Sarees', 'Festival Collection', 'Office Wear', 'Daily Wear'
+  'Kanchipuram Sarees',
+  'Banarasi Sarees',
+  'Paithani Sarees',
+  'Chanderi Sarees',
+  'Bandhani Sarees',
+  'Patola Sarees',
+  'Maheshwari Sarees',
+  'Kalamkari Sarees',
+  'Pochampally Sarees',
+  'Handcrafted Heritage Sarees',
+  'Designer Artisan Sarees',
+  'Royal Zari Brocade Sarees',
 ];
 
 const FALLBACK_CATEGORIES = SAREE_CATEGORIES_20.map((name, i) => ({
@@ -89,26 +97,8 @@ export const getCategories = async (req: Request, res: Response): Promise<void> 
     else if (sort === 'oldest') sortOption = { createdAt: 1 };
     else if (sort === 'products') sortOption = { productCount: -1 };
 
-    const categories = await Category.find(query).sort(sortOption).populate('parentCategory', 'name slug');
-
-    // Update real product counts for each category
-    const categoriesWithCount = await Promise.all(
-      categories.map(async (cat) => {
-        const count = await Product.countDocuments({
-          $or: [
-            { category: new RegExp(cat.name, 'i') },
-            { category: cat.slug },
-          ],
-        });
-        if (cat.productCount !== count) {
-          cat.productCount = count;
-          await cat.save();
-        }
-        return cat;
-      })
-    );
-
-    res.json(categoriesWithCount);
+    const categories = await Category.find(query).sort(sortOption).populate('parentCategory', 'name slug').lean();
+    res.json(categories);
   } catch (error) {
     res.json(FALLBACK_CATEGORIES);
   }
@@ -168,19 +158,44 @@ export const createCategory = async (req: Request, res: Response): Promise<void>
       .replace(/ /g, '-')
       .replace(/[^\w-]+/g, '');
 
+    let finalImageUrl = image;
+    let finalBannerUrl = banner || '';
+
+    if (mongoose.connection.readyState !== 1) {
+      const fallbackNew: any = {
+        _id: `cat-${Date.now()}`,
+        name: name.trim(),
+        slug: generatedSlug,
+        description: description || '',
+        image: finalImageUrl,
+        banner: finalBannerUrl,
+        status: status || 'ACTIVE',
+        isLive: isLive !== undefined ? isLive : true,
+        featured: featured || false,
+        displayOrder: Number(displayOrder) || 0,
+        productCount: 0,
+        createdBy: (req as any).user?.name || 'Admin',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      FALLBACK_CATEGORIES.unshift(fallbackNew);
+      emitRealtimeEvent('categoryCreated', fallbackNew);
+      emitRealtimeEvent('categoryUpdated', fallbackNew);
+      res.status(201).json(fallbackNew);
+      return;
+    }
+
     const existingName = await Category.findOne({ name: name.trim() });
     if (existingName) {
       res.status(400).json({ message: 'Category with this name already exists' });
       return;
     }
 
-    let finalImageUrl = image;
     if (image && image.startsWith('data:image/')) {
       const uploaded = await uploadImageToCloudinary(image, 'evan_categories');
       finalImageUrl = uploaded.url;
     }
 
-    let finalBannerUrl = banner || '';
     if (banner && banner.startsWith('data:image/')) {
       const uploadedBanner = await uploadImageToCloudinary(banner, 'evan_categories');
       finalBannerUrl = uploadedBanner.url;
@@ -218,6 +233,23 @@ export const createCategory = async (req: Request, res: Response): Promise<void>
 export const updateCategory = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+
+    if (id.startsWith('cat-') || mongoose.connection.readyState !== 1) {
+      const fallbackCat = FALLBACK_CATEGORIES.find((c) => c._id === id || c.slug === id);
+      if (fallbackCat) {
+        if (req.body.name) fallbackCat.name = req.body.name;
+        if (req.body.description !== undefined) fallbackCat.description = req.body.description;
+        if (req.body.status) fallbackCat.status = req.body.status;
+        if (req.body.isLive !== undefined) fallbackCat.isLive = req.body.isLive;
+        if (req.body.featured !== undefined) fallbackCat.featured = req.body.featured;
+        if (req.body.image) fallbackCat.image = req.body.image;
+        if (req.body.displayOrder !== undefined) fallbackCat.displayOrder = Number(req.body.displayOrder);
+        emitRealtimeEvent('categoryUpdated', fallbackCat);
+        res.json(fallbackCat);
+        return;
+      }
+    }
+
     const category = await Category.findById(id);
 
     if (!category) {
@@ -332,6 +364,18 @@ export const patchCategoryStatus = async (req: Request, res: Response): Promise<
 export const deleteCategory = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+
+    if (id.startsWith('cat-') || mongoose.connection.readyState !== 1) {
+      const idx = FALLBACK_CATEGORIES.findIndex((c) => c._id === id || c.slug === id);
+      if (idx !== -1) {
+        const deleted = FALLBACK_CATEGORIES[idx];
+        FALLBACK_CATEGORIES.splice(idx, 1);
+        emitRealtimeEvent('categoryDeleted', { _id: id });
+        res.json({ message: 'Category deleted successfully', category: deleted });
+        return;
+      }
+    }
+
     const category = await Category.findById(id);
 
     if (!category) {

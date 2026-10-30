@@ -21,7 +21,7 @@ vi.mock('../services/api', () => ({
     get: vi.fn().mockResolvedValue({
       data: {
         whatsappNumber: '919490644434',
-        whatsappGreeting: 'Hello EVAN Collections',
+        whatsappGreeting: 'Hello Aneera Silks',
         whatsappEnabled: true,
         whatsappPosition: 'bottom-right',
         whatsappColor: '#25D366',

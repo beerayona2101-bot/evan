@@ -18,7 +18,7 @@ export const WhatsAppButton: React.FC = () => {
   const { socket } = useSocket();
   const [settings, setSettings] = useState<IWhatsAppSettings>({
     whatsappNumber: '919490644434',
-    whatsappGreeting: 'Hello EVAN Collections, I would like to know more about your sarees.',
+    whatsappGreeting: 'Hello Aneera Silks, I would like to know more about your sarees.',
     whatsappEnabled: true,
     whatsappPosition: 'bottom-right',
     whatsappColor: '#25D366',
@@ -79,7 +79,7 @@ export const WhatsAppButton: React.FC = () => {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
-        title="Chat on WhatsApp with EVAN Collections Concierge"
+        title="Chat on WhatsApp with Aneera Silks Concierge"
         style={{ backgroundColor: settings.whatsappColor || '#25D366' }}
         className="w-11 h-11 sm:w-12 sm:h-12 rounded-full text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group border border-white/40 focus:outline-none focus:ring-4 focus:ring-emerald-400"
       >

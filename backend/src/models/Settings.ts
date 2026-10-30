@@ -15,7 +15,7 @@ const SettingsSchema = new Schema<ISettings>(
     whatsappGreeting: {
       type: String,
       required: true,
-      default: 'Hello EVAN Collections, I would like to know more about your sarees.',
+      default: 'Hello Aneera Silks, I would like to know more about your sarees.',
     },
     whatsappEnabled: { type: Boolean, default: true },
     whatsappPosition: { type: String, enum: ['bottom-left', 'bottom-right'], default: 'bottom-right' },

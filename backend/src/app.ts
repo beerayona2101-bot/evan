@@ -19,6 +19,9 @@ import homepageRoutes from './routes/homepageRoutes';
 import revenueRoutes from './routes/revenueRoutes';
 import settingsRoutes from './routes/settingsRoutes';
 import inquiryRoutes from './routes/inquiryRoutes';
+import fabricRoutes from './routes/fabricRoutes';
+import occasionRoutes from './routes/occasionRoutes';
+import collectionRoutes from './routes/collectionRoutes';
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
 dotenv.config();
@@ -34,12 +37,15 @@ app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(morgan('dev'));
 
 app.get('/api/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'OK', message: 'Kanchanika Luxury Saree API is running' });
+  res.status(200).json({ status: 'OK', message: 'Aneera Silks Luxury Saree API is running', service: 'Aneera Silks API Service' });
 });
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/fabrics', fabricRoutes);
+app.use('/api/occasions', occasionRoutes);
+app.use('/api/collections', collectionRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);

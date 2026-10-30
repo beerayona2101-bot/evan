@@ -53,12 +53,12 @@ export const LoginPage: React.FC = () => {
         <div className="text-center space-y-2">
           <div className="flex justify-center pb-1">
             <img
-              src="/kanchanika_attire_logo.svg"
-              alt="Kanchanika Logo"
-              className="w-14 h-14 object-contain drop-shadow"
+              src="/aneera_silks_logo.jpg"
+              alt="Aneera Silks Logo"
+              className="w-16 h-16 rounded-2xl object-cover shadow-md border border-amber-300"
             />
           </div>
-          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">KANCHANIKA</span>
+          <span className="font-serif-luxury text-3xl font-extrabold tracking-wider text-slate-900 block">ANEERA SILKS</span>
           <h2 className="font-serif-luxury text-base font-bold text-amber-900 uppercase tracking-widest">WELCOME BACK</h2>
           <p className="text-xs text-slate-500 font-medium">Sign in to access your orders, wishlist, and VIP concierge privileges.</p>
         </div>
@@ -77,7 +77,7 @@ export const LoginPage: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@kanchanika.com or ananya@example.com"
+              placeholder="admin@aneerasilks.com or ananya@example.com"
               className="w-full p-3.5 bg-amber-50/40 border border-amber-200 rounded-xl text-slate-900 focus:border-red-800 focus:outline-none"
             />
           </div>
@@ -122,12 +122,12 @@ export const LoginPage: React.FC = () => {
             disabled={loading}
             className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300"
           >
-            {loading ? 'SIGNING IN...' : 'SIGN IN TO KANCHANIKA'}
+            {loading ? 'SIGNING IN...' : 'SIGN IN TO ANEERA SILKS'}
           </button>
         </form>
 
         <div className="text-center text-xs text-slate-500 pt-2 border-t border-amber-200">
-          Don't have a Kanchanika account?{' '}
+          Don't have an Aneera Silks account?{' '}
           <Link to="/register" className="text-red-800 font-extrabold hover:underline">
             Register Here
           </Link>

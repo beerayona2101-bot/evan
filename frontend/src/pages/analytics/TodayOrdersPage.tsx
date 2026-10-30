@@ -109,7 +109,7 @@ export const TodayOrdersPage: React.FC<TodayOrdersPageProps> = ({ onBack }) => {
               {loading ? (
                 <tr>
                   <td colSpan={10} className="p-8 text-center text-slate-500 font-bold">
-                    Loading orders from MongoDB Atlas...
+                    Loading orders...
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (

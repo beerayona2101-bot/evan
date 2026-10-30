@@ -29,8 +29,8 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         req.user = createFallbackUser({
           _id: new mongoose.Types.ObjectId(mongoose.Types.ObjectId.isValid(decoded.id) ? decoded.id : '65f0a0000000000000000001'),
           role: (decoded.role as any) || 'admin',
-          email: decoded.role === 'admin' ? 'admin@evan.com' : 'ananya@example.com',
-          name: decoded.role === 'admin' ? 'EVAN COLLECTIONS Admin' : 'Ananya Sharma',
+          email: decoded.role === 'admin' ? 'admin@aneerasilks.com' : 'ananya@example.com',
+          name: decoded.role === 'admin' ? 'Aneera Silks Admin' : 'Ananya Sharma',
         });
         return next();
       }
@@ -45,6 +45,8 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
           req.user = fallbackUser;
           return next();
         }
+        res.status(401).json({ message: 'User not found or token invalid' });
+        return;
       }
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token validation failed' });

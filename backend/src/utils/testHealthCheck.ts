@@ -28,7 +28,7 @@ const runHealthCheck = async () => {
     console.log(`✅ [Phase 6 Categories] Live MongoDB Categories: ${categoryCount} Categories`);
     console.log(`✅ [Phase 4 Users] Registered Database Users: ${userCount} Users`);
 
-    const sampleProduct = await Product.findOne().populate('categoryRef');
+    const sampleProduct = await Product.findOne().populate('categoryIds');
     if (sampleProduct) {
       console.log(`✅ [Phase 6 Schema Verification] Sample Saree: "${sampleProduct.name}" (SKU: ${sampleProduct.sku}, Price: ₹${sampleProduct.price})`);
     }
