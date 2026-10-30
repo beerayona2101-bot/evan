@@ -190,7 +190,7 @@ export const HomePage: React.FC = () => {
     { id: 's5', title: 'Handwoven Peacock Paithani Silk', tag: 'PAITHANI SILK', price: '$280.00 USD', rupeePrice: '₹17,999', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees' },
     { id: 's6', title: 'Pure Artisan Soft Linen Saree', tag: 'LIGHTWEIGHT LINEN', price: '$95.00 USD', rupeePrice: '₹4,499', image: '/images/saree_linen_beige.png', buttonLink: '/shop?category=Linen Sarees' },
     { id: 's7', title: 'Mustard Temple Zari Kanchipuram', tag: 'KANCHIPURAM SILK', price: '$240.00 USD', rupeePrice: '₹14,999', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees' },
-    { id: 's8', title: 'Contemporary Floral Chiffon Drape', tag: 'TRENDY CHIFFON', price: '$135.00 USD', rupeePrice: '₹8,499', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Designer Sarees' },
+    { id: 's8', title: 'Contemporary Floral Chiffon Saree', tag: 'TRENDY CHIFFON', price: '$135.00 USD', rupeePrice: '₹8,499', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Designer Sarees' },
   ];
 
   const sareeCollectionCards = cms?.featuredCategories && cms.featuredCategories.length >= 1
@@ -254,9 +254,9 @@ export const HomePage: React.FC = () => {
     {
       id: 'fashion',
       offerBadge: 'TRENDING FASHION WEAR 2026',
-      subtitle: 'MODERN DESIGNER DRAPES',
+      subtitle: 'MODERN DESIGNER SAREES',
       title: 'FASHION WEAR',
-      description: 'Discover sleek contemporary silhouettes, lightweight organza & tissue sarees, and modern fusion drapes curated for the trendsetting fashionista.',
+      description: 'Discover sleek contemporary silhouettes, lightweight organza & tissue sarees, and modern fusion styles curated for the trendsetting fashionista.',
       primaryButtonText: 'EXPLORE FASHION',
       primaryButtonLink: '/shop?category=Designer Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
@@ -269,7 +269,7 @@ export const HomePage: React.FC = () => {
       offerBadge: 'EXCLUSIVE PARTYWEAR 2026',
       subtitle: 'CELEBRATION GLAMOUR',
       title: 'PARTY COLLECTIONS',
-      description: 'Elevate your evening look with opulent sequence work, shimmering tissue zari, vibrant georgettes, and grand festive partywear drapes.',
+      description: 'Elevate your evening look with opulent sequence work, shimmering tissue zari, vibrant georgettes, and grand festive partywear sarees.',
       primaryButtonText: 'SHOP PARTYWEAR',
       primaryButtonLink: '/shop?category=Organza Sarees',
       secondaryButtonText: 'EXPLORE CATALOG',
@@ -389,7 +389,7 @@ export const HomePage: React.FC = () => {
             const cols = cms?.featuredCollections || [];
             const tile1 = cols[0] || { name: 'Banarasi Zari Brocade Collection', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees', buttonText: 'Explore' };
             const tile2 = cols[1] || { name: 'Kanchipuram Temple Border', image: '/images/saree_kanchipuram_gold.png', buttonLink: '/shop?category=Kanchipuram Sarees', buttonText: 'Explore' };
-            const tile3 = cols[2] || { name: 'LUXURY SILK SAREES', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Royal Zari Brocade Sarees', buttonText: 'SHOP SILK COLLECTION', description: 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.' };
+            const tile3 = cols[2] || { name: 'LUXURY SILK SAREES', image: '/images/saree_banarasi_purple.png', buttonLink: '/shop?category=Royal Zari Brocade Sarees', buttonText: 'SHOP SILK COLLECTION', description: 'Discover handcrafted mulberry silk sarees & heirloom zari sarees.' };
             const tile4 = cols[3] || { name: 'Paithani Peacock Pallu', image: '/images/saree_paithani_green.png', buttonLink: '/shop?category=Paithani Sarees', buttonText: 'Explore' };
             const tile5 = cols[4] || { name: 'Scalloped Floral Organza', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees', buttonText: 'Explore' };
 
@@ -455,7 +455,7 @@ export const HomePage: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex items-end p-5">
                       <div className="w-full">
                         <h3 className="text-amber-300 font-street text-2xl sm:text-3xl tracking-wide group-hover:text-white transition-colors">{tile3.name}</h3>
-                        <p className="text-slate-200 text-xs mt-0.5">{tile3.description || 'Discover handcrafted mulberry silk sarees & heirloom zari drapes.'}</p>
+                        <p className="text-slate-200 text-xs mt-0.5">{tile3.description || 'Discover handcrafted mulberry silk sarees & heirloom zari sarees.'}</p>
                         <div className="mt-2.5 inline-flex items-center gap-2 text-xs font-black text-amber-400 uppercase group-hover:translate-x-1 transition-transform">
                           <span>{tile3.buttonText || 'SHOP SILK COLLECTION'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />

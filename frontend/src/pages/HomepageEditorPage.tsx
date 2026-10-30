@@ -429,7 +429,7 @@ export const HomepageEditorPage: React.FC = () => {
                             id: `hs-${Date.now()}`,
                             offerBadge: 'NEW SAREE COLLECTION 2026',
                             subtitle: 'EXQUISITE HANDLOOM',
-                            title: 'NEW SAREE DRAPE',
+                            title: 'NEW SAREE',
                             description: 'Explore breathtaking handcrafted luxury sarees woven by master Indian artisans.',
                             primaryButtonText: 'SHOP NOW',
                             primaryButtonLink: '/shop',
@@ -783,7 +783,7 @@ export const HomepageEditorPage: React.FC = () => {
                     onClick={() => {
                       const newCard = {
                         id: `sc-${Date.now()}`,
-                        name: 'New Modern Saree Drape',
+                        name: 'New Modern Saree',
                         tag: 'TRENDING PARTYWEAR',
                         price: '$140.00 USD',
                         rupeePrice: '₹8,999',
