@@ -242,12 +242,23 @@ export const AccountPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={logout}
-            className="px-6 py-2.5 bg-red-100 hover:bg-red-200 text-red-900 text-xs font-extrabold uppercase tracking-widest rounded-xl border border-red-300 transition-all shadow-sm"
-          >
-            Sign Out
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {user.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-amber-300 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-300 shadow-sm flex items-center gap-1.5 transition-colors"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-300" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
+            <button
+              onClick={logout}
+              className="px-6 py-2.5 bg-red-100 hover:bg-red-200 text-red-900 text-xs font-extrabold uppercase tracking-widest rounded-xl border border-red-300 transition-all shadow-sm"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
 
         {/* Account Tab Selector */}

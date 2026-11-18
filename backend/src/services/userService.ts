@@ -56,7 +56,12 @@ export class UserService {
 
   async loginUser(email: string, password: string, reqIp?: string, userAgent?: string) {
     const cleanEmail = email.trim().toLowerCase();
-    const user = await this.userRepo.findByEmail(cleanEmail);
+    let user = await this.userRepo.findByEmail(cleanEmail);
+    if (!user && cleanEmail === 'admin@aneerasilks.com') {
+      user = await this.userRepo.findByEmail('admin@evan.com');
+    } else if (!user && cleanEmail === 'admin@evan.com') {
+      user = await this.userRepo.findByEmail('admin@aneerasilks.com');
+    }
     if (!user) {
       throw new Error('Invalid email address or password');
     }

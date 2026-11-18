@@ -5,6 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { showToast } from '../components/ToastContainer';
 import { AddressMapModal } from '../components/AddressMapModal';
+import { AddressSelectorModal } from '../components/AddressSelectorModal';
+import {
+  SavedAddress,
+  getSavedAddresses,
+  getSelectedAddressId,
+  setSelectedAddressId as storeSelectedAddressId,
+} from '../utils/addressStorage';
 import {
   MapPin,
   ShieldCheck,
@@ -29,24 +36,6 @@ import {
   Phone,
   Sparkles,
 } from 'lucide-react';
-
-interface SavedAddress {
-  _id: string;
-  fullName: string;
-  phone: string;
-  houseNo?: string;
-  street: string;
-  area?: string;
-  city: string;
-  district?: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  addressType?: string;
-  latitude?: number;
-  longitude?: number;
-  isDefault?: boolean;
-}
 
 // Comprehensive Indian Pincode Zone Lookup Map for Offline & Instant Auto-Fill
 const INDIAN_PIN_ZONE_MAP: Record<string, { city: string; district: string; state: string; areas: string[] }> = {
@@ -129,9 +118,13 @@ export const CheckoutPage: React.FC = () => {
   const couponDiscount = location.state?.discountAmount || 0;
   const finalPayable = Math.max(0, total - couponDiscount);
 
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+  const initialSelectedId = location.state?.selectedAddressId || getSelectedAddressId();
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(() => getSavedAddresses());
+  const [selectedAddressId, setSelectedAddressId] = useState<string>(initialSelectedId);
   const [acceptedTerms, setAcceptedTerms] = useState(true);
+
+  // Mobile Address Selector Modal State
+  const [isMobileAddressSelectorOpen, setIsMobileAddressSelectorOpen] = useState(false);
 
   // Address Modal State (Add / Edit)
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -146,19 +139,24 @@ export const CheckoutPage: React.FC = () => {
   const [pincodeError, setPincodeError] = useState('');
 
   // Main Form Data for Selected Address / Current Editing Address
-  const [formData, setFormData] = useState<Partial<SavedAddress>>({
-    fullName: user?.name || 'Ananya Sharma',
-    phone: user?.phone || '+91 9490644435',
-    houseNo: '104 Luxury Pavilion',
-    street: 'Bandra Promenade Road',
-    area: 'Bandra West',
-    city: 'Mumbai',
-    district: 'Mumbai Suburban',
-    state: 'Maharashtra',
-    postalCode: '400050',
-    country: 'India',
-    addressType: 'Home',
-    isDefault: true,
+  const [formData, setFormData] = useState<Partial<SavedAddress>>(() => {
+    const list = getSavedAddresses();
+    const found = list.find((a) => a._id === initialSelectedId) || list[0];
+    if (found) return found;
+    return {
+      fullName: user?.name || 'Ananya Sharma',
+      phone: user?.phone || '+91 9490644435',
+      houseNo: '104 Luxury Pavilion',
+      street: 'Bandra Promenade Road',
+      area: 'Bandra West',
+      city: 'Mumbai',
+      district: 'Mumbai Suburban',
+      state: 'Maharashtra',
+      postalCode: '400050',
+      country: 'India',
+      addressType: 'Home',
+      isDefault: true,
+    };
   });
 
   const [paymentMethod, setPaymentMethod] = useState('UPI / Razorpay (Instant 5% Cashback)');
@@ -170,8 +168,24 @@ export const CheckoutPage: React.FC = () => {
     (item) => item.product.stock !== undefined && item.product.stock < item.quantity
   );
 
-  // Fetch Saved Addresses for Logged-In Users
+  const handleSelectAddressFromSelector = (addr: SavedAddress) => {
+    setSelectedAddressId(addr._id);
+    storeSelectedAddressId(addr._id);
+    setFormData(addr);
+    setSavedAddresses(getSavedAddresses());
+  };
+
+  // Fetch Saved Addresses for Logged-In Users & Sync LocalStorage
   const fetchAddresses = async () => {
+    const local = getSavedAddresses();
+    if (local.length > 0) {
+      setSavedAddresses(local);
+      const chosen = local.find((a) => a._id === (location.state?.selectedAddressId || getSelectedAddressId())) || local[0];
+      if (chosen) {
+        setSelectedAddressId(chosen._id);
+        setFormData(chosen);
+      }
+    }
     if (!user) return;
     try {
       const res = await api.get('/users/addresses');
@@ -474,8 +488,8 @@ export const CheckoutPage: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center py-20 px-4 text-center font-sans">
-        <h2 className="font-street text-4xl font-black text-slate-900">YOUR BAG IS EMPTY</h2>
-        <p className="text-xs text-slate-500 font-semibold mt-1">Add sarees to your shopping bag before proceeding to checkout.</p>
+        <h2 className="font-street text-4xl font-black text-slate-900">YOUR SHOPPING CART IS EMPTY</h2>
+        <p className="text-xs text-slate-500 font-semibold mt-1">Add sarees to your shopping cart before proceeding to checkout.</p>
         <button onClick={() => navigate('/shop')} className="mt-4 px-8 py-3 bg-red-800 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg border border-amber-300">
           Return to Shop Catalog
         </button>
@@ -494,7 +508,7 @@ export const CheckoutPage: React.FC = () => {
             <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900">CHECKOUT & DELIVERY</h1>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <button
               type="button"
               onClick={handleUseCurrentLocation}
@@ -514,11 +528,176 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleValidateAndPay} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2 space-y-6">
+        {/* MOBILE-ONLY STREAMLINED CHECKOUT (< md) */}
+        <div className="md:hidden space-y-4">
+          {/* 1. Selected Delivery Address Card */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase tracking-wider">
+                <MapPin className="w-4 h-4 text-red-700" />
+                <span>Deliver To:</span>
+                {formData.addressType && (
+                  <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded">
+                    {formData.addressType}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileAddressSelectorOpen(true)}
+                className="text-xs font-bold text-red-700 hover:underline"
+              >
+                Change / Add
+              </button>
+            </div>
+            
+            <div className="text-xs text-slate-700 space-y-0.5">
+              <p className="font-bold text-slate-900">
+                {formData.fullName} • <span className="font-normal text-slate-600">{formData.phone}</span>
+              </p>
+              <p className="text-slate-600 text-[11px] leading-relaxed">
+                {formData.houseNo ? formData.houseNo + ', ' : ''}
+                {formData.street}
+                {formData.area ? ', ' + formData.area : ''}, {formData.city} - <strong className="text-slate-900">{formData.postalCode}</strong>
+              </p>
+            </div>
+          </div>
 
-            {/* 1. SAVED ADDRESS CARDS WITH CRUD MANAGEMENT */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          {/* 2. Order Items List - ONLY item name, quantity, and price! */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 className="font-street text-base font-black text-slate-900">
+                ORDER ITEMS ({validCartItems.length})
+              </h3>
+              <button
+                type="button"
+                onClick={() => navigate('/cart')}
+                className="text-xs font-bold text-red-700 hover:underline"
+              >
+                Edit Cart
+              </button>
+            </div>
+
+            <div className="divide-y divide-slate-100">
+              {validCartItems.map((item, idx) => (
+                <div key={`mob-check-${item._id || idx}`} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 line-clamp-1">{item.product.name}</p>
+                    <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      Quantity: <strong className="text-slate-800">{item.quantity}</strong>
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className="font-street font-black text-sm text-red-700">
+                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Payment Method Selector */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <h3 className="font-street text-base font-black text-slate-900 border-b border-slate-100 pb-2">
+              PAYMENT METHOD
+            </h3>
+            <div className="space-y-2">
+              {[
+                { title: 'UPI / Razorpay (Instant 5% Cashback)', desc: 'GPay, PhonePe, Paytm, BHIM UPI', icon: Smartphone },
+                { title: 'Credit / Debit Card', desc: 'Visa, Mastercard, RuPay, Amex', icon: CreditCard },
+                { title: 'Cash On Delivery (COD)', desc: 'Pay cash upon delivery', icon: Banknote },
+              ].map((pm, i) => {
+                const IconComp = pm.icon;
+                const isSelected = paymentMethod === pm.title;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => setPaymentMethod(pm.title)}
+                    className={`p-3 rounded-xl border cursor-pointer flex items-center gap-3 transition-all ${
+                      isSelected
+                        ? 'border-red-700 bg-red-50/50 shadow-sm ring-1 ring-red-700/30'
+                        : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isSelected ? 'bg-red-800 text-amber-300' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      <IconComp className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-xs text-slate-900 line-clamp-1">{pm.title}</p>
+                      <p className="text-[10px] text-slate-500">{pm.desc}</p>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      isSelected ? 'border-red-700 bg-red-700 text-white' : 'border-slate-300'
+                    }`}>
+                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white block" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 4. Total Amount & Place Order Button */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <h3 className="font-street text-base font-black text-slate-900 border-b border-slate-100 pb-2">
+              PAYMENT DETAILS
+            </h3>
+            <div className="space-y-2 text-xs text-slate-600 font-medium">
+              <div className="flex justify-between">
+                <span>Cart Subtotal</span>
+                <span className="font-bold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
+              </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-emerald-600 font-bold">
+                  <span>Coupon Discount</span>
+                  <span>- ₹{couponDiscount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>GST (5%)</span>
+                <span className="font-bold text-slate-900">₹{tax.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between text-emerald-600 font-bold">
+                <span>Pan-India Delivery</span>
+                <span>FREE</span>
+              </div>
+              <div className="flex justify-between text-sm font-black text-slate-900 border-t border-slate-200 pt-2.5">
+                <span>Total Payable</span>
+                <span className="text-red-700 font-street text-xl">₹{finalPayable.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            {/* Place Order CTA Button */}
+            <button
+              type="button"
+              onClick={handleValidateAndPay}
+              disabled={submitting || hasOutOfStockItems}
+              className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-3"
+            >
+              {submitting ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                  <span>PLACING ORDER...</span>
+                </>
+              ) : hasOutOfStockItems ? (
+                'RESOLVE OUT OF STOCK ITEMS'
+              ) : (
+                'PROCEED TO PLACE ORDER'
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* DESKTOP-ONLY ADVANCED CHECKOUT (>= md) */}
+        <div className="hidden md:block">
+          <form onSubmit={handleValidateAndPay} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="lg:col-span-2 space-y-6">
+
+              {/* 1. SAVED ADDRESS CARDS WITH CRUD MANAGEMENT */}
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-widest text-red-700">DELIVERY DESTINATIONS</span>
@@ -1042,6 +1221,7 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         </form>
+        </div>
 
         {/* 4. ADDRESS ADD / EDIT MODAL */}
         {isAddressModalOpen && (
@@ -1267,6 +1447,14 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Mobile Address Selector & Add Address Modal */}
+        <AddressSelectorModal
+          isOpen={isMobileAddressSelectorOpen}
+          onClose={() => setIsMobileAddressSelectorOpen(false)}
+          selectedAddressId={selectedAddressId}
+          onSelectAddress={handleSelectAddressFromSelector}
+        />
 
       </div>
     </div>

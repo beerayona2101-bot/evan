@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { X, ShoppingBag, Trash2, ArrowRight, Heart } from 'lucide-react';
+import { X, ShoppingCart, Trash2, ArrowRight, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 
@@ -45,12 +45,12 @@ export const CartDrawer: React.FC = () => {
           <div className="p-5 bg-amber-50/80 border-b border-amber-200 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center shadow-sm">
-                <ShoppingBag className="w-4 h-4 text-amber-800" />
+                <ShoppingCart className="w-4 h-4 text-amber-800" />
               </div>
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 block">EVAN SAREE BAG</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 block">EVAN SAREE CART</span>
                 <h3 className="font-street text-xl font-black text-slate-900 leading-tight">
-                  MY BAG ({totalItemsCount})
+                  MY CART ({totalItemsCount})
                 </h3>
               </div>
             </div>
@@ -69,10 +69,10 @@ export const CartDrawer: React.FC = () => {
             {cartItems.filter(i => i && i.product && i.product._id).length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-12">
                 <div className="w-16 h-16 rounded-full bg-amber-100/80 text-amber-800 flex items-center justify-center border border-amber-300">
-                  <ShoppingBag className="w-8 h-8" />
+                  <ShoppingCart className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-street text-2xl font-black text-slate-900">YOUR BAG IS EMPTY</h4>
+                  <h4 className="font-street text-2xl font-black text-slate-900">YOUR CART IS EMPTY</h4>
                   <p className="text-xs text-slate-500 font-semibold max-w-xs">
                     Explore our exquisite selection of handcrafted Banarasi, Kanchipuram & Organza sarees.
                   </p>
@@ -194,7 +194,7 @@ export const CartDrawer: React.FC = () => {
                   }}
                   className="py-3 bg-amber-100/70 hover:bg-amber-200 text-slate-900 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 transition-all text-center"
                 >
-                  View Shopping Bag
+                  View Cart
                 </button>
                 <button
                   onClick={() => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Minus, Plus } from 'lucide-react';
+import { ShoppingCart, Minus, Plus } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -144,14 +144,14 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     );
   }
 
-  // State 1: Item Not in Cart -> Soft Light Gold "ADD TO BAG" Button
+  // State 1: Item Not in Cart -> Soft Light Gold "ADD TO CART" Button
   if (variant === 'full') {
     return (
       <button
         onClick={handleInitialAdd}
         className={`w-full py-4 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm border border-amber-300 flex items-center justify-center gap-2 ${className}`}
       >
-        <ShoppingBag className="w-4 h-4 text-amber-800" /> ADD TO BAG
+        <ShoppingCart className="w-4 h-4 text-amber-800" /> ADD TO CART
       </button>
     );
   }
@@ -161,7 +161,7 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       onClick={handleInitialAdd}
       className={`w-full mt-1.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-md text-[9.5px] font-black uppercase tracking-wider transition-all shadow-sm border border-amber-300 flex items-center justify-center gap-1 ${className}`}
     >
-      <ShoppingBag className="w-2.5 h-2.5 text-amber-800" /> ADD TO BAG
+      <ShoppingCart className="w-2.5 h-2.5 text-amber-800" /> ADD TO CART
     </button>
   );
 };

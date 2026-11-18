@@ -6,46 +6,54 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-slate-900 text-slate-200 border-t border-amber-500/20 pt-16 pb-12 font-sans">
       {/* Brand Value Pillars */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-slate-800/80 p-8 rounded-3xl border border-amber-400/20 shadow-2xl">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-              <Award className="w-6 h-6" />
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 mb-12 sm:mb-16">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-4 lg:gap-6 bg-slate-800/80 p-2.5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl border border-amber-400/20 shadow-2xl">
+          <div className="flex flex-col items-center text-center p-1 sm:p-2 group">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl sm:rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-1.5 sm:mb-2.5 group-hover:scale-105 group-hover:bg-amber-400/20 transition-all duration-300">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h4 className="font-extrabold text-sm text-white">100% PURE SILK MARK</h4>
-              <p className="text-xs text-slate-400">Certified Authentic Indian Handlooms</p>
-            </div>
+            <h4 className="font-black text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-white uppercase tracking-tight leading-tight">
+              100% SILK MARK
+            </h4>
+            <p className="text-[7.5px] xs:text-[8.5px] sm:text-[11px] md:text-xs text-slate-400 font-medium leading-tight mt-0.5 sm:mt-1">
+              Certified Pure
+            </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-              <Truck className="w-6 h-6" />
+          <div className="flex flex-col items-center text-center p-1 sm:p-2 group">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl sm:rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-1.5 sm:mb-2.5 group-hover:scale-105 group-hover:bg-amber-400/20 transition-all duration-300">
+              <Truck className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h4 className="font-extrabold text-sm text-white">FREE EXPRESS SHIPPING</h4>
-              <p className="text-xs text-slate-400">Insured Delivery Across India</p>
-            </div>
+            <h4 className="font-black text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-white uppercase tracking-tight leading-tight">
+              FREE SHIPPING
+            </h4>
+            <p className="text-[7.5px] xs:text-[8.5px] sm:text-[11px] md:text-xs text-slate-400 font-medium leading-tight mt-0.5 sm:mt-1">
+              Pan-India Insured
+            </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-              <RefreshCw className="w-6 h-6" />
+          <div className="flex flex-col items-center text-center p-1 sm:p-2 group">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl sm:rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-1.5 sm:mb-2.5 group-hover:scale-105 group-hover:bg-amber-400/20 transition-all duration-300">
+              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h4 className="font-extrabold text-sm text-white">7-DAY HASSLE RETURN</h4>
-              <p className="text-xs text-slate-400">Easy Returns & Exchanges</p>
-            </div>
+            <h4 className="font-black text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-white uppercase tracking-tight leading-tight">
+              7-DAY RETURN
+            </h4>
+            <p className="text-[7.5px] xs:text-[8.5px] sm:text-[11px] md:text-xs text-slate-400 font-medium leading-tight mt-0.5 sm:mt-1">
+              Easy Exchanges
+            </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="flex flex-col items-center text-center p-1 sm:p-2 group">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl sm:rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-1.5 sm:mb-2.5 group-hover:scale-105 group-hover:bg-amber-400/20 transition-all duration-300">
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h4 className="font-extrabold text-sm text-white">WEAVER DIRECT CRAFT</h4>
-              <p className="text-xs text-slate-400">Supporting Traditional Indian Artisans</p>
-            </div>
+            <h4 className="font-black text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-white uppercase tracking-tight leading-tight">
+              DIRECT WEAVER
+            </h4>
+            <p className="text-[7.5px] xs:text-[8.5px] sm:text-[11px] md:text-xs text-slate-400 font-medium leading-tight mt-0.5 sm:mt-1">
+              Artisan Made
+            </p>
           </div>
         </div>
       </div>

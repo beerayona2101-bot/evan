@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Heart, Menu, X, Shield, User as UserIcon, Sparkles } from 'lucide-react';
+import { ShoppingCart, Heart, Shield, User as UserIcon, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -10,7 +10,6 @@ export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { totalItemsCount } = useCart();
   const { wishlist } = useWishlist();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const location = useLocation();
 
@@ -37,14 +36,6 @@ export const Navbar: React.FC = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-1.5 px-4 sm:px-8 shadow-sm">
       {/* ANEERA SILKS Seamless Header */}
       <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-slate-800 hover:text-red-700 focus:outline-none"
-        >
-          {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-        </button>
-
         {/* Brand Logo: Aneera Silks */}
         <Link to="/" className="flex items-center space-x-2.5">
           <img
@@ -124,8 +115,28 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Right Header Icons */}
-        <div className="flex items-center space-x-3.5 text-slate-800">
+        {/* Mobile Top Actions (Admin badge & Concierge) */}
+        <div className="flex items-center space-x-2 md:hidden">
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-800 text-amber-300 border border-amber-300 text-[10px] font-black uppercase tracking-wider shadow-xs"
+            >
+              <Shield className="w-3 h-3 text-amber-300" />
+              <span>Admin</span>
+            </Link>
+          )}
+          <Link
+            to="/contact"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-100/70 hover:bg-amber-200/80 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider transition-colors shadow-xs"
+          >
+            <Sparkles className="w-3 h-3 text-red-700" />
+            <span>Concierge</span>
+          </Link>
+        </div>
+
+        {/* Desktop Right Header Icons */}
+        <div className="hidden md:flex items-center space-x-3.5 text-slate-800">
           {/* Wishlist Icon with Counter - Rendered ONLY when user is logged in */}
           {user && (
             <Link
@@ -155,10 +166,10 @@ export const Navbar: React.FC = () => {
               className={`p-1.5 transition-colors relative ${
                 isActive('/cart') ? 'text-red-700 font-black' : 'hover:text-red-700'
               }`}
-              aria-label="Shopping Bag"
-              title="View Shopping Bag Page"
+              aria-label="Shopping Cart"
+              title="View Shopping Cart Page"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingCart className="w-4 h-4" />
               {totalItemsCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-800 text-amber-300 font-black text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-amber-300">
                   {totalItemsCount}
@@ -250,63 +261,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Mobile Drawer Navigation */}
-      {mobileMenuOpen && (
-        <div className="md:hidden mt-3 p-6 bg-white rounded-3xl border border-amber-300 shadow-2xl space-y-4 text-xs font-black tracking-widest uppercase">
-          <Link
-            to="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/about') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            About Us
-          </Link>
-          <Link
-            to="/shop"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/shop') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            Collections
-          </Link>
-          <Link
-            to="/contact"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/contact') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            Contact Us
-          </Link>
-          <Link
-            to="/faq"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block py-2 ${
-              isActive('/faq') ? 'text-red-700 font-black border-l-4 border-red-700 pl-2' : 'text-slate-900 hover:text-red-700'
-            }`}
-          >
-            FAQs
-          </Link>
-
-          {user?.role === 'admin' && (
-            <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-red-800 font-black">
-              Admin Dashboard
-            </Link>
-          )}
-        </div>
-      )}
     </header>
   );
 };

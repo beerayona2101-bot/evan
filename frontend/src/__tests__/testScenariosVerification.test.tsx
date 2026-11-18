@@ -178,9 +178,9 @@ describe('Aneera Silks Complete Test Scenarios Verification', () => {
   });
 
   describe('4. Shopping Cart & Wishlist Scenarios', () => {
-    it('Verify Shopping Bag Section & Empty Cart State', () => {
+    it('Verify Shopping Cart Section & Empty Cart State', () => {
       renderWithProviders(<CartPage />);
-      expect(screen.getByText(/YOUR SHOPPING BAG IS EMPTY/i)).toBeInTheDocument();
+      expect(screen.getByText(/YOUR SHOPPING (CART|BAG) IS EMPTY/i)).toBeInTheDocument();
     });
 
     it('Verify Wishlist (Your Wishlist is Empty) Page', () => {

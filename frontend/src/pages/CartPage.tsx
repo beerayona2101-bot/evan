@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, ArrowRight, ShoppingBag, ShieldCheck, Check, Bookmark, Sparkles, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Trash2, ArrowRight, ShoppingCart, ShieldCheck, Check, Bookmark, RefreshCw, AlertTriangle, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { couponApi } from '../services/couponApi';
 import { showToast } from '../components/ToastContainer';
-import { ProductCard } from '../components/ProductCard';
+import { AddressSelectorModal } from '../components/AddressSelectorModal';
+import {
+  SavedAddress,
+  getSavedAddresses,
+  getSelectedAddressId,
+  setSelectedAddressId as storeSelectedAddressId,
+} from '../utils/addressStorage';
 
 export const CartPage: React.FC = () => {
   const {
@@ -32,6 +38,29 @@ export const CartPage: React.FC = () => {
   // Confirmation Modal States
   const [itemToRemove, setItemToRemove] = useState<{ index: number; name: string; isSaved: boolean } | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // In-Cart Address State & Modal
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(() => getSavedAddresses());
+  const [selectedAddressId, setSelectedAddressId] = useState<string>(() => getSelectedAddressId());
+
+  const selectedAddress =
+    savedAddresses.find((a) => a._id === selectedAddressId) || savedAddresses[0] || null;
+
+  const handleAddressSelect = (addr: SavedAddress) => {
+    setSelectedAddressId(addr._id);
+    storeSelectedAddressId(addr._id);
+    setSavedAddresses(getSavedAddresses());
+  };
+
+  const handleProceedToCheckout = () => {
+    navigate('/checkout', {
+      state: {
+        selectedAddressId,
+        discountAmount: discount,
+      },
+    });
+  };
 
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,90 +97,137 @@ export const CartPage: React.FC = () => {
   const validCartItems = cartItems.filter((i) => i && i.product && i.product._id);
   const validSavedItems = savedForLaterItems.filter((i) => i && i.product && i.product._id);
 
-  if (validCartItems.length === 0 && validSavedItems.length === 0) {
+  if (validCartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FFFDF9] text-slate-900 py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="w-24 h-24 rounded-full bg-amber-100/80 text-amber-800 flex items-center justify-center mx-auto border-2 border-amber-300 shadow-inner">
-            <ShoppingBag className="w-12 h-12" />
+      <div className="min-h-screen bg-[#FFFDF9] text-slate-900 py-12 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <div className="w-24 h-24 rounded-full bg-amber-100/90 text-amber-800 flex items-center justify-center mx-auto border-2 border-amber-300 shadow-md">
+            <ShoppingCart className="w-12 h-12" />
           </div>
-          <h2 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900">YOUR SHOPPING BAG IS EMPTY</h2>
-          <p className="text-sm text-slate-500 font-medium max-w-md mx-auto">
-            Discover our exquisite collection of pure silk, handcrafted Banarasi & Kanchipuram sarees tailored for timeless elegance.
+          <h1 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-wide">
+            YOUR SHOPPING CART IS EMPTY
+          </h1>
+          <p className="text-sm text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
+            Your luxury shopping bag is currently empty. Discover our exquisite collection of pure silk, handcrafted Banarasi & Kanchipuram sarees tailored for timeless elegance.
           </p>
-          <div>
+          <div className="pt-2">
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300 hover:scale-[1.02]"
             >
               EXPLORE SAREE CATALOG <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {/* Recommended Sarees Grid */}
-          <div className="pt-12 border-t border-amber-200/80 text-left space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-luxury text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" /> Recommended For You
-              </h3>
-              <Link to="/shop" className="text-xs font-bold text-red-800 hover:underline">View All Sarees →</Link>
+          {/* Luxury Atelier Assurance Badges (Clean, Responsive, No Product Cards) */}
+          <div className="pt-10 border-t border-amber-200/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+            <div className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900">100% Pure Silk Mark</h4>
+                <p className="text-[10px] text-slate-500">Government certified authentic weaves</p>
+              </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                {
-                  _id: '6a702511162ab5cd258363b9',
-                  name: 'Royal Royal Crimson Banarasi Katan Silk Saree',
-                  price: 14187,
-                  mrp: 18999,
-                  discountPercentage: 25,
-                  category: 'Banarasi Silk',
-                  fabric: 'Pure Katan Silk',
-                  images: ['/images/saree_banarasi_red.png'],
-                  numReviews: 48,
-                  rating: 4.9,
-                },
-                {
-                  _id: '6a702511162ab5cd25836ba',
-                  name: 'Imperial Emerald Kanchipuram Zari Brocade Saree',
-                  price: 18500,
-                  mrp: 24999,
-                  discountPercentage: 26,
-                  category: 'Kanchipuram Silk',
-                  fabric: 'Mulberry Silk',
-                  images: ['/images/saree_kanchipuram_green.png'],
-                  numReviews: 32,
-                  rating: 5.0,
-                },
-                {
-                  _id: '6a702511162ab5cd25836bb',
-                  name: 'Midnight Onyx Organza Handloom Silk Saree',
-                  price: 9800,
-                  mrp: 12999,
-                  discountPercentage: 24,
-                  category: 'Organza Silk',
-                  fabric: 'Sheer Organza',
-                  images: ['/images/saree_organza_black.png'],
-                  numReviews: 29,
-                  rating: 4.8,
-                },
-                {
-                  _id: '6a702511162ab5cd25836bc',
-                  name: 'Antique Gold Tissue Silk Festive Saree',
-                  price: 22000,
-                  mrp: 29999,
-                  discountPercentage: 27,
-                  category: 'Tissue Silk',
-                  fabric: 'Gold Tissue',
-                  images: ['/images/saree_tissue_gold.png'],
-                  numReviews: 55,
-                  rating: 4.9,
-                },
-              ].map((p) => (
-                <ProductCard key={p._id} product={p as any} />
-              ))}
+            <div className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+                <Check className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900">Express Delivery</h4>
+                <p className="text-[10px] text-slate-500">Complimentary insured pan-India shipping</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+                <RefreshCw className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900">7-Day Atelier Assurance</h4>
+                <p className="text-[10px] text-slate-500">Hassle-free exchange policy</p>
+              </div>
             </div>
           </div>
+
+          {/* Saved For Later Section (Only if user has saved items) */}
+          {validSavedItems.length > 0 && (
+            <div className="pt-8 text-left">
+              <div className="bg-amber-50/40 p-6 rounded-3xl border border-amber-200/90 space-y-4">
+                <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+                  <h3 className="font-serif-luxury text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <Bookmark className="w-5 h-5 text-amber-700" /> SAVED FOR LATER ({validSavedItems.length})
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium">Items saved for future orders</span>
+                </div>
+
+                <div className="space-y-3">
+                  {validSavedItems.map((item, idx) => (
+                    <div key={item._id || idx} className="bg-white p-3.5 rounded-2xl border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={item.product.images[0] || '/images/saree_banarasi_red.png'}
+                          alt={item.product.name}
+                          className="w-14 aspect-[4/5] object-contain rounded-xl bg-amber-50/30 p-1 border border-amber-200"
+                        />
+                        <div>
+                          <h4 className="font-serif-luxury font-bold text-sm text-slate-900 line-clamp-1">{item.product.name}</h4>
+                          <span className="text-xs text-red-800 font-bold">₹{item.price.toLocaleString('en-IN')}</span>
+                          <span className="text-[10px] text-slate-400 ml-2">Size: {item.size} • Color: {item.color}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button
+                          onClick={() => moveToCartFromSaved(idx)}
+                          className="px-4 py-2 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm"
+                        >
+                          Move To Cart
+                        </button>
+                        <button
+                          onClick={() => setItemToRemove({ index: idx, name: item.product.name, isSaved: true })}
+                          className="p-2 text-slate-400 hover:text-red-700 transition"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Item Remove Confirmation Modal for saved items */}
+        {itemToRemove && (
+          <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-amber-200 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-3 text-red-800">
+                <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+                <h3 className="font-serif-luxury text-xl font-bold">Remove Item?</h3>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Are you sure you want to remove <strong>"{itemToRemove.name}"</strong>?
+              </p>
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setItemToRemove(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRemoveItem}
+                  className="px-5 py-2 bg-red-800 hover:bg-red-900 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition shadow"
+                >
+                  Yes, Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -165,7 +241,7 @@ export const CartPage: React.FC = () => {
           <div>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 block">EVAN SAREE ATELIER</span>
             <h1 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900">
-              MY SHOPPING BAG ({validCartItems.length})
+              MY SHOPPING CART ({validCartItems.length})
             </h1>
           </div>
           
@@ -174,7 +250,7 @@ export const CartPage: React.FC = () => {
               onClick={() => setShowClearConfirm(true)}
               className="text-xs font-bold text-slate-500 hover:text-red-700 transition-colors flex items-center gap-1"
             >
-              <Trash2 className="w-3.5 h-3.5" /> Clear Entire Bag
+              <Trash2 className="w-3.5 h-3.5" /> Clear Entire Cart
             </button>
             <Link
               to="/shop"
@@ -189,7 +265,178 @@ export const CartPage: React.FC = () => {
           
           {/* Main Cart Items Section */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="space-y-4">
+
+            {/* MOBILE ONLY: In-Cart Delivery Address Section */}
+            <div className="md:hidden bg-white p-4 rounded-2xl border border-amber-200/90 shadow-sm space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <MapPin className="w-4 h-4 text-red-800" />
+                  <span>Deliver To:</span>
+                  {selectedAddress?.addressType && (
+                    <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded">
+                      {selectedAddress.addressType}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAddressModalOpen(true)}
+                  className="text-xs font-bold text-red-800 hover:text-red-900 hover:underline flex items-center gap-0.5"
+                >
+                  Change / Add
+                </button>
+              </div>
+
+              {selectedAddress ? (
+                <div className="text-xs text-slate-600 bg-amber-50/40 p-2.5 rounded-xl border border-amber-100">
+                  <p className="font-bold text-slate-900">
+                    {selectedAddress.fullName} • <span className="font-normal text-slate-600">{selectedAddress.phone}</span>
+                  </p>
+                  <p className="line-clamp-2 text-slate-600 text-[11px] mt-0.5">
+                    {selectedAddress.houseNo ? selectedAddress.houseNo + ', ' : ''}
+                    {selectedAddress.street}
+                    {selectedAddress.area ? ', ' + selectedAddress.area : ''}, {selectedAddress.city} - <strong className="text-slate-800">{selectedAddress.postalCode}</strong>
+                  </p>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAddressModalOpen(true)}
+                  className="w-full text-xs text-red-800 bg-amber-50/50 p-2.5 rounded-xl border border-dashed border-amber-300 text-center font-bold"
+                >
+                  + Add or select a delivery address
+                </button>
+              )}
+            </div>
+
+            {/* MOBILE ONLY: Compact Single-Row Cart Item Cards (Image + Name + Qty + Price in one row) */}
+            <div className="md:hidden space-y-3">
+              {validCartItems.map((item, idx) => {
+                const stock = item.product.stock !== undefined ? item.product.stock : 25;
+                const mrp = item.product.mrp || Math.round((item.price || 0) * 1.25);
+
+                return (
+                  <div
+                    key={`mob-${item._id || idx}`}
+                    className="bg-white p-3 rounded-2xl border border-amber-200/90 shadow-sm flex items-center gap-3 relative"
+                  >
+                    {/* Item Thumbnail */}
+                    <Link
+                      to={`/product/${item.product._id}`}
+                      className="w-16 h-20 rounded-xl overflow-hidden bg-amber-50/40 border border-amber-200 flex-shrink-0 flex items-center justify-center p-0.5"
+                    >
+                      <img
+                        src={item.product.images[0] || '/images/saree_banarasi_red.png'}
+                        alt={item.product.name}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                    </Link>
+
+                    {/* Item Name & Quantity Stepper */}
+                    <div className="flex-1 min-w-0">
+                      <Link to={`/product/${item.product._id}`}>
+                        <h4 className="font-serif-luxury font-bold text-xs text-slate-900 line-clamp-1 hover:text-red-800">
+                          {item.product.name}
+                        </h4>
+                      </Link>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                        {item.color} • {item.size}
+                      </p>
+
+                      {/* Quantity Stepper in row */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center border border-amber-200 rounded-lg bg-amber-50/60 p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(idx, item.quantity - 1)}
+                            className="w-6 h-6 rounded bg-white flex items-center justify-center text-xs font-bold text-slate-800 hover:bg-amber-100 active:scale-95 transition"
+                            title="Decrease Quantity"
+                          >
+                            -
+                          </button>
+                          <span className="text-xs font-black px-2.5 font-mono text-slate-900">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(idx, item.quantity + 1)}
+                            disabled={item.quantity >= stock}
+                            className="w-6 h-6 rounded bg-white flex items-center justify-center text-xs font-bold text-slate-800 hover:bg-amber-100 active:scale-95 transition disabled:opacity-40"
+                            title="Increase Quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">Qty</span>
+                      </div>
+                    </div>
+
+                    {/* Price details & Remove */}
+                    <div className="flex flex-col items-end justify-between self-stretch flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setItemToRemove({ index: idx, name: item.product.name, isSaved: false })}
+                        className="text-slate-400 hover:text-red-700 p-1"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <div className="text-right">
+                        <div className="text-[10px] text-slate-400 line-through">₹{(mrp * item.quantity).toLocaleString('en-IN')}</div>
+                        <div className="font-black text-sm text-red-800">₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* MOBILE ONLY: Total Amount Details Card */}
+            <div className="md:hidden bg-white p-4 rounded-2xl border border-amber-200/90 shadow-sm space-y-3">
+              <h3 className="font-serif-luxury text-sm font-bold text-slate-900 border-b border-amber-100 pb-2">
+                TOTAL AMOUNT DETAILS
+              </h3>
+              <div className="space-y-2 text-xs text-slate-600">
+                <div className="flex justify-between">
+                  <span>Cart Subtotal ({validCartItems.length} items)</span>
+                  <span className="font-bold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-bold">
+                    <span>Coupon Discount</span>
+                    <span>- ₹{discount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>Estimated GST (5%)</span>
+                  <span className="font-bold text-slate-900">₹{tax.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>Express Shipping</span>
+                  <span>FREE</span>
+                </div>
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>Luxury Box Packaging</span>
+                  <span>FREE</span>
+                </div>
+                <div className="border-t border-amber-100 pt-2 flex justify-between items-baseline text-slate-900 font-black">
+                  <span className="text-sm">Total Amount</span>
+                  <span className="text-red-800 font-serif-luxury text-xl font-black">
+                    ₹{total.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Proceed to Checkout Button */}
+              <button
+                type="button"
+                onClick={handleProceedToCheckout}
+                className="w-full py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg flex items-center justify-center gap-2 transition border border-amber-300 mt-2"
+              >
+                PROCEED TO CHECKOUT <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* DESKTOP ONLY: Standard Detailed Cart Items Layout */}
+            <div className="hidden md:block space-y-4">
               {validCartItems.map((item, idx) => {
                 const sku = item.product.sku || `EVAN-SKU-${item.product._id ? item.product._id.slice(-4) : idx + 100}`;
                 const stock = item.product.stock !== undefined ? item.product.stock : 25;
@@ -342,7 +589,7 @@ export const CartPage: React.FC = () => {
                           onClick={() => moveToCartFromSaved(idx)}
                           className="px-4 py-2 bg-slate-900 hover:bg-red-800 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm"
                         >
-                          Move To Bag
+                          Move To Cart
                         </button>
                         <button
                           onClick={() => setItemToRemove({ index: idx, name: item.product.name, isSaved: true })}
@@ -408,7 +655,7 @@ export const CartPage: React.FC = () => {
               {/* Cost Breakdown */}
               <div className="space-y-2.5 text-xs border-t border-amber-100 pt-4 text-slate-600 font-medium">
                 <div className="flex justify-between">
-                  <span>Bag Subtotal ({validCartItems.length} items)</span>
+                  <span>Cart Subtotal ({validCartItems.length} items)</span>
                   <span className="font-bold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
 
@@ -455,7 +702,8 @@ export const CartPage: React.FC = () => {
 
               {/* Proceed to Checkout CTA */}
               <button
-                onClick={() => navigate('/checkout')}
+                type="button"
+                onClick={handleProceedToCheckout}
                 className="w-full py-4 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl flex items-center justify-center gap-2 transition border border-amber-300"
               >
                 PROCEED TO CHECKOUT <ArrowRight className="w-4 h-4" />
@@ -478,10 +726,10 @@ export const CartPage: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-amber-200 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-3 text-red-800">
               <AlertTriangle className="w-6 h-6 flex-shrink-0" />
-              <h3 className="font-serif-luxury text-xl font-bold">Remove From Shopping Bag?</h3>
+              <h3 className="font-serif-luxury text-xl font-bold">Remove From Cart?</h3>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to remove <strong>"{itemToRemove.name}"</strong> from your bag? You can also save it for later instead of deleting it.
+              Are you sure you want to remove <strong>"{itemToRemove.name}"</strong> from your cart? You can also save it for later instead of deleting it.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
@@ -507,10 +755,10 @@ export const CartPage: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-amber-200 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-3 text-red-800">
               <AlertTriangle className="w-6 h-6 flex-shrink-0" />
-              <h3 className="font-serif-luxury text-xl font-bold">Clear Entire Shopping Bag?</h3>
+              <h3 className="font-serif-luxury text-xl font-bold">Clear Entire Cart?</h3>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to delete all {validCartItems.length} items from your shopping bag? This action cannot be undone.
+              Are you sure you want to delete all {validCartItems.length} items from your cart? This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
@@ -523,12 +771,20 @@ export const CartPage: React.FC = () => {
                 onClick={confirmClearCart}
                 className="px-5 py-2 bg-red-800 hover:bg-red-900 text-amber-300 rounded-xl text-xs font-black uppercase tracking-wider transition shadow"
               >
-                Clear Entire Bag
+                Clear Entire Cart
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Address Selector & Add Address Modal for Cart */}
+      <AddressSelectorModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        selectedAddressId={selectedAddressId}
+        onSelectAddress={handleAddressSelect}
+      />
     </div>
   );
 };

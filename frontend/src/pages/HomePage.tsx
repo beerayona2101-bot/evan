@@ -114,6 +114,61 @@ export const HomePage: React.FC = () => {
     };
   }, [socket]);
 
+  // Testimonials with 4 royal client reviews (2 existing + 2 newly added)
+  const defaultTestimonials = [
+    {
+      id: 'test-1',
+      customerName: 'Priya Rajvanshi',
+      location: 'Hyderabad, India',
+      rating: 5,
+      review: 'The Kanchipuram pure zari saree I ordered for my wedding was breathtaking. Authentic silk weave and magnificent craftsmanship!',
+    },
+    {
+      id: 'test-2',
+      customerName: 'Ananya Sharma',
+      location: 'Mumbai, India',
+      rating: 5,
+      review: 'EVAN COLLECTIONS is the best luxury saree atelier! Fast shipping and 100% authentic handloom craftsmanship.',
+    },
+    {
+      id: 'test-3',
+      customerName: 'Deepika Reddy',
+      location: 'Bengaluru, India',
+      rating: 5,
+      review: 'The Banarasi pure Katan silk drape is exquisite. The royal zari sheen and luxury box packaging felt like pure regal heritage.',
+    },
+    {
+      id: 'test-4',
+      customerName: 'Meera Krishnan',
+      location: 'Chennai, India',
+      rating: 5,
+      review: 'Received my heirloom silk saree with official Silk Mark certification within 48 hours. The drape and rich fall are absolutely unmatched.',
+    },
+  ];
+
+  const testimonialsList = React.useMemo(() => {
+    const fromCms = cms?.testimonials && cms.testimonials.length > 0 ? cms.testimonials : [];
+    if (fromCms.length >= 4) return fromCms;
+    const combined = [...fromCms];
+    for (const def of defaultTestimonials) {
+      if (!combined.some((t: any) => (t.customerName || t.clientName) === def.customerName)) {
+        combined.push(def);
+      }
+    }
+    return combined;
+  }, [cms?.testimonials]);
+
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+
+  // Auto-change testimonial card every 1.5 seconds like a carousel
+  useEffect(() => {
+    if (testimonialsList.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentTestimonialIndex((prev) => (prev + 1) % testimonialsList.length);
+    }, 1500);
+    return () => clearInterval(timer);
+  }, [testimonialsList.length]);
+
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [mouseStartX, setMouseStartX] = useState(0);
@@ -293,8 +348,8 @@ export const HomePage: React.FC = () => {
 
       {/* 1. LUXURY SAREE HERO BANNER SECTION - 100% FULL-BLEED EDITORIAL BANNER CAROUSEL (3 SLIDES) */}
       {hero.enabled && (
-        <section className="relative w-full mb-6 group mt-0 pt-0">
-          <div className="relative w-full overflow-hidden bg-[#0b070d] min-h-[440px] sm:min-h-[500px] lg:min-h-[540px] flex items-center">
+        <section className="relative w-full mb-4 sm:mb-6 group mt-2.5 sm:mt-3 md:mt-0 pt-0 px-3 sm:px-6 md:px-0">
+          <div className="relative w-full overflow-hidden bg-[#0b070d] h-[200px] xs:h-[220px] sm:h-[280px] md:h-auto md:min-h-[500px] lg:min-h-[540px] rounded-2xl md:rounded-none shadow-md md:shadow-none flex items-center">
             
             {/* Full-bleed Background Images Carousel displaying model face & full saree drape */}
             <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -304,42 +359,60 @@ export const HomePage: React.FC = () => {
                   src={slide.image}
                   alt={`Aneera Silks Saree - ${slide.title}`}
                   {...({ fetchpriority: idx === 0 ? 'high' : 'auto' } as any)}
-                  className={`absolute inset-0 w-full h-full object-cover object-[75%_center] sm:object-right filter brightness-[0.95] contrast-[1.05] transition-opacity duration-700 ease-in-out ${
+                  className={`absolute inset-0 w-full h-full object-cover object-[center_30%] sm:object-right filter brightness-[0.95] contrast-[1.05] transition-opacity duration-700 ease-in-out ${
                     idx === safeSlideIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
                   }`}
                 />
               ))}
-              {/* Left-to-right gradient overlay for text readability & seamless integration */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#09050b] via-[#09050b]/80 to-transparent w-[70%] sm:w-[58%] lg:w-[50%] z-10" />
+              {/* Gradient overlays:
+                  - Mobile: bottom-to-top gradient for clean image visibility with legible bottom heading
+                  - Desktop: left-to-right gradient overlay for text readability & seamless integration */}
+              <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent z-10" />
+              <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#09050b] via-[#09050b]/80 to-transparent w-[70%] sm:w-[58%] lg:w-[50%] z-10" />
             </div>
 
-            {/* Left Content Area (Overlaid on the dark left gradient) */}
-            <div className="relative z-20 max-w-7xl mx-auto w-full px-6 sm:px-12 lg:px-16 py-8 sm:py-12">
-              <div key={activeSlide.id || safeSlideIndex} className="space-y-3 sm:space-y-5 max-w-[85%] sm:max-w-xl flex flex-col justify-center animate-fadeIn">
+            {/* Mobile Touch Tap Overlay (Whole rectangular banner is clickable on mobile) */}
+            <Link
+              to={activeSlide.primaryButtonLink || '/shop'}
+              onMouseEnter={() => prefetchRoute('shop')}
+              onTouchStart={() => prefetchRoute('shop')}
+              className="md:hidden absolute inset-0 z-30"
+              aria-label={`Shop ${activeSlide.title}`}
+            />
+
+            {/* Content Area - Responsive for both Mobile and Desktop */}
+            <div className="relative z-20 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 lg:px-16 h-full flex flex-col justify-end pb-4 pt-4 sm:pb-6 md:justify-center md:py-8 md:py-12 pointer-events-none md:pointer-events-auto">
+              <div key={activeSlide.id || safeSlideIndex} className="space-y-2 sm:space-y-3 md:space-y-5 max-w-[90%] sm:max-w-xl flex flex-col justify-center animate-fadeIn">
                 
-                {/* Gold Pill Badge */}
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase w-fit shadow-md">
+                {/* Gold Pill Badge (Desktop Only) */}
+                <div className="hidden md:inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase w-fit shadow-md">
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                   <span>{activeSlide.offerBadge}</span>
                 </div>
 
                 {/* Subtitle & Main Headline */}
-                <div className="space-y-1 sm:space-y-1.5">
-                  <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.25em] text-amber-500">
+                <div className="space-y-0.5 sm:space-y-1 md:space-y-1.5">
+                  <span className="hidden md:block text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.25em] text-amber-500">
                     {activeSlide.subtitle}
                   </span>
-                  <h1 className="font-street text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-none uppercase drop-shadow-md">
-                    {activeSlide.title}
-                  </h1>
+                  <div className="flex items-end justify-between gap-3">
+                    <h1 className="font-street text-xl xs:text-2xl sm:text-3xl md:text-6xl lg:text-7xl font-black text-white tracking-wide md:tracking-tight uppercase drop-shadow-md leading-tight">
+                      {activeSlide.title}
+                    </h1>
+                    <span className="md:hidden flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 backdrop-blur-xs border border-amber-400/50 text-amber-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      <span>SHOP</span>
+                      <ArrowRight className="w-3 h-3 text-amber-300" />
+                    </span>
+                  </div>
                 </div>
 
-                {/* Description Text */}
-                <p className="text-xs sm:text-sm text-slate-200 font-normal leading-relaxed max-w-lg line-clamp-3 sm:line-clamp-none">
+                {/* Description Text (Desktop Only) */}
+                <p className="hidden md:block text-xs sm:text-sm text-slate-200 font-normal leading-relaxed max-w-lg">
                   {activeSlide.description}
                 </p>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 pt-1">
+                {/* Action Buttons (Desktop Only) */}
+                <div className="hidden md:flex flex-wrap items-center gap-2.5 sm:gap-4 pt-1 pointer-events-auto">
                   <Link
                     to={activeSlide.primaryButtonLink || '/shop'}
                     onMouseEnter={() => prefetchRoute('shop')}
@@ -361,7 +434,7 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Bottom Right Floating Collection Badge */}
+            {/* Bottom Right Floating Collection Badge (Desktop only) */}
             <Link
               to={activeSlide.secondaryButtonLink || '/shop'}
               onMouseEnter={() => prefetchRoute('shop')}
@@ -373,18 +446,34 @@ export const HomePage: React.FC = () => {
             </Link>
 
           </div>
+
+          {/* Mobile Carousel Indicators (Dots) */}
+          {heroSlides.length > 1 && (
+            <div className="flex md:hidden items-center justify-center gap-1.5 mt-2.5">
+              {heroSlides.map((_: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentHeroSlide(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    idx === safeSlideIndex ? 'w-6 bg-red-700 shadow-xs' : 'w-1.5 bg-amber-300/80 hover:bg-amber-400'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
       {/* 2. 5-TILE EDITORIAL SAREE LOOKBOOK GALLERY (PROPORTIONALLY SCALED FOR SINGLE-SCREEN FIT) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 my-8 py-2">
-        <div className="bg-white p-5 sm:p-8 rounded-3xl border border-amber-200/90 shadow-md space-y-4">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 my-5 sm:my-8 py-1 sm:py-2">
+        <div className="bg-white p-3 sm:p-5 md:p-8 rounded-2xl sm:rounded-3xl border border-amber-200/90 shadow-md space-y-3 sm:space-y-4">
           <div className="text-center space-y-0.5">
-            <h2 className="font-street text-3xl sm:text-4xl text-slate-900 tracking-wider">EDITORIAL LOOKBOOK GALLERY</h2>
-            <p className="text-[10px] sm:text-xs text-amber-800 font-bold uppercase tracking-widest">Curated Saree Collections • Click Any Tile To Explore</p>
+            <h2 className="font-street text-2xl sm:text-3xl md:text-4xl text-slate-900 tracking-wider">EDITORIAL LOOKBOOK GALLERY</h2>
+            <p className="text-[9px] sm:text-xs text-amber-800 font-bold uppercase tracking-widest">Curated Saree Collections • Click Any Tile To Explore</p>
           </div>
 
-          {/* Dynamic 5-Tile Lookbook Gallery from CMS */}
+          {/* Dynamic 5-Tile Lookbook Gallery from CMS (Same 3-column Bento layout on mobile & web) */}
           {(() => {
             const cols = cms?.featuredCollections || [];
             const tile1 = cols[0] || { name: 'Banarasi Zari Brocade Collection', image: '/images/saree_banarasi_red.png', buttonLink: '/shop?category=Banarasi Sarees', buttonText: 'Explore' };
@@ -394,12 +483,13 @@ export const HomePage: React.FC = () => {
             const tile5 = cols[4] || { name: 'Scalloped Floral Organza', image: '/images/saree_organza_floral.png', buttonLink: '/shop?category=Organza Sarees', buttonText: 'Explore' };
 
             return (
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 h-auto md:h-[400px]">
-                {/* Tile 1 & 2 */}
-                <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
+              <div className="grid grid-cols-12 gap-2 sm:gap-3 md:gap-3.5 h-[270px] xs:h-[300px] sm:h-[350px] md:h-[400px]">
+                {/* Tile 1 & 2 (Left Column: 2 Stacked Tiles) */}
+                <div className="col-span-4 grid grid-rows-2 gap-2 sm:gap-3 md:gap-3.5 h-full">
                   <Link
                     to={tile1.buttonLink || '/shop?category=Banarasi Sarees'}
-                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                    className="relative rounded-xl sm:rounded-2xl overflow-hidden group border border-amber-200/90 bg-slate-100 block h-full shadow-xs active:scale-[0.98] transition-transform"
+                    aria-label={tile1.name}
                   >
                     <img
                       src={tile1.image || '/images/saree_banarasi_red.png'}
@@ -408,7 +498,8 @@ export const HomePage: React.FC = () => {
                       decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent hidden md:flex items-end p-3.5 justify-between">
                       <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile1.name}</span>
                       <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
                         {tile1.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
@@ -418,7 +509,8 @@ export const HomePage: React.FC = () => {
 
                   <Link
                     to={tile2.buttonLink || '/shop?category=Kanchipuram Sarees'}
-                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                    className="relative rounded-xl sm:rounded-2xl overflow-hidden group border border-amber-200/90 bg-slate-100 block h-full shadow-xs active:scale-[0.98] transition-transform"
+                    aria-label={tile2.name}
                   >
                     <img
                       src={tile2.image || '/images/saree_kanchipuram_gold.png'}
@@ -427,7 +519,8 @@ export const HomePage: React.FC = () => {
                       decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent hidden md:flex items-end p-3.5 justify-between">
                       <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile2.name}</span>
                       <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
                         {tile2.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
@@ -436,11 +529,12 @@ export const HomePage: React.FC = () => {
                   </Link>
                 </div>
 
-                {/* Tile 3 (Featured Large Center Tile) */}
-                <div className="md:col-span-4 h-full min-h-[320px] md:min-h-full">
+                {/* Tile 3 (Center Column: Featured Large Tile) */}
+                <div className="col-span-4 h-full">
                   <Link
                     to={tile3.buttonLink || '/shop?category=Royal Zari Brocade Sarees'}
-                    className="relative h-full rounded-2xl overflow-hidden group border border-amber-200 bg-slate-900 block"
+                    className="relative h-full rounded-xl sm:rounded-2xl overflow-hidden group border border-amber-200/90 bg-slate-900 block shadow-xs active:scale-[0.98] transition-transform"
+                    aria-label={tile3.name}
                   >
                     <img
                       src={tile3.image || '/images/saree_banarasi_purple.png'}
@@ -449,10 +543,11 @@ export const HomePage: React.FC = () => {
                       decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow z-10">
+                    <div className="hidden md:block absolute top-3 left-3 bg-red-800 text-amber-300 border border-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow z-10">
                       EDITOR'S CHOICE
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex items-end p-5">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent hidden md:flex items-end p-5">
                       <div className="w-full">
                         <h3 className="text-amber-300 font-street text-2xl sm:text-3xl tracking-wide group-hover:text-white transition-colors">{tile3.name}</h3>
                         <p className="text-slate-200 text-xs mt-0.5">{tile3.description || 'Discover handcrafted mulberry silk sarees & heirloom zari sarees.'}</p>
@@ -465,11 +560,12 @@ export const HomePage: React.FC = () => {
                   </Link>
                 </div>
 
-                {/* Tile 4 & 5 */}
-                <div className="md:col-span-4 grid grid-rows-2 gap-3.5 h-full min-h-[360px] md:min-h-full">
+                {/* Tile 4 & 5 (Right Column: 2 Stacked Tiles) */}
+                <div className="col-span-4 grid grid-rows-2 gap-2 sm:gap-3 md:gap-3.5 h-full">
                   <Link
                     to={tile4.buttonLink || '/shop?category=Paithani Sarees'}
-                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                    className="relative rounded-xl sm:rounded-2xl overflow-hidden group border border-amber-200/90 bg-slate-100 block h-full shadow-xs active:scale-[0.98] transition-transform"
+                    aria-label={tile4.name}
                   >
                     <img
                       src={tile4.image || '/images/saree_paithani_green.png'}
@@ -478,7 +574,8 @@ export const HomePage: React.FC = () => {
                       decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent hidden md:flex items-end p-3.5 justify-between">
                       <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile4.name}</span>
                       <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
                         {tile4.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
@@ -488,7 +585,8 @@ export const HomePage: React.FC = () => {
 
                   <Link
                     to={tile5.buttonLink || '/shop?category=Organza Sarees'}
-                    className="relative rounded-2xl overflow-hidden group border border-amber-200 bg-slate-100 block h-full min-h-[170px]"
+                    className="relative rounded-xl sm:rounded-2xl overflow-hidden group border border-amber-200/90 bg-slate-100 block h-full shadow-xs active:scale-[0.98] transition-transform"
+                    aria-label={tile5.name}
                   >
                     <img
                       src={tile5.image || '/images/saree_organza_floral.png'}
@@ -497,7 +595,8 @@ export const HomePage: React.FC = () => {
                       decoding="async"
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex items-end p-3.5 justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent hidden md:flex items-end p-3.5 justify-between">
                       <span className="text-amber-300 text-xs font-bold uppercase tracking-wider">{tile5.name}</span>
                       <span className="text-white bg-red-800 px-2 py-0.5 rounded text-[10px] font-black uppercase flex items-center gap-1 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
                         {tile5.buttonText || 'Explore'} <ArrowRight className="w-3 h-3" />
@@ -632,19 +731,97 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 4. NEW SAREE ARRIVALS GRID WITH DIRECT PRODUCT LINKING */}
+      {/* 4. NEW SAREE ARRIVALS: MOBILE HORIZONTAL SCROLL ROW (2 VISIBLE + 1 PEEK) & DESKTOP GRID */}
       {cms?.newArrivals?.enabled !== false && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
-          <div className="text-center mb-10 space-y-1">
-            <h2 className="font-street text-4xl sm:text-5xl text-slate-900 tracking-wider">
-              {cms?.newArrivals?.title || 'NEW SAREE ARRIVALS'}
-            </h2>
-            <p className="text-xs text-amber-800 font-bold uppercase tracking-widest">
-              {cms?.newArrivals?.subtitle || 'Freshly Woven Artisan Sarees Added Today'}
-            </p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-16">
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-5 sm:mb-10 text-center sm:text-left gap-2">
+            <div className="space-y-1">
+              <h2 className="font-street text-3xl sm:text-5xl text-slate-900 tracking-wider uppercase">
+                {cms?.newArrivals?.title || 'NEW SAREE ARRIVALS'}
+              </h2>
+              <p className="text-[11px] sm:text-xs text-amber-800 font-bold uppercase tracking-widest">
+                {cms?.newArrivals?.subtitle || 'Freshly Woven Artisan Sarees Added Today'}
+              </p>
+            </div>
+            {/* Mobile swipe hint */}
+            <div className="sm:hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider shadow-2xs">
+              <span>Swipe Row</span>
+              <span className="text-red-800 font-bold">⇄</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* MOBILE ONLY: Single-row horizontal scrollable cards with 2 visible + 1 peeking */}
+          <div className="flex sm:hidden overflow-x-auto gap-3 pb-3 pt-1 px-1 -mx-1 scroll-smooth snap-x snap-mandatory touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            {featuredProducts.slice(0, Math.max(cms?.newArrivals?.maxItems || 6, 6)).map((product, idx) => {
+              const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
+              return (
+                <div
+                  key={`mob-${idx}-${product._id}`}
+                  className="w-[44%] min-w-[150px] max-w-[175px] flex-shrink-0 snap-start bg-white rounded-2xl border border-amber-200/90 shadow-sm hover:border-amber-400 flex flex-col justify-between overflow-hidden"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100 cursor-pointer">
+                    <Link to={`/product/${product._id}`}>
+                      <img
+                        src={product.images[0] || '/images/saree_banarasi_red.png'}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                        loading="lazy"
+                      />
+                    </Link>
+                    <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5 pointer-events-none">
+                      <span className="bg-red-800 text-amber-300 text-[7.5px] font-black uppercase px-1.5 py-0.5 rounded shadow border border-amber-300 max-w-[85px] truncate">
+                        {product.category || 'PURE SILK'}
+                      </span>
+                      <span className="bg-slate-900 text-white text-[7.5px] font-black uppercase px-1.5 py-0.5 rounded w-fit">
+                        NEW
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!user) {
+                          showToast('Please log in to add sarees to your wishlist', 'info');
+                          navigate('/login');
+                          return;
+                        }
+                        toggleWishlist(product);
+                      }}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 shadow flex items-center justify-center text-slate-700 hover:text-red-700 active:scale-90 transition-transform"
+                      aria-label="Wishlist"
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isInWishlist(product._id) ? 'fill-current text-red-700' : ''}`} />
+                    </button>
+                  </div>
+
+                  <div className="p-2 text-center space-y-1">
+                    <Link to={`/product/${product._id}`}>
+                      <h4
+                        className="font-serif-luxury font-bold text-xs text-slate-900 line-clamp-1 hover:text-red-800 transition-colors"
+                        title={formatSareeName(product.name, product.category, false, product._id)}
+                      >
+                        {formatSareeName(product.name, product.category, false, product._id)}
+                      </h4>
+                    </Link>
+                    <div className="flex items-center justify-center gap-0.5 text-amber-500 text-[10px]">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-2.5 h-2.5 fill-current" />
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5 pt-0.5 font-bold">
+                      <span className="text-slate-400 text-[10px] line-through">₹{(product.mrp || product.price + 2000).toLocaleString('en-IN')}</span>
+                      <span className="text-red-800 text-xs font-black">₹{displayPrice.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="pt-0.5">
+                      <AddToCartButton product={product} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* DESKTOP ONLY: 4-Column Grid Layout */}
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.slice(0, cms?.newArrivals?.maxItems || 4).map((product, idx) => {
               const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
               return (
@@ -704,34 +881,112 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 9. CUSTOMER TESTIMONIALS */}
-      {cms?.testimonials && cms.testimonials.length > 0 && (
-        <section className="bg-amber-50/60 py-16 border-t border-amber-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center space-y-8">
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-red-800 block">REAL VERIFIED REVIEWS</span>
-              <h2 className="font-street text-4xl sm:text-5xl text-slate-900 tracking-tight">WHAT OUR ROYAL CLIENTS SAY</h2>
+      {/* 9. CUSTOMER TESTIMONIALS - AUTO-PLAYING 1.5s CAROUSEL */}
+      {testimonialsList.length > 0 && (
+        <section className="bg-amber-50/60 py-12 sm:py-16 border-t border-amber-200 overflow-hidden">
+          <div className="max-w-4xl mx-auto px-4 sm:px-8 text-center space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-red-800 block">
+                REAL VERIFIED REVIEWS
+              </span>
+              <h2 className="font-street text-3xl sm:text-5xl text-slate-900 tracking-tight uppercase">
+                WHAT OUR ROYAL CLIENTS SAY
+              </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {cms.testimonials.map((test: any) => (
-                <div key={test.id} className="bg-white p-6 rounded-3xl border border-amber-200 shadow-md space-y-3 text-left">
-                  <div className="flex items-center gap-1 text-amber-500">
-                    {[...Array(test.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-slate-700 italic font-medium leading-relaxed font-serif-luxury">"{test.review || test.quoteText || ''}"</p>
-                  <div className="flex items-center gap-3 pt-2">
-                    <div className="w-10 h-10 rounded-full bg-slate-900 text-amber-300 font-black text-sm flex items-center justify-center border border-amber-300">
-                      {(test.customerName || test.clientName || 'R').charAt(0)}
+
+            {/* Testimonials Single Card Carousel with 1.5s Transitions */}
+            <div className="relative max-w-xl mx-auto">
+              <div className="relative h-[220px] xs:h-[200px] sm:h-[190px] w-full">
+                {testimonialsList.map((test: any, idx: number) => {
+                  const isCurrent = idx === currentTestimonialIndex;
+                  return (
+                    <div
+                      key={test.id || idx}
+                      className={`absolute inset-0 bg-white p-5 sm:p-6 rounded-3xl border border-amber-200/90 shadow-md text-left transition-all duration-700 ease-in-out flex flex-col justify-between ${
+                        isCurrent
+                          ? 'opacity-100 scale-100 translate-y-0 z-20 pointer-events-auto'
+                          : 'opacity-0 scale-95 translate-y-2 z-10 pointer-events-none'
+                      }`}
+                    >
+                      <Quote className="w-8 h-8 text-amber-300/40 absolute top-4 right-5 pointer-events-none" />
+
+                      <div className="space-y-2">
+                        {/* 5 Stars */}
+                        <div className="flex items-center gap-1 text-amber-500">
+                          {[...Array(test.rating || 5)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-current drop-shadow-2xs" />
+                          ))}
+                        </div>
+
+                        {/* Review text */}
+                        <p className="text-xs sm:text-sm text-slate-800 italic font-medium leading-relaxed font-serif-luxury pr-6 line-clamp-3">
+                          "{test.review || test.quoteText || ''}"
+                        </p>
+                      </div>
+
+                      {/* Customer Info */}
+                      <div className="flex items-center gap-3 pt-2.5 border-t border-amber-100/80">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 text-amber-300 font-black text-xs sm:text-sm flex items-center justify-center border-2 border-amber-300 shadow-xs flex-shrink-0">
+                          {(test.customerName || test.clientName || 'R').charAt(0)}
+                        </div>
+                        <div>
+                          <h5 className="text-xs sm:text-sm font-bold text-slate-900">
+                            {test.customerName || test.clientName || 'Royal Client'}
+                          </h5>
+                          <span className="text-[10px] text-amber-800 font-extrabold uppercase tracking-wider block">
+                            {test.location || test.cityState || 'India'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="text-xs font-bold text-slate-900">{test.customerName || test.clientName || 'Royal Client'}</h5>
-                      <span className="text-[10px] text-amber-800 font-extrabold uppercase">{test.location || test.cityState || ''}</span>
-                    </div>
-                  </div>
+                  );
+                })}
+              </div>
+
+              {/* Carousel Navigation & Dots Indicator */}
+              <div className="flex items-center justify-center gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentTestimonialIndex(
+                      (prev) => (prev - 1 + testimonialsList.length) % testimonialsList.length
+                    )
+                  }
+                  className="w-7 h-7 rounded-full bg-white border border-amber-300 hover:bg-amber-100 text-slate-800 flex items-center justify-center transition shadow-xs active:scale-90 text-sm font-bold"
+                  aria-label="Previous Review"
+                >
+                  ‹
+                </button>
+
+                {/* Animated sequential indicator dots */}
+                <div className="flex items-center gap-1.5">
+                  {testimonialsList.map((_: any, idx: number) => {
+                    const isCurrent = idx === currentTestimonialIndex;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setCurrentTestimonialIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          isCurrent ? 'w-6 bg-red-800' : 'w-2 bg-amber-300 hover:bg-amber-400'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    );
+                  })}
                 </div>
-              ))}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentTestimonialIndex((prev) => (prev + 1) % testimonialsList.length)
+                  }
+                  className="w-7 h-7 rounded-full bg-white border border-amber-300 hover:bg-amber-100 text-slate-800 flex items-center justify-center transition shadow-xs active:scale-90 text-sm font-bold"
+                  aria-label="Next Review"
+                >
+                  ›
+                </button>
+              </div>
             </div>
           </div>
         </section>

@@ -6,6 +6,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { SocketProvider } from './context/SocketContext';
 
 import { Navbar } from './components/Navbar';
+import { MobileBottomBar } from './components/MobileBottomBar';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { AIFashionAssistant } from './components/AIFashionAssistant';
@@ -47,13 +48,13 @@ const PageLoader: React.FC = () => (
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const hideFooter = isAdminRoute || location.pathname.startsWith('/shop');
+  const isHomePage = location.pathname === '/';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FFFDF9] selection:bg-amber-300 selection:text-red-950">
       <GlobalNavigationController />
       {!isAdminRoute && <Navbar />}
-      <main className={`flex-grow ${!isAdminRoute ? 'pt-[46px]' : ''}`}>
+      <main className={`flex-grow ${!isAdminRoute ? 'pt-[50px] sm:pt-[54px] md:pt-[58px] pb-16 md:pb-0' : ''}`}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -76,7 +77,8 @@ const AppContent: React.FC = () => {
           </Routes>
         </Suspense>
       </main>
-      {!hideFooter && <Footer />}
+      {isHomePage && <Footer />}
+      {!isAdminRoute && <MobileBottomBar />}
       <WhatsAppButton />
       <ToastContainer />
     </div>
