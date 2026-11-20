@@ -47,8 +47,9 @@ export const OrdersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="font-street text-4xl sm:text-5xl font-black text-slate-900 mb-8 border-b border-slate-200 pb-4">
-          MY ORDERS
+        <h1 className="font-street text-2xl sm:text-4xl md:text-5xl font-black mb-6 sm:mb-8 border-b border-slate-200 pb-3 sm:pb-4">
+          <span className="text-slate-900">MY</span>{' '}
+          <span className="text-red-800">ORDERS</span>
         </h1>
 
         {loading ? (

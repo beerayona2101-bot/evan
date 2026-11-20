@@ -34,15 +34,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
   const mrp = product.mrp || Math.round(product.price * 1.25);
   const formattedName = formatSareeName(product.name, product.category, false, product._id);
+  const discountPercent = product.discountPercentage && product.discountPercentage > 0
+    ? Math.round(product.discountPercentage)
+    : mrp > displayPrice
+      ? Math.round(((mrp - displayPrice) / mrp) * 100)
+      : 0;
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) {
-      showToast('Please log in to add sarees to your wishlist', 'info');
-      navigate('/login');
-      return;
-    }
     toggleWishlist(product);
   };
 
@@ -63,17 +63,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
         </Link>
 
-        {/* Badges - Small Single-Line Pills */}
-        <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10 max-w-[75%]">
-          <span className="bg-red-100/90 text-red-950 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full shadow-sm border border-red-300 whitespace-nowrap truncate">
-            {product.category.includes('Silk') ? 'PURE SILK' : 'HANDLOOM'}
-          </span>
-          {product.discountPercentage && product.discountPercentage > 0 && (
+        {/* Badges - Discount Percentage Only (e.g. 34%) */}
+        {discountPercent > 0 && (
+          <div className="absolute top-1.5 left-1.5 z-10">
             <span className="bg-amber-100/90 text-amber-950 text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap">
-              {product.discountPercentage}% OFF
+              {discountPercent}%
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Wishlist Action Button */}
         <button

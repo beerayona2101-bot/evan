@@ -205,7 +205,7 @@ export const AccountPage: React.FC = () => {
         <div className="w-20 h-20 rounded-full bg-red-100/80 text-red-800 flex items-center justify-center mb-4 border border-amber-300 shadow">
           <UserIcon className="w-10 h-10" />
         </div>
-        <h2 className="font-street text-4xl font-black text-slate-900">ACCOUNT ACCESS REQUIRED</h2>
+        <h2 className="font-street text-xl sm:text-3xl md:text-4xl font-black text-slate-900">ACCOUNT ACCESS REQUIRED</h2>
         <p className="text-xs text-slate-500 font-semibold mt-1">Please sign in to view your orders, addresses & saved wishlist.</p>
         <Link to="/login" className="mt-6 px-8 py-3 bg-red-800 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg border border-amber-300">
           SIGN IN / REGISTER
@@ -237,7 +237,7 @@ export const AccountPage: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 block">AUTHENTICATED CUSTOMER</span>
-              <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900 uppercase">{user.name}</h1>
+              <h1 className="font-street text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 uppercase">{user.name}</h1>
               <p className="text-xs text-slate-500 font-bold">{user.email} • {user.phone || 'Phone not set'}</p>
             </div>
           </div>

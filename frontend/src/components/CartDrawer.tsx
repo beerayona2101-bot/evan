@@ -3,8 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { X, ShoppingCart, Trash2, ArrowRight, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
+import { showToast } from './ToastContainer';
 
 export const CartDrawer: React.FC = () => {
+  const { user } = useAuth();
   const {
     cartItems,
     isCartDrawerOpen,
@@ -72,7 +75,10 @@ export const CartDrawer: React.FC = () => {
                   <ShoppingCart className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-street text-2xl font-black text-slate-900">YOUR CART IS EMPTY</h4>
+                  <h4 className="font-street text-xl sm:text-2xl font-black uppercase">
+                    <span className="text-slate-900">THERE ARE NO ITEMS</span>{' '}
+                    <span className="text-red-800">IN YOUR CART</span>
+                  </h4>
                   <p className="text-xs text-slate-500 font-semibold max-w-xs">
                     Explore our exquisite selection of handcrafted Banarasi, Kanchipuram & Organza sarees.
                   </p>
@@ -82,9 +88,10 @@ export const CartDrawer: React.FC = () => {
                     closeCartDrawer();
                     navigate('/shop');
                   }}
-                  className="mt-2 px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-300 shadow-sm transition-all"
+                  className="mt-2 inline-flex items-center gap-2 px-6 py-3 bg-red-800 hover:bg-red-900 text-amber-300 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-300 shadow-md transition-all active:scale-95 cursor-pointer"
                 >
-                  Explore Saree Catalog
+                  <span>EXPLORE PRODUCTS & ADD TO CART</span>
+                  <ArrowRight className="w-4 h-4 text-amber-300" />
                 </button>
               </div>
             ) : (
@@ -95,6 +102,7 @@ export const CartDrawer: React.FC = () => {
                 >
                   <Link
                     to={`/product/${item.product._id}`}
+                    state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
                     onClick={closeCartDrawer}
                     className="w-20 aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 border border-amber-200 flex-shrink-0"
                   >
@@ -109,6 +117,7 @@ export const CartDrawer: React.FC = () => {
                     <div className="flex justify-between items-start gap-1">
                       <Link
                         to={`/product/${item.product._id}`}
+                        state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
                         onClick={closeCartDrawer}
                         className="font-serif-luxury font-bold text-xs text-slate-900 line-clamp-1 hover:text-red-800 transition-colors"
                       >
@@ -199,7 +208,12 @@ export const CartDrawer: React.FC = () => {
                 <button
                   onClick={() => {
                     closeCartDrawer();
-                    navigate('/checkout');
+                    if (!user) {
+                      showToast('Please sign in or register to complete your checkout', 'info');
+                      navigate('/login?redirect=/checkout');
+                    } else {
+                      navigate('/checkout');
+                    }
                   }}
                   className="py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-[11px] uppercase tracking-wider rounded-xl border border-amber-300 shadow-sm transition-all flex items-center justify-center gap-1"
                 >

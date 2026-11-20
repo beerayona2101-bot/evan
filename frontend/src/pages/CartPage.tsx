@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ArrowRight, ShoppingCart, ShieldCheck, Check, Bookmark, RefreshCw, AlertTriangle, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { couponApi } from '../services/couponApi';
 import { showToast } from '../components/ToastContainer';
 import { AddressSelectorModal } from '../components/AddressSelectorModal';
@@ -30,6 +31,7 @@ export const CartPage: React.FC = () => {
     total,
     totalSavings,
   } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [couponCode, setCouponCode] = useState('');
@@ -54,6 +56,11 @@ export const CartPage: React.FC = () => {
   };
 
   const handleProceedToCheckout = () => {
+    if (!user) {
+      showToast('Please sign in or create an account to proceed with checkout', 'info');
+      navigate('/login?redirect=/checkout');
+      return;
+    }
     navigate('/checkout', {
       state: {
         selectedAddressId,
@@ -104,18 +111,19 @@ export const CartPage: React.FC = () => {
           <div className="w-24 h-24 rounded-full bg-amber-100/90 text-amber-800 flex items-center justify-center mx-auto border-2 border-amber-300 shadow-md">
             <ShoppingCart className="w-12 h-12" />
           </div>
-          <h1 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-wide">
-            YOUR SHOPPING CART IS EMPTY
+          <h1 className="font-serif-luxury text-xl sm:text-3xl md:text-4xl font-extrabold tracking-wide uppercase">
+            <span className="text-slate-900">THERE ARE NO ITEMS</span>{' '}
+            <span className="text-red-800">IN YOUR CART</span>
           </h1>
-          <p className="text-sm text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
             Your luxury shopping bag is currently empty. Discover our exquisite collection of pure silk, handcrafted Banarasi & Kanchipuram sarees tailored for timeless elegance.
           </p>
           <div className="pt-2">
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300 hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg border border-amber-300 hover:scale-[1.02] cursor-pointer"
             >
-              EXPLORE SAREE CATALOG <ArrowRight className="w-4 h-4" />
+              EXPLORE PRODUCTS & ADD TO CART <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -240,8 +248,9 @@ export const CartPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-amber-200/80 pb-4 gap-4">
           <div>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 block">EVAN SAREE ATELIER</span>
-            <h1 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900">
-              MY SHOPPING CART ({validCartItems.length})
+            <h1 className="font-serif-luxury text-xl sm:text-3xl md:text-4xl font-extrabold">
+              <span className="text-slate-900">MY SHOPPING</span>{' '}
+              <span className="text-red-800">CART ({validCartItems.length})</span>
             </h1>
           </div>
           
@@ -323,6 +332,7 @@ export const CartPage: React.FC = () => {
                     {/* Item Thumbnail */}
                     <Link
                       to={`/product/${item.product._id}`}
+                      state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
                       className="w-16 h-20 rounded-xl overflow-hidden bg-amber-50/40 border border-amber-200 flex-shrink-0 flex items-center justify-center p-0.5"
                     >
                       <img
@@ -334,7 +344,10 @@ export const CartPage: React.FC = () => {
 
                     {/* Item Name & Quantity Stepper */}
                     <div className="flex-1 min-w-0">
-                      <Link to={`/product/${item.product._id}`}>
+                      <Link
+                        to={`/product/${item.product._id}`}
+                        state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
+                      >
                         <h4 className="font-serif-luxury font-bold text-xs text-slate-900 line-clamp-1 hover:text-red-800">
                           {item.product.name}
                         </h4>
@@ -455,7 +468,11 @@ export const CartPage: React.FC = () => {
                     className="bg-white p-4 sm:p-5 rounded-3xl border border-amber-200 shadow-md flex flex-col sm:flex-row gap-4 items-start sm:items-center relative group hover:border-amber-300 transition-all"
                   >
                     {/* Thumbnail Image */}
-                    <Link to={`/product/${item.product._id}`} className="w-24 aspect-[4/5] rounded-2xl overflow-hidden bg-amber-50/40 border border-amber-200 flex-shrink-0 p-1 flex items-center justify-center">
+                    <Link
+                      to={`/product/${item.product._id}`}
+                      state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
+                      className="w-24 aspect-[4/5] rounded-2xl overflow-hidden bg-amber-50/40 border border-amber-200 flex-shrink-0 p-1 flex items-center justify-center"
+                    >
                       <img
                         src={item.product.images[0] || '/images/saree_banarasi_red.png'}
                         alt={item.product.name}
@@ -470,7 +487,11 @@ export const CartPage: React.FC = () => {
                           <span className="text-[9px] font-black uppercase tracking-wider text-amber-800 block">
                             {item.product.category || 'Luxury Saree'} • {item.product.fabric || 'Pure Silk'}
                           </span>
-                          <Link to={`/product/${item.product._id}`} className="hover:text-red-800 transition-colors">
+                          <Link
+                            to={`/product/${item.product._id}`}
+                            state={{ from: '/cart', fromLabel: 'Shopping Cart' }}
+                            className="hover:text-red-800 transition-colors"
+                          >
                             <h3 className="font-serif-luxury font-bold text-base text-slate-900 leading-snug line-clamp-1">{item.product.name}</h3>
                           </Link>
                           <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">SKU: {sku}</span>

@@ -48,13 +48,14 @@ const PageLoader: React.FC = () => (
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/reset-password' || location.pathname === '/verify-email';
   const isHomePage = location.pathname === '/';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FFFDF9] selection:bg-amber-300 selection:text-red-950">
       <GlobalNavigationController />
-      {!isAdminRoute && <Navbar />}
-      <main className={`flex-grow ${!isAdminRoute ? 'pt-[50px] sm:pt-[54px] md:pt-[58px] pb-16 md:pb-0' : ''}`}>
+      {!isAdminRoute && !isAuthRoute && <Navbar />}
+      <main className={`flex-grow ${!isAdminRoute && !isAuthRoute ? 'pt-[49px] sm:pt-[54px] md:pt-[60px] pb-16 md:pb-0' : ''}`}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -78,8 +79,8 @@ const AppContent: React.FC = () => {
         </Suspense>
       </main>
       {isHomePage && <Footer />}
-      {!isAdminRoute && <MobileBottomBar />}
-      <WhatsAppButton />
+      {!isAdminRoute && !isAuthRoute && <MobileBottomBar />}
+      {!isAuthRoute && <WhatsAppButton />}
       <ToastContainer />
     </div>
   );

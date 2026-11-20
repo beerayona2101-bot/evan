@@ -55,8 +55,9 @@ export const ContactPage: React.FC = () => {
           <span className="text-xs font-black uppercase tracking-[0.25em] text-amber-800 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-red-700" /> SILK STYLIST CONCIERGE
           </span>
-          <h1 className="font-street text-5xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none uppercase">
-            CONTACT ANEERA SILKS
+          <h1 className="font-street text-2xl sm:text-5xl md:text-6xl font-black tracking-tight leading-none uppercase">
+            <span className="text-slate-900">CONTACT</span>{' '}
+            <span className="text-red-800">ANEERA SILKS</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">
             Have a query regarding bridal sarees, silk mark verification, or custom blouse tailoring? Our luxury saree concierge is at your service.
@@ -66,7 +67,7 @@ export const ContactPage: React.FC = () => {
         {/* Centered Inquiry Form */}
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="bg-white p-8 sm:p-12 rounded-3xl border border-amber-200 shadow-xl space-y-6">
-            <h3 className="font-street text-3xl font-black text-slate-900 text-center uppercase tracking-wide">
+            <h3 className="font-street text-xl sm:text-3xl font-black text-slate-900 text-center uppercase tracking-wide">
               SEND A SAREE INQUIRY
             </h3>
 

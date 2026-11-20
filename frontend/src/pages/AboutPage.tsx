@@ -30,8 +30,9 @@ export const AboutPage: React.FC = () => {
         <div className="bg-white rounded-3xl p-8 sm:p-14 border border-amber-200 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-6 space-y-6">
             <span className="text-xs font-black uppercase tracking-widest text-red-800">MASTER WEAVERS & ARTISANS</span>
-            <h2 className="font-serif-luxury text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-              CRAFTED BY GENERATIONS OF WEAVING FAMILIES
+            <h2 className="font-serif-luxury text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+              <span className="text-slate-900">CRAFTED BY GENERATIONS</span>{' '}
+              <span className="text-red-800">OF WEAVING FAMILIES</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
               Every saree in the Aneera Silks atelier represents weeks of dedicated handloom craftsmanship by master weavers in Varanasi, Kanchipuram, Paithan, and Chanderi. We partner directly with artisan clusters to preserve authentic zari weaving.

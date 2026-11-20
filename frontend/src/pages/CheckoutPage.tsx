@@ -35,6 +35,8 @@ import {
   User,
   Phone,
   Sparkles,
+  Mail,
+  ShoppingBag,
 } from 'lucide-react';
 
 // Comprehensive Indian Pincode Zone Lookup Map for Offline & Instant Auto-Fill
@@ -115,6 +117,13 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    if (!user) {
+      showToast('Please sign in or create an account to proceed with checkout', 'info');
+      navigate('/login?redirect=/checkout');
+    }
+  }, [user, navigate]);
+
   const couponDiscount = location.state?.discountAmount || 0;
   const finalPayable = Math.max(0, total - couponDiscount);
 
@@ -122,6 +131,7 @@ export const CheckoutPage: React.FC = () => {
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(() => getSavedAddresses());
   const [selectedAddressId, setSelectedAddressId] = useState<string>(initialSelectedId);
   const [acceptedTerms, setAcceptedTerms] = useState(true);
+  const [showSavedAddressList, setShowSavedAddressList] = useState(false);
 
   // Mobile Address Selector Modal State
   const [isMobileAddressSelectorOpen, setIsMobileAddressSelectorOpen] = useState(false);
@@ -488,7 +498,7 @@ export const CheckoutPage: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center py-20 px-4 text-center font-sans">
-        <h2 className="font-street text-4xl font-black text-slate-900">YOUR SHOPPING CART IS EMPTY</h2>
+        <h2 className="font-street text-xl sm:text-3xl md:text-4xl font-black text-slate-900">YOUR SHOPPING CART IS EMPTY</h2>
         <p className="text-xs text-slate-500 font-semibold mt-1">Add sarees to your shopping cart before proceeding to checkout.</p>
         <button onClick={() => navigate('/shop')} className="mt-4 px-8 py-3 bg-red-800 text-amber-300 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg border border-amber-300">
           Return to Shop Catalog
@@ -505,32 +515,38 @@ export const CheckoutPage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
           <div>
             <span className="text-[10px] font-black tracking-[0.2em] text-red-700 uppercase block">ANEERA SILKS CONCIERGE</span>
-            <h1 className="font-street text-3xl sm:text-4xl font-black text-slate-900">CHECKOUT & DELIVERY</h1>
-          </div>
-
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleUseCurrentLocation}
-              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-black rounded-xl flex items-center gap-1.5 border border-amber-300 shadow-sm uppercase tracking-wider"
-            >
-              <Navigation className="w-3.5 h-3.5 text-amber-300" />
-              <span>Use GPS Location</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsMapModalOpen(true)}
-              className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-amber-300 text-xs font-black rounded-xl flex items-center gap-1.5 border border-amber-300 shadow-sm uppercase tracking-wider"
-            >
-              <MapIcon className="w-3.5 h-3.5 text-amber-300" />
-              <span>Pick Pin on Map</span>
-            </button>
+            <h1 className="font-street text-xl sm:text-3xl md:text-4xl font-black">
+              <span className="text-slate-900">CHECKOUT &</span>{' '}
+              <span className="text-red-800">DELIVERY</span>
+            </h1>
           </div>
         </div>
 
         {/* MOBILE-ONLY STREAMLINED CHECKOUT (< md) */}
         <div className="md:hidden space-y-4">
-          {/* 1. Selected Delivery Address Card */}
+          {/* 1. Customer Account / User Details Card */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase tracking-wider">
+                <User className="w-4 h-4 text-red-700" />
+                <span>Customer Account</span>
+              </div>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified
+              </span>
+            </div>
+            
+            <div className="text-xs text-slate-700 space-y-0.5">
+              <p className="font-bold text-slate-900 text-sm">
+                {user?.name || formData.fullName || 'Valued Customer'}
+              </p>
+              <p className="text-slate-500 text-[11px]">
+                {user?.email || 'customer@aneerasilks.com'} • {user?.phone || formData.phone || '+91 9490644434'}
+              </p>
+            </div>
+          </div>
+
+          {/* 2. Selected Delivery Address Card */}
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase tracking-wider">
@@ -696,331 +712,307 @@ export const CheckoutPage: React.FC = () => {
           <form onSubmit={handleValidateAndPay} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             <div className="lg:col-span-2 space-y-6">
 
-              {/* 1. SAVED ADDRESS CARDS WITH CRUD MANAGEMENT */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-700">DELIVERY DESTINATIONS</span>
-                  <h2 className="font-street text-2xl font-black text-slate-900 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-red-700" /> SAVED ADDRESSES
-                  </h2>
+              {/* STEP 1: USER / ACCOUNT CONTACT DETAILS */}
+              <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-700">STEP 1 OF 4 • VERIFIED ACCOUNT</span>
+                    <h2 className="font-street text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                      <User className="w-5 h-5 text-red-700" /> CUSTOMER ACCOUNT DETAILS
+                    </h2>
+                  </div>
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Logged In</span>
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingAddressId(null);
-                    setFormData({
-                      fullName: user?.name || '',
-                      phone: user?.phone || '',
-                      houseNo: '',
-                      street: '',
-                      area: '',
-                      city: '',
-                      district: '',
-                      state: '',
-                      postalCode: '',
-                      country: 'India',
-                      addressType: 'Home',
-                      isDefault: false,
-                    });
-                    setIsAddressModalOpen(true);
-                  }}
-                  className="px-3.5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-xs font-black rounded-xl flex items-center gap-1 uppercase tracking-wider"
-                >
-                  <Plus className="w-4 h-4 text-amber-800" /> Add New Address
-                </button>
+
+                <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-900 text-amber-300 font-street font-black text-xl flex items-center justify-center border border-amber-400 shadow-md flex-shrink-0">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div>
+                      <h4 className="font-street font-black text-base text-slate-900 tracking-wide">
+                        {user?.name || formData.fullName || 'Valued Customer'}
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 font-semibold mt-0.5">
+                        <span className="flex items-center gap-1">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          {user?.email || 'customer@aneerasilks.com'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Phone className="w-3.5 h-3.5 text-slate-400" />
+                          {user?.phone || formData.phone || '+91 9490644434'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-500 font-medium sm:max-w-xs text-left sm:text-right">
+                    Order confirmation, tax invoice & dispatch tracking updates will be dispatched to this account.
+                  </p>
+                </div>
               </div>
 
-              {savedAddresses.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  {savedAddresses.map((addr) => {
-                    const isSelected = selectedAddressId === addr._id;
-                    return (
-                      <div
-                        key={addr._id}
-                        onClick={() => handleSelectSavedAddress(addr)}
-                        className={`p-4 rounded-2xl border cursor-pointer transition-all relative flex flex-col justify-between ${
-                          isSelected
-                            ? 'border-red-700 bg-red-50/40 ring-2 ring-red-700/20 shadow-md'
-                            : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white'
-                        }`}
+              {/* STEP 2: DELIVERY ADDRESS */}
+              <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-2">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-700">STEP 2 OF 4 • PAN-INDIA DISPATCH</span>
+                    <h2 className="font-street text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-red-700" /> DELIVERY ADDRESS
+                    </h2>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {savedAddresses.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowSavedAddressList(!showSavedAddressList)}
+                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1 border border-slate-300 transition-colors"
                       >
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-black text-slate-900 text-sm flex items-center gap-1.5">
-                              {addr.fullName}
-                              {addr.isDefault && (
-                                <span className="px-2 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-black rounded uppercase">DEFAULT</span>
-                              )}
-                            </span>
-                            <span className="px-2 py-0.5 bg-slate-200 text-slate-700 text-[9px] font-bold rounded uppercase">
-                              {addr.addressType || 'Home'}
+                        <RefreshCw className="w-3.5 h-3.5 text-red-700" />
+                        <span>{showSavedAddressList ? 'Hide Saved List' : `Change Address (${savedAddresses.length})`}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingAddressId(null);
+                        setFormData({
+                          fullName: user?.name || '',
+                          phone: user?.phone || '',
+                          houseNo: '',
+                          street: '',
+                          area: '',
+                          city: '',
+                          district: '',
+                          state: '',
+                          postalCode: '',
+                          country: 'India',
+                          addressType: 'Home',
+                          isDefault: false,
+                        });
+                        setIsAddressModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-xs font-black rounded-xl flex items-center gap-1 uppercase tracking-wider transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-amber-800" /> Add New
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingAddressId(selectedAddressId || null);
+                        setIsAddressModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-bold rounded-xl flex items-center gap-1 shadow-sm transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-amber-300" /> Edit Address
+                    </button>
+                  </div>
+                </div>
+
+                {/* Optional Expandable List of Saved Addresses to select */}
+                {showSavedAddressList && savedAddresses.length > 0 && (
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 animate-in fade-in duration-150">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
+                      Select delivery destination:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      {savedAddresses.map((addr) => {
+                        const isSelected = selectedAddressId === addr._id;
+                        return (
+                          <div
+                            key={addr._id}
+                            onClick={() => {
+                              handleSelectSavedAddress(addr);
+                              setShowSavedAddressList(false);
+                            }}
+                            className={`p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                              isSelected
+                                ? 'border-red-700 bg-red-50/50 ring-2 ring-red-700/20 shadow-sm'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-slate-900">
+                                  {addr.fullName}
+                                  {addr.isDefault && (
+                                    <span className="ml-1.5 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-black rounded uppercase">DEFAULT</span>
+                                  )}
+                                </span>
+                                <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[9px] font-bold rounded uppercase">
+                                  {addr.addressType || 'Home'}
+                                </span>
+                              </div>
+                              <p className="text-slate-600 text-[11px]">
+                                {addr.houseNo ? addr.houseNo + ', ' : ''}{addr.street}, {addr.area ? addr.area + ', ' : ''}{addr.city} - {addr.postalCode}
+                              </p>
+                            </div>
+                            <span className={`text-[10px] font-bold mt-2 ${isSelected ? 'text-red-700' : 'text-slate-400'}`}>
+                              {isSelected ? '✓ Currently Selected' : 'Click to select this destination'}
                             </span>
                           </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
-                          <p className="text-slate-600 text-xs font-medium pt-1">
-                            {addr.houseNo ? addr.houseNo + ', ' : ''}{addr.street}
-                          </p>
-                          <p className="text-slate-500 text-xs">
-                            {addr.area ? addr.area + ', ' : ''}{addr.city}, {addr.state} - <strong>{addr.postalCode}</strong>
-                          </p>
-                          <p className="text-slate-500 text-[11px] font-bold flex items-center gap-1 pt-1">
-                            <Phone className="w-3 h-3 text-slate-400" /> {addr.phone}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between border-t border-slate-200/60 pt-2.5 mt-3">
-                          <span className={`text-[10px] font-black uppercase ${isSelected ? 'text-red-800' : 'text-slate-400'}`}>
-                            {isSelected ? '✓ Selected for Shipping' : 'Click to Select'}
+                {/* Primary Selected Address Display */}
+                <div className="bg-slate-50/80 rounded-2xl p-5 sm:p-6 border border-slate-200/80 space-y-4">
+                  {/* Recipient info row */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/60">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-red-100 text-red-800 flex items-center justify-center font-bold flex-shrink-0">
+                        <MapPin className="w-5 h-5 text-red-700" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-street font-black text-lg text-slate-900 tracking-wide">
+                            {formData.fullName || 'Recipient Name Not Set'}
                           </span>
+                          {formData.addressType && (
+                            <span className="px-2.5 py-0.5 bg-slate-900 text-amber-300 text-[10px] font-black rounded-full uppercase flex items-center gap-1">
+                              {formData.addressType === 'Home' && <Home className="w-3 h-3" />}
+                              {formData.addressType === 'Office' && <Briefcase className="w-3 h-3" />}
+                              <span>{formData.addressType}</span>
+                            </span>
+                          )}
+                          {formData.isDefault && (
+                            <span className="px-2 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-black rounded uppercase">
+                              DEFAULT
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mt-0.5">
+                          <Phone className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{formData.phone || 'Phone not provided'}</span>
+                        </div>
+                      </div>
+                    </div>
 
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingAddressId(addr._id);
-                                setFormData(addr);
-                                setIsAddressModalOpen(true);
-                              }}
-                              className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-200 rounded-lg transition-colors"
-                              title="Edit Address"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => handleDeleteAddress(addr._id, e)}
-                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                              title="Delete Address"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Deliverable Destination</span>
+                    </div>
+                  </div>
+
+                  {/* Formatted Address Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">HOUSE / BUILDING & STREET</span>
+                      <p className="font-bold text-slate-900 text-sm">
+                        {formData.houseNo ? formData.houseNo + ', ' : ''}{formData.street || '—'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">AREA / LOCALITY</span>
+                      <p className="font-bold text-slate-800 text-sm">
+                        {formData.area || '—'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">CITY / TOWN & DISTRICT</span>
+                      <p className="font-bold text-slate-800 text-sm">
+                        {formData.city || '—'}{formData.district ? `, ${formData.district}` : ''}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">STATE & COUNTRY</span>
+                      <p className="font-bold text-slate-800 text-sm">
+                        {formData.state || '—'}, {formData.country || 'India'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">POSTAL PINCODE</span>
+                      <p className="font-black text-red-800 font-street text-base tracking-wider">
+                        {formData.postalCode || '—'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">ESTIMATED DISPATCH</span>
+                      <p className="font-bold text-emerald-700 text-sm flex items-center gap-1">
+                        <span>Express Pan-India (2-4 Days)</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Footer reassurance */}
+                  <div className="pt-3 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2 text-[11px] font-medium text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                      <span>Pan-India Dispatch from Silk Atelier • 100% Quality Inspected</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingAddressId(selectedAddressId || null);
+                        setIsAddressModalOpen(true);
+                      }}
+                      className="text-red-700 hover:text-red-800 font-bold hover:underline"
+                    >
+                      Edit details in full-page editor →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* STEP 3: ORDER ITEMS */}
+              <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-700">STEP 3 OF 4 • BAG ITEMS</span>
+                    <h2 className="font-street text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                      <ShoppingBag className="w-5 h-5 text-red-700" /> ORDER ITEMS ({validCartItems.length})
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/cart')}
+                    className="text-xs font-bold text-red-700 hover:underline"
+                  >
+                    Modify Cart
+                  </button>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {validCartItems.map((item, idx) => (
+                    <div key={`check-item-${item._id || idx}`} className="py-3 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src={item.product.images?.[0] || '/images/saree_banarasi_red.png'}
+                          alt={item.product.name}
+                          className="w-14 h-16 object-cover rounded-xl border border-slate-200 flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 text-sm line-clamp-1">{item.product.name}</p>
+                          <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                            <span>Color: <strong className="text-slate-700">{item.color}</strong></span>
+                            <span>•</span>
+                            <span>Size: <strong className="text-slate-700">{item.size || 'Free Size'}</strong></span>
+                            <span>•</span>
+                            <span>Qty: <strong className="text-slate-800">{item.quantity}</strong></span>
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 text-center text-xs text-amber-900 font-medium">
-                  No saved addresses found. Fill in your delivery details below to create one.
-                </div>
-              )}
-            </div>
 
-            {/* 2. REAL ADDRESS FORM WITH LIVE PINCODE AUTO-LOOKUP */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-5">
-              <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-2">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-700">VERIFIED INDIAN DESTINATION</span>
-                  <h2 className="font-street text-2xl font-black text-slate-900 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-red-700" /> SHIPPING DESTINATION DETAILS
-                  </h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleUseCurrentLocation}
-                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1 border border-slate-300"
-                  >
-                    <Navigation className="w-3.5 h-3.5 text-red-700" /> GPS Auto-Fill
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsMapModalOpen(true)}
-                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1 border border-slate-300"
-                  >
-                    <MapIcon className="w-3.5 h-3.5 text-red-700" /> Map Pin
-                  </button>
+                      <div className="text-right flex-shrink-0">
+                        <span className="font-street font-black text-base text-red-700">
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="space-y-4 text-xs font-medium">
-                
-                {/* Full Name & Phone */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">RECIPIENT FULL NAME *</label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Ananya Sharma"
-                        value={formData.fullName || ''}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">MOBILE NUMBER (10-DIGIT) *</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="tel"
-                        required
-                        maxLength={10}
-                        placeholder="e.g. 9490644435"
-                        value={formData.phone || ''}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
-                        className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* House No & Street */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">HOUSE / FLAT / BUILDING NO. *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Flat 104, Royal Pavilion"
-                      value={formData.houseNo || ''}
-                      onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-700 font-bold mb-1">STREET / ROAD NAME / LANDMARK *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Bandra Promenade Road, Opp Taj Lands End"
-                      value={formData.street || ''}
-                      onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                    />
-                  </div>
-                </div>
-
-                {/* Pincode & Area Locality */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="block text-slate-700 font-bold">INDIAN PINCODE (6-DIGIT) *</label>
-                      {pincodeLoading && <span className="text-[10px] text-red-700 font-bold animate-pulse flex items-center gap-1"><RefreshCw className="w-3 h-3 animate-spin" /> Lookup API...</span>}
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      placeholder="e.g. 500001 or 400050"
-                      value={formData.postalCode || ''}
-                      onChange={(e) => handlePincodeChange(e.target.value.replace(/\D/g, ''))}
-                      className={`w-full p-3 bg-slate-50 border rounded-xl text-slate-900 focus:bg-white focus:outline-none font-bold text-sm tracking-wider ${
-                        pincodeError ? 'border-red-500 bg-red-50/30' : 'border-slate-300 focus:border-red-700'
-                      }`}
-                    />
-                    {pincodeError && <p className="text-[11px] font-bold text-red-600 mt-1">{pincodeError}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">AREA / LOCALITY *</label>
-                    {areaOptions.length > 0 ? (
-                      <select
-                        value={formData.area || ''}
-                        onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                      >
-                        {areaOptions.map((a, i) => (
-                          <option key={i} value={a}>{a}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Bandra West / HITEC City"
-                        value={formData.area || ''}
-                        onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* City, District & State */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">CITY / TOWN *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Mumbai"
-                      value={formData.city || ''}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">DISTRICT *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Mumbai Suburban"
-                      value={formData.district || ''}
-                      onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">STATE *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Maharashtra"
-                      value={formData.state || ''}
-                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold"
-                    />
-                  </div>
-                </div>
-
-                {/* Address Type & Save Options */}
-                <div className="flex flex-wrap items-center justify-between pt-2 gap-3 border-t border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-slate-700 uppercase">Save As:</span>
-                    {['Home', 'Office', 'Other'].map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, addressType: type })}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1 ${
-                          formData.addressType === type
-                            ? 'bg-slate-900 text-amber-300 border-slate-900 shadow-sm'
-                            : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
-                        }`}
-                      >
-                        {type === 'Home' && <Home className="w-3 h-3" />}
-                        {type === 'Office' && <Briefcase className="w-3 h-3" />}
-                        <span>{type}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {user && (
-                    <button
-                      type="button"
-                      onClick={handleSaveAddress}
-                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-xs rounded-xl border border-amber-300 uppercase tracking-wider flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-800" />
-                      <span>Save Address to Profile</span>
-                    </button>
-                  )}
-                </div>
-
-              </div>
-            </div>
 
             {/* 3. PAYMENT METHOD SELECTOR */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
@@ -1223,144 +1215,276 @@ export const CheckoutPage: React.FC = () => {
         </form>
         </div>
 
-        {/* 4. ADDRESS ADD / EDIT MODAL */}
+        {/* 4. ADDRESS ADD / EDIT FULL-PAGE MODAL */}
         {isAddressModalOpen && (
-          <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-amber-300 shadow-2xl space-y-4 my-8">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="font-street text-xl font-black text-slate-900 uppercase">
-                  {editingAddressId ? 'EDIT SAVED ADDRESS' : 'ADD NEW REAL ADDRESS'}
-                </h3>
-                <button
-                  onClick={() => setIsAddressModalOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-700 flex items-center justify-center"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-3 text-xs font-medium">
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">RECIPIENT FULL NAME *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.fullName || ''}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">MOBILE PHONE NUMBER (10 DIGITS) *</label>
-                  <input
-                    type="tel"
-                    required
-                    maxLength={10}
-                    value={formData.phone || ''}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
+          <div className="fixed inset-0 z-50 bg-slate-100 overflow-y-auto flex flex-col animate-in fade-in duration-200">
+            {/* Full-Page Luxury Header Bar */}
+            <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-4 shadow-sm">
+              <div className="max-w-4xl mx-auto flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddressModalOpen(false)}
+                    className="p-2 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-red-700" />
+                    <span className="hidden sm:inline">Back to Checkout</span>
+                  </button>
                   <div>
-                    <label className="block text-slate-700 font-bold mb-1">HOUSE / FLAT NO. *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.houseNo || ''}
-                      onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">STREET / ROAD *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.street || ''}
-                      onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                    />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-700 block">
+                      ANEERA SILKS LUXURY ATELIER
+                    </span>
+                    <h2 className="font-street text-xl sm:text-2xl font-black text-slate-900">
+                      {editingAddressId ? 'EDIT SAVED ADDRESS' : 'ADD NEW REAL ADDRESS'}
+                    </h2>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">PINCODE *</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      value={formData.postalCode || ''}
-                      onChange={(e) => handlePincodeChange(e.target.value.replace(/\D/g, ''))}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">AREA / LOCALITY *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.area || ''}
-                      onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">CITY *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.city || ''}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">STATE *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.state || ''}
-                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-2 flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.isDefault || false}
-                      onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                      className="rounded border-slate-300 text-red-700 focus:ring-red-700"
-                    />
-                    <span className="text-xs font-bold text-slate-700">Set as Default Delivery Address</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsAddressModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl"
+                  className="w-9 h-9 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-700 flex items-center justify-center transition-colors"
+                  title="Close"
                 >
-                  Cancel
+                  <X className="w-5 h-5" />
                 </button>
-                <button
-                  type="button"
-                  onClick={handleSaveAddress}
-                  className="px-5 py-2.5 bg-red-800 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300"
-                >
-                  Save Real Address
-                </button>
+              </div>
+            </header>
+
+            {/* Full-Page Form Container */}
+            <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-6 sm:py-10">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10 space-y-6">
+                
+                {/* Quick Auto-Fill Location Tools */}
+                <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-amber-50/70 rounded-2xl border border-amber-200">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-800 flex-shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold text-amber-950 block">Quick Location Auto-Fill</span>
+                      <span className="text-[10px] text-amber-800">Use device GPS or place a pin on the interactive map</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleUseCurrentLocation}
+                      className="px-3.5 py-2 bg-white hover:bg-amber-100 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-amber-300 shadow-sm transition-all"
+                    >
+                      <Navigation className="w-3.5 h-3.5 text-red-700" /> GPS Auto-Fill
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="px-3.5 py-2 bg-white hover:bg-amber-100 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-amber-300 shadow-sm transition-all"
+                    >
+                      <MapIcon className="w-3.5 h-3.5 text-red-700" /> Map Pin
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Form */}
+                <form onSubmit={handleSaveAddress} className="space-y-5 text-xs font-medium">
+                  {/* Row 1: Full Name & Mobile */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">RECIPIENT FULL NAME *</label>
+                      <div className="relative">
+                        <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Ananya Sharma"
+                          value={formData.fullName || ''}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          className="w-full pl-9 pr-3.5 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">MOBILE NUMBER (10-DIGIT) *</label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          required
+                          maxLength={10}
+                          placeholder="e.g. 9490644434"
+                          value={formData.phone || ''}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
+                          className="w-full pl-9 pr-3.5 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: House No & Street / Road Name / Landmark */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">HOUSE / FLAT / BUILDING NO. *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. H.No 1 / Flat 104"
+                        value={formData.houseNo || ''}
+                        onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-slate-700 font-bold mb-1.5">STREET / ROAD NAME / LANDMARK *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Main Road, Opp Taj Lands End"
+                        value={formData.street || ''}
+                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 3: Pincode & Area Locality */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="block text-slate-700 font-bold">INDIAN PINCODE (6-DIGIT) *</label>
+                        {pincodeLoading && (
+                          <span className="text-[10px] text-red-700 font-bold animate-pulse flex items-center gap-1">
+                            <RefreshCw className="w-3 h-3 animate-spin" /> Lookup API...
+                          </span>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        placeholder="e.g. 500081"
+                        value={formData.postalCode || ''}
+                        onChange={(e) => handlePincodeChange(e.target.value.replace(/\D/g, ''))}
+                        className={`w-full p-3 bg-slate-50 border rounded-xl text-slate-900 focus:bg-white focus:outline-none font-bold text-sm tracking-wider transition-colors ${
+                          pincodeError ? 'border-red-500 bg-red-50/30' : 'border-slate-300 focus:border-red-700'
+                        }`}
+                      />
+                      {pincodeError && <p className="text-[11px] font-bold text-red-600 mt-1">{pincodeError}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">AREA / LOCALITY *</label>
+                      {areaOptions.length > 0 ? (
+                        <select
+                          value={formData.area || ''}
+                          onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                          className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                        >
+                          {areaOptions.map((a, i) => (
+                            <option key={i} value={a}>{a}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. HITEC City"
+                          value={formData.area || ''}
+                          onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                          className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 4: City, District & State (From 2nd Image) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">CITY / TOWN *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Hyderabad"
+                        value={formData.city || ''}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">DISTRICT *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Ranga Reddy"
+                        value={formData.district || ''}
+                        onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1.5">STATE *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Telangana"
+                        value={formData.state || ''}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:border-red-700 focus:outline-none font-semibold text-sm transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 5: Save As Pills & Default Checkbox */}
+                  <div className="pt-3 pb-1 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-slate-700 uppercase">SAVE AS:</span>
+                      {(['Home', 'Office', 'Other'] as const).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, addressType: type })}
+                          className={`px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 ${
+                            formData.addressType === type
+                              ? 'bg-slate-900 text-amber-300 border-slate-900 shadow-sm'
+                              : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
+                          }`}
+                        >
+                          {type === 'Home' && <Home className="w-3.5 h-3.5" />}
+                          {type === 'Office' && <Briefcase className="w-3.5 h-3.5" />}
+                          <span>{type}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.isDefault || false}
+                        onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                        className="w-4 h-4 rounded border-slate-300 text-red-700 focus:ring-red-700 cursor-pointer"
+                      />
+                      <span className="text-xs font-bold text-slate-700">Set as Default Delivery Address</span>
+                    </label>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-5 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddressModalOpen(false)}
+                      className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-8 py-3 bg-red-800 hover:bg-red-900 text-amber-300 font-black text-xs uppercase tracking-wider rounded-xl shadow-md border border-amber-300 transition-all flex items-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-300" />
+                      <span>{editingAddressId ? 'Update Real Address' : 'Save Real Address'}</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

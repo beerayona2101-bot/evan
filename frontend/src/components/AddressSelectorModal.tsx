@@ -194,7 +194,7 @@ export const AddressSelectorModal: React.FC<AddressSelectorModalProps> = ({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="text-[10px] font-bold text-slate-700 block mb-0.5">City *</label>
                   <input
@@ -203,6 +203,16 @@ export const AddressSelectorModal: React.FC<AddressSelectorModalProps> = ({
                     placeholder="Hyderabad"
                     value={formData.city || ''}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full p-2 bg-white border border-amber-200 rounded-xl text-xs focus:outline-none focus:border-red-800"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-0.5">District</label>
+                  <input
+                    type="text"
+                    placeholder="Ranga Reddy"
+                    value={formData.district || ''}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                     className="w-full p-2 bg-white border border-amber-200 rounded-xl text-xs focus:outline-none focus:border-red-800"
                   />
                 </div>
@@ -222,7 +232,7 @@ export const AddressSelectorModal: React.FC<AddressSelectorModalProps> = ({
               {/* Type Selection */}
               <div className="flex items-center gap-2 pt-1">
                 <span className="text-[10px] font-bold text-slate-600 uppercase">Save As:</span>
-                {['Home', 'Work'].map((type) => (
+                {['Home', 'Office', 'Other'].map((type) => (
                   <button
                     key={type}
                     type="button"

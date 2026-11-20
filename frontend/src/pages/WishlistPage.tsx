@@ -20,7 +20,10 @@ export const WishlistPage: React.FC = () => {
         <div className="w-20 h-20 rounded-full bg-red-100/80 text-red-800 flex items-center justify-center mb-4 border border-amber-300 shadow-md">
           <Heart className="w-10 h-10" />
         </div>
-        <h2 className="font-street text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">YOUR WISHLIST IS EMPTY</h2>
+        <h2 className="font-street text-xl sm:text-3xl md:text-5xl font-black tracking-tight">
+          <span className="text-slate-900">YOUR WISHLIST</span>{' '}
+          <span className="text-red-800">IS EMPTY</span>
+        </h2>
         <p className="text-xs text-slate-600 font-semibold mt-1 max-w-sm">
           Save your favorite heirloom Banarasi, Kanchipuram & Organza sarees to buy later.
         </p>
@@ -42,8 +45,9 @@ export const WishlistPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-amber-200 pb-4 gap-4">
           <div>
             <span className="text-xs font-black uppercase tracking-widest text-amber-800 block">SAVED SAREE COLLECTIONS</span>
-            <h1 className="font-street text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-              MY WISHLIST ({wishlist.length})
+            <h1 className="font-street text-xl sm:text-3xl md:text-5xl font-black tracking-tight">
+              <span className="text-slate-900">MY</span>{' '}
+              <span className="text-red-800">WISHLIST ({wishlist.length})</span>
             </h1>
           </div>
 
@@ -72,7 +76,7 @@ export const WishlistPage: React.FC = () => {
                 className="group bg-white rounded-2xl border border-amber-200/90 hover:border-amber-400 hover:shadow-xl transition-all flex flex-col justify-between relative overflow-hidden"
               >
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100">
-                  <Link to={`/product/${product._id}`}>
+                  <Link to={`/product/${product._id}`} state={{ from: '/wishlist', fromLabel: 'Wishlist' }}>
                     <img
                       src={product.images[0] || '/images/saree_banarasi_red.png'}
                       alt={product.name}
@@ -94,7 +98,7 @@ export const WishlistPage: React.FC = () => {
                     {product.fabric || product.category}
                   </span>
 
-                  <Link to={`/product/${product._id}`}>
+                  <Link to={`/product/${product._id}`} state={{ from: '/wishlist', fromLabel: 'Wishlist' }}>
                     <h4 className="font-serif-luxury font-bold text-sm text-slate-900 line-clamp-1 hover:text-red-800 transition-colors">
                       {product.name}
                     </h4>

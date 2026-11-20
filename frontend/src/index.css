@@ -6,7 +6,7 @@
   body {
     background-color: #fffdf9;
     color: #1e1b18;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1,
@@ -36,6 +36,14 @@
   .font-condensed-bold {
     font-family: 'Syne', 'Unbounded', sans-serif;
     font-weight: 800;
+  }
+
+  .font-playfair {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-cinzel {
+    font-family: 'Cinzel', serif;
   }
 }
 

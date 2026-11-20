@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Heart, Shield, User as UserIcon, Sparkles } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Heart, Shield, User as UserIcon, Sparkles, Bell, X, Tag, Truck, ChevronRight, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -11,7 +11,15 @@ export const Navbar: React.FC = () => {
   const { totalItemsCount } = useCart();
   const { wishlist } = useWishlist();
   const [userDropdown, setUserDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(2);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleNotificationClick = (path: string) => {
+    setShowNotifications(false);
+    navigate(path);
+  };
 
   // If on Admin Panel, hide customer navbar so Admin has a dedicated clean sidebar layout
   if (location.pathname.startsWith('/admin')) {
@@ -33,9 +41,9 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-1.5 px-4 sm:px-8 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-amber-200/80 font-sans py-1.5 md:py-0 md:h-[60px] px-4 sm:px-8 shadow-sm flex items-center">
       {/* ANEERA SILKS Seamless Header */}
-      <div className="max-w-7xl mx-auto text-slate-900 flex items-center justify-between transition-all">
+      <div className="max-w-7xl mx-auto w-full text-slate-900 flex items-center justify-between transition-all">
         {/* Brand Logo: Aneera Silks */}
         <Link to="/" className="flex items-center space-x-2.5">
           <img
@@ -115,8 +123,8 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Mobile Top Actions (Admin badge & Concierge) */}
-        <div className="flex items-center space-x-2 md:hidden">
+        {/* Mobile Top Actions (Admin badge & Notification Bell Button with Dropdown) */}
+        <div className="flex items-center space-x-1.5 md:hidden">
           {user?.role === 'admin' && (
             <Link
               to="/admin"
@@ -126,13 +134,192 @@ export const Navbar: React.FC = () => {
               <span>Admin</span>
             </Link>
           )}
-          <Link
-            to="/contact"
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-100/70 hover:bg-amber-200/80 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider transition-colors shadow-xs"
-          >
-            <Sparkles className="w-3 h-3 text-red-700" />
-            <span>Concierge</span>
-          </Link>
+
+          {/* Mobile Right Notification Bell Dropdown Container */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 rounded-full text-slate-800 hover:text-red-800 hover:bg-amber-100/60 active:scale-90 transition-all focus:outline-none"
+              aria-label="View Notifications"
+            >
+              <Bell className="w-5 h-5 text-slate-800" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-700 border-2 border-white"></span>
+                </span>
+              )}
+            </button>
+
+            {/* Notification Dropdown Menu (Directly Below Bell Button) */}
+            {showNotifications && (
+              <>
+                {/* Backdrop to close on tap outside */}
+                <div
+                  className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[1px]"
+                  onClick={() => setShowNotifications(false)}
+                  aria-hidden="true"
+                />
+
+                {/* Dropdown Card */}
+                <div className="absolute right-0 top-full mt-2 w-[310px] xs:w-[335px] max-w-[calc(100vw-20px)] bg-[#FFFDF9] rounded-2xl border-2 border-amber-300/90 shadow-2xl z-50 overflow-hidden animate-fadeIn text-slate-900">
+                  {/* Header */}
+                  <div className="px-3.5 py-2.5 border-b border-amber-200/90 bg-gradient-to-r from-amber-50 via-white to-red-50/40 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-red-800 text-amber-300 flex items-center justify-center shadow-xs">
+                        <Bell className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="font-street font-black text-xs uppercase tracking-wider text-slate-900 leading-none">
+                          NOTIFICATIONS
+                        </h4>
+                        <span className="text-[9px] text-amber-800 font-bold uppercase tracking-wider">
+                          Atelier Updates & Offers
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowNotifications(false)}
+                      className="w-6 h-6 rounded-full bg-amber-100 hover:bg-amber-200 text-slate-700 flex items-center justify-center transition-colors"
+                      aria-label="Close notifications"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Dropdown Notification Items (Clicking any item opens related info) */}
+                  <div className="divide-y divide-amber-100/90 max-h-[340px] overflow-y-auto">
+                    {/* Item 1: Royal Welcome Offer -> Opens Shop Offers */}
+                    <div
+                      onClick={() => handleNotificationClick('/shop?offers=true')}
+                      className="p-3 hover:bg-amber-50 active:bg-amber-100/70 cursor-pointer transition-colors flex items-center justify-between gap-2.5 group"
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <Tag className="w-3.5 h-3.5 text-amber-800" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-slate-900 group-hover:text-red-800 transition-colors">
+                              Royal Welcome Privilege
+                            </span>
+                            <span className="text-[8px] font-black text-red-800 bg-red-50 border border-red-200 px-1 py-0.2 rounded">
+                              10% OFF
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-600 leading-snug">
+                            Use code <span className="font-black text-red-800">ROYAL10</span> at checkout for 10% privilege discount on all sarees. Tap to shop!
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-red-800 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+
+                    {/* Item 2: New Arrivals -> Opens Shop sorted by newest */}
+                    <div
+                      onClick={() => handleNotificationClick('/shop?sort=newest')}
+                      className="p-3 hover:bg-amber-50 active:bg-amber-100/70 cursor-pointer transition-colors flex items-center justify-between gap-2.5 group"
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-red-50 text-red-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <Sparkles className="w-3.5 h-3.5 text-red-800" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-slate-900 group-hover:text-red-800 transition-colors">
+                              New Artisan Weaves Live
+                            </span>
+                            <span className="text-[8.5px] font-bold text-slate-400">
+                              Today
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-600 leading-snug">
+                            Fresh handloom Banarasi & Kanchipuram sarees added. Tap to explore latest weaves!
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-red-800 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+
+                    {/* Item 3: Delivery Info -> Opens FAQ */}
+                    <div
+                      onClick={() => handleNotificationClick('/faq')}
+                      className="p-3 hover:bg-amber-50 active:bg-amber-100/70 cursor-pointer transition-colors flex items-center justify-between gap-2.5 group"
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-slate-900 group-hover:text-red-800 transition-colors">
+                              Complimentary Delivery
+                            </span>
+                            <span className="text-[8.5px] font-bold text-emerald-700">
+                              Active
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-600 leading-snug">
+                            Complimentary insured express doorstep delivery active across India. Tap for details.
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-red-800 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+
+                    {/* Item 4: Customer Orders or Concierge */}
+                    <div
+                      onClick={() => handleNotificationClick(user ? '/orders' : '/login')}
+                      className="p-3 hover:bg-amber-50 active:bg-amber-100/70 cursor-pointer transition-colors flex items-center justify-between gap-2.5 group"
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <Package className="w-3.5 h-3.5 text-indigo-700" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-slate-900 group-hover:text-red-800 transition-colors">
+                              {user ? 'My Orders & Deliveries' : 'Atelier Concierge Account'}
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-600 leading-snug">
+                            {user
+                              ? 'Track active saree shipments and orders in real-time. Tap to open orders.'
+                              : 'Sign in to access VIP privileges, order tracking & concierge. Tap to sign in.'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-red-800 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+                  </div>
+
+                  {/* Dropdown Footer */}
+                  <div className="p-2.5 bg-amber-50/90 border-t border-amber-200/90 flex items-center justify-between gap-2 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUnreadCount(0);
+                        setShowNotifications(false);
+                      }}
+                      className="text-slate-600 hover:text-red-800 font-bold transition-colors"
+                    >
+                      Mark all as read
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleNotificationClick('/shop')}
+                      className="text-red-800 hover:text-red-900 font-extrabold flex items-center gap-0.5 transition-colors"
+                    >
+                      <span>Explore Catalog</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Desktop Right Header Icons */}

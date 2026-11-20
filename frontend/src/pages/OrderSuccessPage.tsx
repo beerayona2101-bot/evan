@@ -31,8 +31,9 @@ export const OrderSuccessPage: React.FC = () => {
           <span className="text-xs font-black tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 uppercase">
             PAYMENT CONFIRMED
           </span>
-          <h1 className="font-street text-4xl sm:text-5xl font-black text-slate-900 mt-2">
-            ORDER PLACED!
+          <h1 className="font-street text-2xl sm:text-4xl md:text-5xl font-black mt-2">
+            <span className="text-slate-900">ORDER</span>{' '}
+            <span className="text-red-800">PLACED!</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
             Thank you for shopping with Aneera Silks. Your heirloom saree order has been confirmed.

@@ -40,19 +40,9 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const quantityInCart = getItemQuantityInCart(product._id, size);
   const maxStock = product.stock !== undefined ? product.stock : 99;
 
-  const checkAuth = (): boolean => {
-    if (!user) {
-      showToast('Please log in to add sarees to your cart or wishlist', 'info');
-      navigate('/login');
-      return false;
-    }
-    return true;
-  };
-
   const handleIncrement = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!checkAuth()) return;
     if (quantityInCart < maxStock) {
       updateCartItemQuantityByProductId(product, quantityInCart + 1, size, effectiveColor);
     }
@@ -61,14 +51,12 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const handleDecrement = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!checkAuth()) return;
     updateCartItemQuantityByProductId(product, quantityInCart - 1, size, effectiveColor);
   };
 
   const handleInitialAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!checkAuth()) return;
     addToCart(
       product,
       size,

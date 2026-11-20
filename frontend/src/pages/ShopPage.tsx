@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, Search, SlidersHorizontal, Sparkles, X, ChevronDown, Check } from 'lucide-react';
+import { Filter, Search, SlidersHorizontal, Sparkles, X, ChevronDown, Check, ArrowUpDown } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { Product, Category, Fabric, Occasion } from '../types';
 import { api } from '../services/api';
@@ -54,6 +54,7 @@ export const ShopPage: React.FC = () => {
   const [allStoreProducts, setAllStoreProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileSortOpen, setMobileSortOpen] = useState(false);
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
   const [dbFabrics, setDbFabrics] = useState<Fabric[]>([]);
   const [dbOccasions, setDbOccasions] = useState<Occasion[]>([]);
@@ -289,73 +290,140 @@ export const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full min-h-[calc(100vh-55px)] sm:h-[calc(100vh-55px)] bg-[#FFFDF9] text-slate-900 p-2 sm:p-3 font-sans flex flex-col overflow-y-auto sm:overflow-hidden relative">
-      <div className="max-w-[1600px] w-full mx-auto flex flex-col h-full space-y-3 sm:overflow-hidden">
+    <div className="w-full min-h-screen md:h-[calc(100vh-64px)] lg:h-[calc(100vh-66px)] bg-[#FFFDF9] text-slate-900 p-2 sm:p-3 pb-24 md:pb-3 font-sans flex flex-col md:overflow-hidden relative">
+      <div className="max-w-[1600px] w-full mx-auto flex flex-col md:h-full space-y-2 sm:space-y-3 md:overflow-hidden">
         
-        {/* Sleek Low-Profile Top Header & Search Banner with Integrated Sort */}
-        <div className="bg-white p-2.5 px-4 sm:px-5 rounded-xl border border-amber-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-amber-800 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-red-700" /> ANEERA SILKS SAREE CATALOG
-              </span>
-              <h1 className="font-street text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none uppercase mt-0.5">
-                {searchParams.get('offers') === 'true' ? '🔥 FESTIVE OFFERS & SPECIAL DISCOUNTS' : (selectedCategory !== 'All' ? selectedCategory : 'LUXURY INDIAN SAREES')}
-              </h1>
-            </div>
-            <span className="bg-amber-100 text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border border-amber-300 shadow-sm whitespace-nowrap hidden sm:inline-block">
-              {displayedProducts.length} Weaves Available
-            </span>
-          </div>
-
-          {/* Integrated Search & Sort By Controls */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
-            <div className="flex-1 sm:w-56 relative">
+        {/* Sleek Mobile Fixed & Desktop Flow Search & Filter Control Bar */}
+        <div className="fixed top-[48px] sm:top-[52px] left-0 right-0 z-40 bg-[#FFFDF9]/98 backdrop-blur-md px-2 sm:px-3 pt-1 pb-1.5 border-b border-amber-200/80 shadow-xs md:static md:p-0 md:bg-transparent md:border-none md:shadow-none flex-shrink-0">
+          <div className="max-w-[1600px] mx-auto bg-white/95 backdrop-blur-md p-1.5 sm:p-2.5 px-2.5 sm:px-4 rounded-xl border border-amber-200 shadow-md flex items-center justify-between gap-2">
+            
+            {/* Search Input */}
+            <div className="flex-1 relative min-w-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-amber-700" />
               <input
                 type="text"
                 placeholder="Search Banarasi, Kanchipuram..."
                 value={searchQuery}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-amber-50/60 border border-amber-300 rounded-full text-xs font-semibold focus:outline-none focus:border-red-800 transition-all"
+                className="w-full pl-8 pr-3 py-1.5 bg-amber-50/60 border border-amber-300 rounded-full text-xs font-semibold focus:outline-none focus:border-red-800 transition-all placeholder:text-slate-400"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => handleFilterChange('search', '')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-700"
+                  aria-label="Clear search"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
-            {/* Mobile Filter Toggle */}
-            <button
-              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-              className="lg:hidden px-3.5 py-1.5 bg-amber-50 border border-amber-300 hover:bg-amber-100 rounded-full text-xs font-extrabold uppercase flex items-center gap-1.5 text-slate-900 transition-all shadow-xs active:scale-95 cursor-pointer"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-red-700" /> Filters
-              {(selectedCategory !== 'All' || selectedFabric !== 'All' || selectedOccasion !== 'All') && (
-                <span className="w-2 h-2 rounded-full bg-red-700 inline-block animate-pulse" />
-              )}
-            </button>
-
-            {/* Integrated Sort By Control */}
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase">Sort By:</span>
-              <select
-                value={sortOption}
-                onChange={(e) => handleFilterChange('sort', e.target.value)}
-                className="bg-amber-50/60 border border-amber-300 text-slate-900 text-xs font-bold rounded-full px-3 py-1 focus:outline-none cursor-pointer hover:border-amber-400 transition-all"
+            {/* Mobile Actions: Filter Icon & Sort By Arrow Icon in ONE Single Line */}
+            <div className="flex items-center gap-1.5 md:hidden flex-shrink-0">
+              {/* Mobile Filter Icon Toggle (No text on mobile) */}
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+                className="relative w-8 h-8 rounded-full bg-amber-50 border border-amber-300 hover:bg-amber-100 flex items-center justify-center text-slate-900 transition-all shadow-2xs active:scale-95 cursor-pointer"
+                aria-label="Filter Sarees"
+                title="Filters"
               >
-                <option value="newest">Newest Arrivals</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
+                <SlidersHorizontal className="w-3.5 h-3.5 text-red-700" />
+                {(selectedCategory !== 'All' || selectedFabric !== 'All' || selectedOccasion !== 'All') && (
+                  <span className="w-2 h-2 rounded-full bg-red-700 absolute top-0.5 right-0.5 animate-pulse" />
+                )}
+              </button>
+
+              {/* Mobile Sort By Arrow Icon Button & Custom Luxury Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMobileSortOpen(!mobileSortOpen)}
+                  className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shadow-2xs active:scale-95 cursor-pointer ${
+                    mobileSortOpen || sortOption !== 'newest'
+                      ? 'bg-amber-100 border-amber-400 text-red-800'
+                      : 'bg-amber-50 border-amber-300 hover:bg-amber-100 text-slate-800'
+                  }`}
+                  aria-label="Sort Sarees"
+                  title="Sort Sarees"
+                >
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  {sortOption !== 'newest' && (
+                    <span className="w-2 h-2 rounded-full bg-red-700 absolute top-0.5 right-0.5 animate-pulse" />
+                  )}
+                </button>
+
+                {/* Mobile Sort Dropdown Menu (Anchored to right-0 so it stays 100% inside mobile frame) */}
+                {mobileSortOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40 bg-black/10"
+                      onClick={() => setMobileSortOpen(false)}
+                      aria-hidden="true"
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-[#FFFDF9] rounded-2xl border-2 border-amber-300/90 shadow-2xl z-50 p-1.5 space-y-1 animate-fadeIn text-slate-900">
+                      <div className="px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-amber-800 border-b border-amber-100 flex items-center justify-between">
+                        <span>Sort Sarees</span>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase">Select</span>
+                      </div>
+                      {[
+                        { value: 'newest', label: 'Newest Arrivals' },
+                        { value: 'price-low', label: 'Price: Low to High' },
+                        { value: 'price-high', label: 'Price: High to Low' },
+                        { value: 'rating', label: 'Highest Rated' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            handleFilterChange('sort', opt.value);
+                            setMobileSortOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
+                            sortOption === opt.value
+                              ? 'bg-red-800 text-amber-300 shadow-xs'
+                              : 'text-slate-800 hover:bg-amber-50 active:bg-amber-100'
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {sortOption === opt.value && (
+                            <Check className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
+
+            {/* Desktop Only: Sort By & Product Count Controls */}
+            <div className="hidden md:flex items-center justify-end gap-2.5 flex-shrink-0">
+              <span className="bg-amber-100 text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border border-amber-300 shadow-2xs whitespace-nowrap">
+                {displayedProducts.length} Sarees
+              </span>
+
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase">Sort By:</span>
+                <select
+                  value={sortOption}
+                  onChange={(e) => handleFilterChange('sort', e.target.value)}
+                  className="bg-amber-50/60 border border-amber-300 text-slate-900 text-xs font-bold rounded-full px-3 py-1 focus:outline-none cursor-pointer hover:border-amber-400 transition-all"
+                >
+                  <option value="newest">Newest Arrivals</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        {/* Mobile Spacer (Compact single-line height) */}
+        <div className="h-[52px] sm:h-[56px] md:hidden flex-shrink-0" aria-hidden="true" />
 
         {/* Active Offers & Promo Code Banner when offers=true */}
         {searchParams.get('offers') === 'true' && (
@@ -393,10 +461,10 @@ export const ShopPage: React.FC = () => {
         )}
 
         {/* 100% Window Height Locked Split Layout */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch sm:overflow-hidden min-h-0">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 lg:gap-4 items-stretch md:overflow-hidden min-h-0">
 
           {/* Left Desktop Filter Sidebar - Independent Scroll */}
-          <aside className="hidden lg:flex flex-col lg:col-span-3 bg-white p-4 rounded-2xl border border-amber-200 shadow-sm space-y-4 h-full overflow-y-auto overscroll-contain pr-2 custom-scrollbar">
+          <aside className="hidden md:flex flex-col md:col-span-4 lg:col-span-3 bg-white p-3.5 lg:p-4 rounded-2xl border border-amber-200 shadow-sm space-y-3.5 lg:space-y-4 h-full overflow-y-auto overscroll-contain pr-1.5 lg:pr-2 custom-scrollbar">
             <div className="flex items-center justify-between border-b border-amber-100 pb-2.5 flex-shrink-0">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">COLLECTIONS</span>
@@ -501,13 +569,13 @@ export const ShopPage: React.FC = () => {
             </div>
           </aside>
 
-          {/* Right Product Grid Area - Independent Scroll Container */}
-          <main className="lg:col-span-9 h-full flex flex-col sm:overflow-hidden min-h-0">
+          {/* Right Product Grid Area - Independent Scroll Container on Desktop, Fluid on Mobile */}
+          <main className="md:col-span-8 lg:col-span-9 md:h-full flex flex-col md:overflow-hidden min-h-0">
 
             {/* Products Scroll Container */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain pr-1">
+            <div className="md:flex-1 md:overflow-y-auto md:custom-scrollbar md:overscroll-contain pr-1">
               {displayedProducts.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 pb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2.5 pb-4">
                   {displayedProducts.map((product) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
@@ -534,7 +602,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Mobile Responsive Filter Bottom Sheet / Modal Drawer */}
       {mobileFilterOpen && (
-        <div className="fixed inset-0 z-[99999] flex items-end sm:items-center justify-center lg:hidden">
+        <div className="fixed inset-0 z-[99999] flex items-end sm:items-center justify-center md:hidden">
           {/* Backdrop Overlay */}
           <div
             onClick={() => setMobileFilterOpen(false)}

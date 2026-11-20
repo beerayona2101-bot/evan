@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, Star, ShoppingBag, ShieldCheck, Truck, RefreshCw, Award, ArrowLeft, Check, Sparkles, Share2, Ruler, Eye } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { api } from '../services/api';
@@ -39,6 +39,23 @@ export const ProductDetailPage: React.FC = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Intelligent dynamic back destination detection
+  const navState = location.state as { from?: string; fromLabel?: string } | null;
+  const backTarget = navState?.from || (document.referrer && document.referrer.includes('/cart') ? '/cart' : '/shop');
+  const backLabel = navState?.fromLabel || (backTarget === '/cart' ? 'Shopping Cart' : 'Saree Catalog');
+
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (navState?.from) {
+      navigate(navState.from);
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/shop');
+    }
+  };
 
   const { socket } = useSocket();
 
@@ -291,11 +308,6 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
-    if (!user) {
-      showToast('Please log in to purchase sarees', 'info');
-      navigate('/login');
-      return;
-    }
     const itemPrice = selectedVariant ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price) : displayPrice;
     const variantImg = (selectedVariant && selectedVariant.images && selectedVariant.images[0]) || selectedImage || product.images[0];
 
@@ -310,26 +322,34 @@ export const ProductDetailPage: React.FC = () => {
       itemPrice,
       selectedVariant?.hexColor
     );
+
+    if (!user) {
+      showToast('Please sign in to proceed with checkout', 'info');
+      navigate('/login?redirect=/checkout');
+      return;
+    }
     navigate('/checkout');
   };
 
   const handleWishlistToggle = () => {
-    if (!user) {
-      showToast('Please log in to add sarees to your wishlist', 'info');
-      navigate('/login');
-      return;
-    }
     toggleWishlist(product);
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] text-slate-900 py-3 sm:py-5 px-3 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
+    <div className="min-h-screen bg-[#FFFDF9] text-slate-900 pt-0 pb-4 sm:py-5 px-3 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-7xl mx-auto space-y-2.5 sm:space-y-4">
         
-        {/* Back Link */}
-        <Link to="/shop" className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 hover:text-red-800 transition-colors">
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Saree Catalog
-        </Link>
+        {/* Mobile Sticky Top & Desktop Static Back Link Bar */}
+        <div className="sticky top-[48px] sm:static z-30 bg-[#FFFDF9]/98 backdrop-blur-md -mx-3 px-3 py-2 sm:p-0 sm:m-0 sm:bg-transparent border-b border-amber-200/80 sm:border-none shadow-2xs sm:shadow-none flex items-center">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-700 hover:text-red-800 transition-colors py-0.5 cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-red-800" />
+            <span>Back to {backLabel}</span>
+          </button>
+        </div>
 
         {/* Main Product Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start bg-white p-4 sm:p-6 rounded-3xl border border-amber-200 shadow-xl">
@@ -452,20 +472,22 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Luxury Color Swatches & Cards */}
-            <div className="space-y-2 py-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>Select Color Variant:</span>
-                  <span className="text-amber-800 font-bold normal-case font-sans">({selectedColor})</span>
+            <div className="space-y-1.5 py-1">
+              <div className="flex items-center justify-between pb-0.5">
+                <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <span>Color:</span>
+                  <span className="text-red-800 font-extrabold normal-case font-serif-luxury text-xs sm:text-sm">
+                    {selectedColor}
+                  </span>
                 </span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                  Instant Gallery Sync
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Instant Sync
                 </span>
               </div>
 
               {/* Render Structured Color Variants if available */}
               {product.variants && product.variants.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar sm:flex-wrap">
                   {product.variants.map((v) => {
                     const isSelected = selectedVariant?._id === v._id || selectedVariant?.sku === v.sku || selectedColor === v.colorName;
                     const isOutOfStock = v.stock === 0 || v.status === 'inactive';
@@ -474,19 +496,23 @@ export const ProductDetailPage: React.FC = () => {
                         key={v.sku || v.colorName}
                         disabled={isOutOfStock}
                         onClick={() => !isOutOfStock && handleSelectColorVariant(v)}
-                        className={`relative flex items-center gap-2 px-3 py-2 rounded-2xl text-xs font-bold transition-all border ${
+                        className={`relative flex items-center justify-center gap-2 p-1.5 sm:px-3 sm:py-2 rounded-full sm:rounded-2xl text-xs font-bold transition-all border shrink-0 ${
                           isOutOfStock
-                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50'
+                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-40'
                             : isSelected
-                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/40 scale-105'
+                            ? 'bg-amber-50 sm:bg-slate-950 text-slate-900 sm:text-amber-300 border-red-800 sm:border-amber-400 shadow-md ring-2 ring-red-800 sm:ring-amber-400/40 scale-105'
                             : 'bg-white text-slate-800 border-amber-200 hover:border-amber-400 hover:bg-amber-50/50'
                         }`}
                         title={isOutOfStock ? `${v.colorName} - OUT OF STOCK` : v.colorName}
+                        aria-label={v.colorName}
                       >
                         <span
-                          className="w-4 h-4 rounded-full border border-white shadow-sm flex-shrink-0 relative overflow-hidden"
+                          className="w-6 h-6 sm:w-4 sm:h-4 rounded-full border-2 border-white shadow-xs flex-shrink-0 relative overflow-hidden flex items-center justify-center"
                           style={{ backgroundColor: v.hexColor || '#800000' }}
                         >
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-white drop-shadow-sm" />
+                          )}
                           {isOutOfStock && (
                             <span className="absolute inset-0 flex items-center justify-center">
                               <span className="w-full h-0.5 bg-red-700 -rotate-45" />
@@ -494,16 +520,16 @@ export const ProductDetailPage: React.FC = () => {
                           )}
                         </span>
 
-                        {/* ONLY THE SELECTED COLOR DISPLAYS ITS NAME */}
+                        {/* Name is HIDDEN on mobile (so all colors stay in ONE line), visible only on desktop */}
                         {isSelected && (
-                          <span className="font-extrabold text-amber-300 text-xs flex items-center gap-1">
+                          <span className="hidden sm:inline-flex font-extrabold text-amber-300 text-xs items-center gap-1">
                             <span>{v.colorName}</span>
                             <Check className="w-3.5 h-3.5 text-amber-400" />
                           </span>
                         )}
 
                         {isOutOfStock && (
-                          <span className="text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
+                          <span className="hidden sm:inline-block text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
                             OUT OF STOCK
                           </span>
                         )}
@@ -513,7 +539,7 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
               ) : (
                 /* Fallback string colors */
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar sm:flex-wrap">
                   {((product?.colors && product.colors.length > 0) ? product.colors : ['Royal Crimson Red', 'Pure Gold', 'Emerald Green', 'Royal Purple']).map((colorName, idx) => {
                     const isSelected = selectedColor === colorName;
                     const isOutOfStock = colorName.toLowerCase().includes('green') || idx === 2;
@@ -530,15 +556,20 @@ export const ProductDetailPage: React.FC = () => {
                         key={colorName}
                         disabled={isOutOfStock}
                         onClick={() => !isOutOfStock && handleSelectColorVariant(colorName)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl text-xs font-bold transition-all border ${
+                        className={`relative flex items-center justify-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full sm:rounded-2xl text-xs font-bold transition-all border shrink-0 ${
                           isOutOfStock
-                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50'
+                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-40'
                             : isSelected
-                            ? 'bg-slate-950 text-amber-300 border-amber-400 shadow-md ring-2 ring-amber-400/30 scale-105'
+                            ? 'bg-amber-50 sm:bg-slate-950 text-slate-900 sm:text-amber-300 border-red-800 sm:border-amber-400 shadow-md ring-2 ring-red-800 sm:ring-amber-400/30 scale-105'
                             : 'bg-white text-slate-800 border-amber-200 hover:border-amber-400 hover:bg-amber-50/50'
                         }`}
+                        title={isOutOfStock ? `${colorName} - OUT OF STOCK` : colorName}
+                        aria-label={colorName}
                       >
-                        <span className={`w-4 h-4 rounded-full ${dotBg} border border-white shadow-sm flex-shrink-0 relative overflow-hidden`}>
+                        <span className={`w-6 h-6 sm:w-4 sm:h-4 rounded-full ${dotBg} border-2 border-white shadow-xs flex-shrink-0 relative overflow-hidden flex items-center justify-center`}>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-white drop-shadow-sm" />
+                          )}
                           {isOutOfStock && (
                             <span className="absolute inset-0 flex items-center justify-center">
                               <span className="w-full h-0.5 bg-red-700 -rotate-45" />
@@ -546,16 +577,16 @@ export const ProductDetailPage: React.FC = () => {
                           )}
                         </span>
 
-                        {/* ONLY THE SELECTED COLOR DISPLAYS ITS NAME */}
+                        {/* Name is HIDDEN on mobile (so all colors stay in ONE line), visible only on desktop */}
                         {isSelected && (
-                          <span className="font-extrabold text-amber-300 text-xs flex items-center gap-1">
+                          <span className="hidden sm:inline-flex font-extrabold text-amber-300 text-xs items-center gap-1">
                             <span>{colorName}</span>
                             <Check className="w-3.5 h-3.5 text-amber-400" />
                           </span>
                         )}
 
                         {isOutOfStock && (
-                          <span className="text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
+                          <span className="hidden sm:inline-block text-[8px] font-black uppercase text-red-700 bg-red-100 px-1 py-0.2 rounded border border-red-200">
                             OUT OF STOCK
                           </span>
                         )}
